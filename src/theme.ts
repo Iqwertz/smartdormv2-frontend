@@ -1,18 +1,15 @@
-// src/theme.ts
 import { createTheme } from "@mui/material/styles";
 import { red } from "@mui/material/colors";
 
-// Define your custom fonts (make sure they are loaded in your public/index.html or via CSS)
-const FONT_FAMILY_PRIMARY = '"Inter", "Roboto", "Helvetica", "Arial", sans-serif';
-const FONT_FAMILY_SECONDARY = '"Poppins", "Roboto", "Helvetica", "Arial", sans-serif';
+const FONT_FAMILY_PRIMARY = 'Geist Sans, "Roboto", "Helvetica", "Arial", sans-serif';
+const FONT_FAMILY_SECONDARY = '"Geist Sans", "Roboto", "Helvetica", "Arial", sans-serif';
 
-// Create a theme instance.
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#3f51b5",
-      light: "#757de8",
-      dark: "#002984",
+      main: "rgb(128, 22, 44);",
+      light: "rgb(204, 99, 120);",
+      dark: "rgb(59, 6, 6);",
     },
     secondary: {
       main: "#f50057",
@@ -21,7 +18,8 @@ const theme = createTheme({
       main: red.A400,
     },
     background: {
-      default: "#fafafa",
+      //Image
+      default: "rgb(255, 218, 218);",
       paper: "#ffffff",
     },
     text: {
@@ -42,7 +40,7 @@ const theme = createTheme({
     },
   },
   shape: {
-    borderRadius: 10,
+    borderRadius: 5,
   },
   // --- Fine-tuning Component Defaults ---
   components: {
@@ -51,24 +49,16 @@ const theme = createTheme({
         variant: "outlined",
       },
       styleOverrides: {
-        root: {
-          // Some CSS applied to the root element
-          // marginBottom: '16px', // Example default margin
-        },
+        root: {},
       },
     },
     MuiOutlinedInput: {
-      // Target the outlined input specifically
       styleOverrides: {
         root: {
-          // Style the root of the outlined input
-          // borderRadius: '12px' // Apply default border radius to ALL outlined inputs
-          // Could adjust default padding via input slot here too:
-          // input: {
-          //   padding: '14px 12px',
-          // }
+          input: {
+            padding: "14px 12px",
+          },
         },
-        // You can target the notch, fieldset etc. here too
         // notchedOutline: {
         //   borderColor: 'rgba(0, 0, 0, 0.1)',
         // },
@@ -83,11 +73,7 @@ const theme = createTheme({
           borderRadius: 10,
           padding: "8px 24px",
         },
-        containedPrimary: {
-          // Styles specifically for variant="contained" color="primary"
-          // backgroundColor: '#ff0000', // Example: Make primary buttons red
-          // '&:hover': { backgroundColor: '#cc0000'}
-        },
+        containedPrimary: {},
       },
     },
   },
