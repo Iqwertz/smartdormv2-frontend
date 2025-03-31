@@ -1,0 +1,9 @@
+// src/styles/global.scss
+@use "./variables";
+
+body {
+  background-color: variables.$background-color;
+  color: variables.$color-text;
+  font-family: "Arial, sans-serif";
+  font-size: variables.$font-size-medium;
+}
