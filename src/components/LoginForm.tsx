@@ -69,13 +69,20 @@ const LoginForm: React.FC = () => {
           pb: 3, // Padding-bottom relative to theme spacing
         }}
       >
-        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          Sign in
-        </Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Typography variant="h3" component="h1" gutterBottom>
+            Login
+          </Typography>
+        </Box>
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}>
+
           <TextField
             margin="normal"
             required
@@ -103,18 +110,26 @@ const LoginForm: React.FC = () => {
             error={!!error}
             helperText={error}
           />
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" checked={keepLoggedIn} onChange={(e) => setKeepLoggedIn(e.target.checked)} />}
-            label="Angemeldet bleiben"
-          />
+           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1}}>
+              <FormControlLabel
+                control={<Checkbox value="remember" color="primary" checked={keepLoggedIn} onChange={(e) => setKeepLoggedIn(e.target.checked)} />}
+                label="Angemeldet bleiben"
+              />
+              <Typography variant="body2" color="textSecondary">
+                <a href="/forgot-password" style={{ textDecoration: 'none', color: 'inherit' }}>
+                Passwort vergessen?
+                </a>
+              </Typography>
+          </Box>
           <Button
             type="submit"
             fullWidth
             variant="contained"
-            sx={{ mt: 3, mb: 2 }}
+            sx={{ mt: 3, mb: 0 }}
           >
             Anmelden
           </Button>
+             
         </Box>
       </Box>
     </Container>
