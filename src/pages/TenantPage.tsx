@@ -3,9 +3,10 @@ import React from 'react';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container'; // Using Container for centering and max-width
+import Container from '@mui/material/Container';
 import CssBaseline from '@mui/material/CssBaseline';
 import Stack from '@mui/material/Stack';
+import LogoutButton from '../components/LogoutButton';
 
 const WelcomeMessage: React.FC = () => (
   <Typography variant="body1">Welcome back, Tenant!</Typography>
@@ -50,6 +51,7 @@ const TenantPage: React.FC = () => {
   return (
     <>
       <CssBaseline />
+      <LogoutButton></LogoutButton>
       <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
         <Typography variant="h4" gutterBottom component="h1">
           Tenant Dashboard

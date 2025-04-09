@@ -1,40 +1,41 @@
+// components/ProtectedRoute.tsx
 import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext'; // Import the custom hook
-import { JSX } from '@emotion/react/jsx-runtime';
+import { Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { RoutePermissions } from '../types/auth';
 
-interface ProtectedRouteProps {
-  children: JSX.Element; // The component to render if authenticated
-  allowedRoles?: ('admin' | 'tenant')[]; // Optional: Specify allowed roles
-}
+interface ProtectedRouteProps extends RoutePermissions {}
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles }) => {
-  const { user, isLoading } = useAuth();
-  const location = useLocation(); // Get current location to redirect back after login
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  requiredUserType = [],
+  requiredRoles = [],
+}) => {
+  const { authState } = useAuth();
 
-  if (isLoading) {
-    // Show a loading indicator while checking authentication
-    // You can replace this with a proper spinner component
-    return <div>Loading authentication status...</div>;
+  if (authState.loading) {
+    return <div>Loading...</div>;  // Nice loading spinner needs to be added
   }
 
-  if (!user) {
-    // User not logged in, redirect to login page
-    // Pass the current location to redirect back after successful login
-    return <Navigate to="/" state={{ from: location }} replace />;
+  if (!authState.isAuthenticated) {
+    return <Navigate to="/login" replace />;
   }
 
-  // Optional: Check for roles if provided
-  if (allowedRoles && user.primary_role && !allowedRoles.includes(user.primary_role)) {
-     // User is logged in but doesn't have the required role
-     // Redirect to login or an "Unauthorized" page
-     console.warn(`User ${user.username} does not have required roles: ${allowedRoles}. Has role: ${user.primary_role}`);
-     // You might want a dedicated /unauthorized page instead of redirecting to login
-     return <Navigate to="/" state={{ from: location }} replace />; // Redirecting to login for simplicity
+  const { user } = authState;
+
+  // Check user_type
+  const hasRequiredUserType =
+    requiredUserType.length === 0 || (user && requiredUserType.includes(user.user_type));
+
+  // Check roles
+  const hasRequiredRole =
+    requiredRoles.length === 0 ||
+    (user && user.groups.some((group) => requiredRoles.includes(group)));
+
+  if (!hasRequiredUserType || !hasRequiredRole) {
+    return <Navigate to="/login" replace />;
   }
 
-  // User is authenticated (and has the right role, if checked)
-  return children;
+  return <Outlet />;
 };
 
 export default ProtectedRoute;

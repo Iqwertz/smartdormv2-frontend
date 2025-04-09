@@ -1,91 +1,84 @@
-import React, { createContext, useState, useContext, useEffect, ReactNode, useCallback } from 'react';
+import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import apiClient from '../services/api';
+import { AuthState } from '../types/auth';
 
-interface UserData {
-  username: string;
-  name: string;
-  surname: string;
-  email: string;
-  groups: string[];
-  is_staff: boolean;
-  is_superuser: boolean;
-  primary_role: 'admin' | 'tenant' | null;
-}
-
-interface AuthContextType {
-  user: UserData | null;
-  isLoading: boolean;
-  login: (userData: UserData) => void;
+interface AuthContextProps {
+  authState: AuthState;
+  login: (username: string, password: string, rememberMe: boolean) => Promise<void>;
   logout: () => Promise<void>;
-  checkAuthStatus: () => Promise<void>; 
+  refreshUser: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<UserData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const checkAuthStatus = useCallback(async () => {
-    setIsLoading(true); // Set loading true when checking
-    try {
-      const response = await apiClient.get<{ authenticated: boolean; user?: UserData }>('/api/auth/me/');
-      if (response.data.authenticated && response.data.user) {
-        setUser(response.data.user);
-      } else {
-        setUser(null);
-      }
-    } catch (error) {
-      console.error("Auth check failed:", error);
-      setUser(null);
-    } finally {
-      setIsLoading(false); 
-    }
-  }, []);
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [authState, setAuthState] = useState<AuthState>({
+    user: null,
+    isAuthenticated: false,
+    loading: true,
+  });
 
   useEffect(() => {
-    checkAuthStatus();
-  }, [checkAuthStatus]);
+    refreshUser();
+  }, []);
 
-  // Function to update user state upon successful login
-  const login = (userData: UserData) => {
-    setUser(userData);
-    setIsLoading(false);
-  };
-
-  // Function to handle logout
-  const logout = async () => {
-    setIsLoading(true); 
+  const refreshUser = async () => {
     try {
-        await apiClient.post('/api/auth/logout/');
-        setUser(null); 
+      const response = await apiClient.get('/api/auth/me/');
+      if (response.data.authenticated) {
+        setAuthState({
+          user: response.data.user,
+          isAuthenticated: true,
+          loading: false,
+        });
+      } else {
+        setAuthState({ user: null, isAuthenticated: false, loading: false });
+      }
     } catch (error) {
-        console.error("Logout failed:", error);
-
-        setUser(null);
-    } finally {
-       setIsLoading(false);
+      console.error('Failed to refresh user:', error);
+      setAuthState({ user: null, isAuthenticated: false, loading: false });
     }
   };
 
-  const value = {
-    user,
-    isLoading,
-    login,
-    logout,
-    checkAuthStatus
+  const login = async (username: string, password: string, rememberMe: boolean) => {
+    try {
+      const response = await apiClient.post('/api/auth/login/', {
+        username,
+        password,
+        rememberMe,
+      });
+      if (response.data.success) {
+        setAuthState({
+          user: response.data.user,
+          isAuthenticated: true,
+          loading: false,
+        });
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error;
+    }
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  const logout = async () => {
+    try {
+      await apiClient.post('/api/auth/logout/', {});
+      setAuthState({ user: null, isAuthenticated: false, loading: false });
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
+  return (
+    <AuthContext.Provider value={{ authState, login, logout, refreshUser }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
+export const useAuth = () => {
+  const context = React.useContext(AuthContext);
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;

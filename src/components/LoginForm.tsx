@@ -1,5 +1,5 @@
 // src/components/LoginForm.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -11,25 +11,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Alert from '@mui/material/Alert';
-import apiClient from '../services/api';
 import { useAuth } from '../context/AuthContext';
-
-interface UserData {
-  username: string;
-  name: string;
-  surname: string;
-  email: string;
-  groups: string[];
-  is_staff: boolean;
-  is_superuser: boolean;
-  primary_role: 'admin' | 'tenant' | null; // Role determined by backend
-}
-
-interface LoginResponse {
-  success: boolean;
-  user?: UserData;
-  message?: string;
-}
 
 const LoginForm: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -38,46 +20,38 @@ const LoginForm: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const { login, authState } = useAuth();
 
-  const from = location.state?.from?.pathname || "/tenant";
+  const from = location.state?.from?.pathname || '/tenant';
+
+  useEffect(() => {
+    if (authState.isAuthenticated && authState.user) {
+      const user = authState.user;
+      if (user.user_type === 'DEPARTMENT') {
+        navigate(location.state?.from?.pathname || '/admin', { replace: true });
+      } else if (user.user_type === 'TENANT') {
+        navigate(from, { replace: true });
+      } else {
+        navigate(from, { replace: true });
+      }
+    }
+  }, [authState, navigate, from, location.state]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
 
     try {
-      const response = await apiClient.post<LoginResponse>(
-        '/api/auth/login/',
-        { username, password, rememberMe }
-      );
-
-      if (response.data.success && response.data.user) {
-        const user = response.data.user;
-        login(user);
-
-        if (user.primary_role === 'admin') {
-            navigate(location.state?.from?.pathname || '/admin', { replace: true });
-        } else if (user.primary_role === 'tenant') {
-            navigate(from, { replace: true });
-        } else {
-             navigate(from, { replace: true });
-        }
-
-      } else {
-        setError(response.data.message || 'Login failed.');
-      }
+      await login(username, password, rememberMe);
     } catch (err: any) {
-        console.error('Login request failed', err);
-        if (err.response) {
-            if (err.response.status === 403) {
-                 setError(err.response.data?.detail || 'Permission denied. CSRF check might have failed.');
-            } else {
-                 setError(err.response.data?.message || 'Invalid username or password.');
-            }
-        } else {
-            setError('Login failed. Could not connect to the server.');
-        }
+      console.error('Login request failed', err);
+      if (err.response?.status === 401) {
+        setError('Invalid username or password.');
+      } else if (err.response?.status === 403) {
+        setError('Permission denied. CSRF check might have failed.');
+      } else {
+        setError('Login failed. Could not connect to the server.');
+      }
     }
   };
 
