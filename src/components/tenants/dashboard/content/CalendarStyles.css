@@ -1,0 +1,37 @@
+/* src/components/dashboard/content/CalendarStyles.css */
+
+/* Basic overrides - MUI's sx prop is often better for theme integration */
+.react-calendar {
+    border: none;
+    /* Remove default border */
+    width: 100%;
+    font-family: inherit;
+    /* Use theme font */
+}
+
+/* Example: Style the active day using theme colors (better done with sx prop) */
+/* .react-calendar__tile--active {
+  background-color: #1976d2; /* Example Primary Color */
+/*  color: white; */
+/* } */
+
+/* Style today's date */
+/* .react-calendar__tile--now { */
+/* background-color: rgba(0, 0, 0, 0.08); Example Hover Color */
+/* } */
+
+/* Make tiles fill space better if needed */
+.react-calendar__month-view__days__day {
+    flex-basis: 14.28% !important;
+    /* Ensure 7 columns */
+    max-width: 14.28%;
+    padding: 0.5em 0.25em;
+    /* Adjust padding */
+    overflow: hidden;
+}
+
+/* Adjust navigation button size/appearance */
+.react-calendar__navigation button {
+    min-width: 44px;
+    padding: 0.5em;
+}
