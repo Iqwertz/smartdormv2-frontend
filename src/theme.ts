@@ -76,6 +76,41 @@ const theme = createTheme({
         containedPrimary: {},
       },
     },
+    MuiDrawer: {
+      styleOverrides: {
+        paper: ({ theme }) => ({
+          // Example: Use paper background, or maybe primary.dark?
+          // backgroundColor: theme.palette.background.paper,
+          // color: theme.palette.text.primary,
+          backgroundColor: theme.palette.primary.dark, // Example: Dark sidebar
+          color: theme.palette.getContrastText(theme.palette.primary.dark), // Ensure text is readable
+        }),
+      },
+    },
+    MuiListItemButton: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          // Example: Style hover/selected states if needed
+          "&:hover": {
+            backgroundColor: "rgba(255, 255, 255, 0.08)", // Subtle hover on dark
+          },
+          "&.Mui-selected": {
+            backgroundColor: theme.palette.primary.main, // Selected item uses primary main
+            "&:hover": {
+              backgroundColor: theme.palette.primary.light, // Slightly lighter on hover when selected
+            },
+          },
+        }),
+      },
+    },
+    MuiListItemIcon: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          // Match icon color to text color inside the drawer
+          color: theme.palette.getContrastText(theme.palette.primary.dark),
+        }),
+      },
+    },
   },
 });
 
