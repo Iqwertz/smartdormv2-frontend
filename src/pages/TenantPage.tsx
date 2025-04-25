@@ -20,7 +20,7 @@ const TenantPage: React.FC = () => {
         component="main"
         sx={{
           flexGrow: 1, // Takes up remaining horizontal space
-          p: 3, // Add padding around the content area
+          p: 1, // Add padding around the content area
           // The sidebar library might handle margin/padding adjustment automatically when open/closed.
           // If not, you might need to add dynamic marginLeft based on sidebar state/width.
           // However, modern sidebar implementations often handle this via transforms or internal padding.

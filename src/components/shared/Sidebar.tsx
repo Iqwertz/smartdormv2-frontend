@@ -14,14 +14,12 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import CodeIcon from "@mui/icons-material/Code";
+import { useAuth } from "../../context/AuthContext";
 
-/* interface SidebarProps {
-  // Add any props you need here
-} */
-
-const Sidebar: React.FC<SidebarProps> = () => {
+const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const { authState } = useAuth();
 
   // Handle sidebar toggle
   const toggleSidebar = () => {
@@ -31,7 +29,7 @@ const Sidebar: React.FC<SidebarProps> = () => {
   // Check if screen is mobile size
   useEffect(() => {
     const checkIfMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
+      setIsMobile(window.innerWidth <= 1100);
     };
 
     // Initial check
@@ -150,8 +148,8 @@ const Sidebar: React.FC<SidebarProps> = () => {
           <li className="profile">
             <div className="profile-details">
               <div className="name_job">
-                <div className="name">Prem Shahi</div>
-                <div className="job">Web designer</div>
+                <div className="name">{authState?.user?.username || "Loading..."}</div>
+                <div className="job">{authState?.user?.name || "Loading..."}</div>
               </div>
             </div>
             <LogoutIcon className="logout-icon" />
