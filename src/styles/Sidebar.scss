@@ -16,9 +16,11 @@
   width: 70px;
   background: variables.$paper-color;
   backdrop-filter: blur(variables.$paper-blur);
+  box-shadow: variables.$box-shadow;
   padding: 6px 14px;
   z-index: 99;
   transition: all 0.5s ease;
+  //border-radius: 0px 10px 10px 0px;
 
   &.open {
     width: 250px;

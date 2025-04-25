@@ -5,17 +5,81 @@ import UserProfile from "../components/tenants/dashboard/content/UserProfile";
 import DashboardCard from "../components/tenants/dashboard/DashboardCard";
 import "../styles/tenantPage.scss";
 import Settings from "../components/tenants/dashboard/content/Settings";
-import SidebarLayout from "../components/shared/Sidebar"; // Import Sidebar
+import Sidebar, { SidebarItemProps } from "../components/shared/Sidebar"; // Import Sidebar
+import HomeIcon from "@mui/icons-material/Home";
+import PersonIcon from "@mui/icons-material/Person";
+import ChatIcon from "@mui/icons-material/Chat";
+import PieChartIcon from "@mui/icons-material/PieChart";
+import FolderIcon from "@mui/icons-material/Folder";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import SettingsIcon from "@mui/icons-material/Settings";
+import { useAuth } from "../context/AuthContext";
 
 const TenantPage: React.FC = () => {
+  const { logout } = useAuth();
+  const sidebarItems: SidebarItemProps[] = [
+    {
+      id: "dashboard",
+      icon: <HomeIcon />,
+      title: "Dashboard",
+      path: "/dashboard",
+    },
+    {
+      id: "user",
+      icon: <PersonIcon />,
+      title: "User",
+      path: "/user",
+    },
+    {
+      id: "messages",
+      icon: <ChatIcon />,
+      title: "Messages",
+      path: "/messages",
+    },
+    {
+      id: "analytics",
+      icon: <PieChartIcon />,
+      title: "Analytics",
+      path: "/analytics",
+      groups: ["admin", "netzwerkreferat"],
+    },
+    {
+      id: "files",
+      icon: <FolderIcon />,
+      title: "File Manager",
+      path: "/files",
+    },
+    {
+      id: "orders",
+      icon: <ShoppingCartIcon />,
+      title: "Orders",
+      path: "/orders",
+      groups: ["admin", "sales"],
+    },
+    {
+      id: "saved",
+      icon: <FavoriteIcon />,
+      title: "Saved",
+      path: "/saved",
+    },
+    {
+      id: "settings",
+      icon: <SettingsIcon />,
+      title: "Setting",
+      path: "/settings",
+      groups: ["admin"],
+    },
+  ];
+
+  const handleLogout = async () => {
+    await logout();
+  };
   return (
     // Use Flexbox for the overall layout
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
       {/* Sidebar takes its defined width */}
-      <SidebarLayout />
-
-      {/* Main content area takes remaining space */}
-      {/* Add component="main" for semantic HTML */}
+      <Sidebar items={sidebarItems} onLogout={handleLogout} />
       <Box
         component="main"
         sx={{

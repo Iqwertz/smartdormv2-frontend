@@ -1,22 +1,25 @@
 import React, { useState, useEffect } from "react";
 import "../../styles/Sidebar.scss"; // Import your sidebar styles
-// Material UI Icons
-import HomeIcon from "@mui/icons-material/Home";
-import SearchIcon from "@mui/icons-material/Search";
-import PersonIcon from "@mui/icons-material/Person";
-import ChatIcon from "@mui/icons-material/Chat";
-import PieChartIcon from "@mui/icons-material/PieChart";
-import FolderIcon from "@mui/icons-material/Folder";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import SettingsIcon from "@mui/icons-material/Settings";
-import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
-import CodeIcon from "@mui/icons-material/Code";
+import LogoutIcon from "@mui/icons-material/Logout";
 import { useAuth } from "../../context/AuthContext";
 
-const Sidebar: React.FC = () => {
+// Define the types for our props
+export interface SidebarItemProps {
+  id: string;
+  icon: React.ReactNode;
+  title: string;
+  path: string;
+  groups?: string[]; // Optional groups property for access control
+}
+
+interface SidebarProps {
+  items: SidebarItemProps[];
+  onLogout?: () => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ items, onLogout }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const { authState } = useAuth();
@@ -59,6 +62,27 @@ const Sidebar: React.FC = () => {
     };
   }, [isMobile, isOpen]);
 
+  // Check if user has access to a sidebar item based on groups
+  const hasAccess = (item: SidebarItemProps): boolean => {
+    // If no groups are specified for the item, everyone has access
+    if (!item.groups || item.groups.length === 0) {
+      return true;
+    }
+
+    // If no user or no user groups, deny access to group-restricted items
+    if (!authState?.user?.groups || authState.user.groups.length === 0) {
+      return false;
+    }
+
+    if (authState.user == null) {
+      console.error("user not authenticated");
+      return false;
+    }
+
+    // Check if there's an overlap between user groups and required groups
+    return item.groups.some((group) => authState.user?.groups.includes(group));
+  };
+
   // Render mobile menu button only when collapsed
   const renderMobileMenuButton = () => {
     if (isMobile && !isOpen) {
@@ -84,67 +108,19 @@ const Sidebar: React.FC = () => {
           )}
         </div>
         <ul className="nav-list">
-          {/* <li>
-            <SearchIcon className="search-icon" onClick={toggleSidebar} />
-            <input type="text" placeholder="Search..." />
-            <span className="tooltip">Search</span>
-          </li> */}
-          <li>
-            <a href="#">
-              <HomeIcon />
-              <span className="links_name">Dashboard</span>
-            </a>
-            <span className="tooltip">Dashboard</span>
-          </li>
-          <li>
-            <a href="#">
-              <PersonIcon />
-              <span className="links_name">User</span>
-            </a>
-            <span className="tooltip">User</span>
-          </li>
-          <li>
-            <a href="#">
-              <ChatIcon />
-              <span className="links_name">Messages</span>
-            </a>
-            <span className="tooltip">Messages</span>
-          </li>
-          <li>
-            <a href="#">
-              <PieChartIcon />
-              <span className="links_name">Analytics</span>
-            </a>
-            <span className="tooltip">Analytics</span>
-          </li>
-          <li>
-            <a href="#">
-              <FolderIcon />
-              <span className="links_name">File Manager</span>
-            </a>
-            <span className="tooltip">Files</span>
-          </li>
-          <li>
-            <a href="#">
-              <ShoppingCartIcon />
-              <span className="links_name">Order</span>
-            </a>
-            <span className="tooltip">Order</span>
-          </li>
-          <li>
-            <a href="#">
-              <FavoriteIcon />
-              <span className="links_name">Saved</span>
-            </a>
-            <span className="tooltip">Saved</span>
-          </li>
-          <li>
-            <a href="#">
-              <SettingsIcon />
-              <span className="links_name">Setting</span>
-            </a>
-            <span className="tooltip">Setting</span>
-          </li>
+          {/* Map through the items prop and only render items the user has access to */}
+          {items.map(
+            (item) =>
+              hasAccess(item) && (
+                <li key={item.id}>
+                  <a href={item.path}>
+                    {item.icon}
+                    <span className="links_name">{item.title}</span>
+                  </a>
+                  <span className="tooltip">{item.title}</span>
+                </li>
+              )
+          )}
           <li className="profile">
             <div className="profile-details">
               <div className="name_job">
@@ -152,7 +128,7 @@ const Sidebar: React.FC = () => {
                 <div className="job">{authState?.user?.name || "Loading..."}</div>
               </div>
             </div>
-            <LogoutIcon className="logout-icon" />
+            <LogoutIcon className="logout-icon" onClick={onLogout} />
           </li>
         </ul>
       </div>
