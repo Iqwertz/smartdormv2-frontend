@@ -1,5 +1,5 @@
-import React from 'react';
-import LogoutButton from '../components/LogoutButton';
+import React from "react";
+import LogoutButton from "../components/LogoutButton";
 
 const AdminPage: React.FC = () => {
   return (
@@ -9,6 +9,6 @@ const AdminPage: React.FC = () => {
       <LogoutButton />
     </div>
   );
-}
+};
 
 export default AdminPage;
