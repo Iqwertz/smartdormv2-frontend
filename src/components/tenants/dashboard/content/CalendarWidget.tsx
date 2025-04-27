@@ -94,12 +94,15 @@ const CalendarWidget: React.FC = () => {
             const startDate = dayjs(event.startDate.toJSDate());
             const endDate = dayjs(event.endDate.toJSDate());
 
-            // Check if it's an all-day event (ends at midnight the next day, or duration is >= 1 day)
-            // ICS standard is complex here, this is a common heuristic
-            const isAllDay =
-              (event.endDate.isDate && !endDate.isSame(startDate, "day")) || endDate.diff(startDate, "day") >= 1;
+            let isAllDay = false;
+            const duration = event.duration.toSeconds();
+            if (duration > 0 && duration % (24 * 60 * 60) === 0) {
+              isAllDay = true;
+            } else if (event.endDate.isDate && !endDate.isSame(startDate, "day")) {
+              // Check if end is midnight
+              isAllDay = endDate.hour() === 0 && endDate.minute() === 0 && endDate.second() === 0;
+            }
 
-            // Basic handling for now, complex recurrence needs iterator
             parsedEvents.push({
               uid: event.uid || `${event.summary}-${startDate.toISOString()}`,
               summary: event.summary || "Kein Titel",
@@ -130,8 +133,13 @@ const CalendarWidget: React.FC = () => {
   const eventDays = useMemo(() => {
     const days = new Set<string>();
     events.forEach((event) => {
-      let current = event.start;
-      while (current.isBefore(event.end, "day") || current.isSame(event.end, "day")) {
+      let current = event.start.startOf("day");
+      const iterationEndDate =
+        event.isAllDay && event.end.isSame(event.end.startOf("day"))
+          ? event.end.subtract(1, "day").endOf("day")
+          : event.end;
+
+      while (current.isBefore(iterationEndDate, "day") || current.isSame(iterationEndDate, "day")) {
         days.add(current.format("YYYY-MM-DD"));
         current = current.add(1, "day");
       }
@@ -147,16 +155,17 @@ const CalendarWidget: React.FC = () => {
     setValue(day);
 
     const eventsOnDay = events.filter((event) => {
-      // Check if 'day' is between event start and end (inclusive)
-      const targetDay = day.startOf("day");
-      const startDay = event.start.startOf("day");
-      // Adjust end date for check: if event ends at midnight, consider it ending the previous day
-      const endDay =
-        event.end.isSame(event.end.startOf("day")) && !event.end.isSame(event.start.startOf("day"))
-          ? event.end.subtract(1, "millisecond").endOf("day")
-          : event.end.endOf("day");
+      const targetDayStart = day.startOf("day");
+      const targetDayEnd = day.endOf("day");
+      const eventStart = event.start;
+      const eventEnd = event.end;
 
-      return targetDay.isBetween(startDay, endDay, "day", "[]"); // '[]' means inclusive
+      const effectiveEventEnd =
+        event.isAllDay && eventEnd.isSame(eventEnd.startOf("day")) && !eventEnd.isSame(eventStart, "day")
+          ? eventEnd.subtract(1, "millisecond")
+          : eventEnd;
+
+      return eventStart.isBefore(targetDayEnd) && effectiveEventEnd.isAfter(targetDayStart);
     });
 
     setSelectedDate(day);
@@ -166,14 +175,17 @@ const CalendarWidget: React.FC = () => {
 
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
-    setSelectedDate(null); // Clear selected date on close
+    setSelectedDate(null);
   };
 
   const formatEventTime = (event: CalendarEvent): string => {
     if (event.isAllDay) return "Ganztägig";
     const start = event.start.format("HH:mm");
-    // Don't show end time if it's same as start (can happen with short events)
-    const end = event.end.isSame(event.start) ? "" : ` - ${event.end.format("HH:mm")}`;
+
+    const end =
+      event.end.isSame(event.start) || event.end.isSame(event.start.add(1, "day").startOf("day"))
+        ? ""
+        : ` - ${event.end.format("HH:mm")}`;
     return `${start}${end}`;
   };
 
