@@ -17,6 +17,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { useAuth } from "../context/AuthContext";
 import CalendarWidget from "../components/tenants/dashboard/content/CalendarWidget";
+import MyEngagements from "../components/tenants/dashboard/content/MyEngagements";
 
 const TenantPage: React.FC = () => {
   const { logout } = useAuth();
@@ -91,7 +92,9 @@ const TenantPage: React.FC = () => {
             // The sidebar library might handle margin/padding adjustment automatically when open/closed.
             // If not, you might need to add dynamic marginLeft based on sidebar state/width.
             // However, modern sidebar implementations often handle this via transforms or internal padding.
-            overflow: "auto", // Add scroll for content overflow
+            overflowX: "hidden", // Prevent horizontal overflow
+            overflowY: "auto",
+            height: "100vh", // Ensure it takes full height
             position: "relative", // Needed for the ::before pseudo-element if you keep it
             zIndex: 1, // Ensure content is above the potential background pseudo-element
           }}
@@ -103,10 +106,12 @@ const TenantPage: React.FC = () => {
               <DashboardCard title="Deine Daten">
                 <UserProfile />
               </DashboardCard>
-              <DashboardCard title="Statistics">
-                {/* Placeholder content */}
-                <div>Some stats here</div>
-                <div>Some stats here</div>
+              <DashboardCard
+                title="Meine Referate"
+                cardSx={{ maxHeight: "calc(35vh + 40px)", overflowY: "auto" }}
+                contentSx={{ height: "100%", display: "flex", flexDirection: "column" }}
+              >
+                <MyEngagements />
               </DashboardCard>
             </div>
             <div className="right">

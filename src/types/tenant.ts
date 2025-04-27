@@ -23,3 +23,18 @@ export interface TenantProfile {
   username: string | null;
   new_address: string | null;
 }
+
+export interface DepartmentInfo {
+  name: string;
+  full_name: string;
+}
+
+export interface Engagement {
+  id: number;
+  semester: string;
+  points: number;
+  note: string | null;
+  compensate: boolean;
+  department: DepartmentInfo;
+  external_id: string;
+}
