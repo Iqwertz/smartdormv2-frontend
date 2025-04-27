@@ -1,5 +1,5 @@
 // src/components/shared/Sidebar.tsx
-import React, { useState, useEffect, MouseEvent } from "react"; // Import MouseEvent
+import React, { useState, useEffect, MouseEvent } from "react";
 import "../../styles/Sidebar.scss";
 import MenuIcon from "@mui/icons-material/Menu";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
@@ -100,17 +100,15 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onLogout }) => {
     // If the click was not on an interactive element and the sidebar is closed, open it.
     setIsOpen(true);
   };
-  // --- End New Handler ---
 
   return (
     <>
-      {/* Add onClick handler to the main sidebar div */}
       <div
         className={`sidebar ${isOpen ? "open" : ""} ${isMobile && !isOpen ? "mobile-collapsed" : ""}`}
-        onClick={handleSidebarClick} // <-- Add the handler here
+        onClick={handleSidebarClick}
       >
         <div className="logo-details">
-          <img src="/logo.svg" alt="logo" /> {/* Use absolute path if logo is in public */}
+          <img src="/logo.svg" alt="logo" />
           <div className="logo_name">Smartdorm</div>
           {/* Menu button's onClick already handles toggling */}
           {(isOpen || !isMobile) && (
@@ -124,7 +122,6 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onLogout }) => {
             (item) =>
               hasAccess(item) && (
                 <li key={item.id}>
-                  {/* Links' onClick behavior is default navigation */}
                   <a href={item.path}>
                     {item.icon}
                     <span className="links_name">{item.title}</span>
@@ -140,7 +137,6 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onLogout }) => {
                 <div className="job">{authState?.user?.name || "Loading..."}</div>
               </div>
             </div>
-            {/* Logout icon's onClick already handles logout */}
             <LogoutIcon className="logout-icon" onClick={onLogout} />
           </li>
         </ul>
