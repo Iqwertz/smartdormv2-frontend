@@ -19,7 +19,7 @@ const theme = createTheme({
     },
     background: {
       //Image
-      default: "linear-gradient(135deg, rgb(255, 218, 218) 0%, rgb(245, 200, 200) 100%)",
+      default: "#f5f5f5",
       paper: "#ffffff",
     },
     text: {

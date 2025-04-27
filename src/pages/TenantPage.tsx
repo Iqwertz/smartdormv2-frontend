@@ -17,7 +17,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { useAuth } from "../context/AuthContext";
 
-const AdminPage: React.FC = () => {
+const TenantPage: React.FC = () => {
   const { logout } = useAuth();
   const sidebarItems: SidebarItemProps[] = [
     {
@@ -123,4 +123,4 @@ const AdminPage: React.FC = () => {
   );
 };
 
-export default AdminPage;
+export default TenantPage;

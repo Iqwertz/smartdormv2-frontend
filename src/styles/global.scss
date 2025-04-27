@@ -6,10 +6,11 @@ body {
   color: variables.$color-text;
   font-family: "Arial, sans-serif";
   font-size: variables.$font-size-medium;
+  overflow: hidden;
 }
 
-.background{
-    background-image: url(./img/Wohnheim.jpg);
+.background {
+  background-image: url(./img/Wohnheim.jpg);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

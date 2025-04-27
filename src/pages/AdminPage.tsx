@@ -13,8 +13,9 @@ import {
   People,
 } from "@mui/icons-material";
 import DashboardCard from "../components/tenants/dashboard/DashboardCard";
+import TenantDataTable from "../components/admin/TenantDataTable";
 
-const TenantPage: React.FC = () => {
+const AdminPage: React.FC = () => {
   const { logout } = useAuth();
   const sidebarItems: SidebarItemProps[] = [
     {
@@ -76,11 +77,18 @@ const TenantPage: React.FC = () => {
             zIndex: 1, // Ensure content is above the potential background pseudo-element
           }}
         >
-          <DashboardCard title="Deine Daten">test</DashboardCard>
+          <DashboardCard
+            title="Bewohner Übersicht"
+            cardSx={{ flexGrow: 1 }}
+            contentSx={{ height: "calc(85vh + 40px)" }}
+          >
+            {" "}
+            <TenantDataTable />
+          </DashboardCard>
         </Box>
       </Box>
     </div>
   );
 };
 
-export default TenantPage;
+export default AdminPage;

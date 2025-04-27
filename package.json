@@ -15,6 +15,7 @@
     "@fontsource/geist-sans": "^5.2.5",
     "@mui/icons-material": "^7.0.2",
     "@mui/material": "^7.0.1",
+    "@mui/x-data-grid": "^8.1.0",
     "@types/axios": "^0.14.4",
     "@types/react-router-dom": "^5.3.3",
     "@types/sass": "^1.45.0",
