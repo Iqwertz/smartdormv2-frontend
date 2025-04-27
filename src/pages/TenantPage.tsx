@@ -16,6 +16,7 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { useAuth } from "../context/AuthContext";
+import CalendarWidget from "../components/tenants/dashboard/content/CalendarWidget";
 
 const TenantPage: React.FC = () => {
   const { logout } = useAuth();
@@ -111,6 +112,9 @@ const TenantPage: React.FC = () => {
             <div className="right">
               <DashboardCard title="Notifications">
                 <div>Some notifications here</div>
+              </DashboardCard>
+              <DashboardCard title="Kalendar">
+                <CalendarWidget></CalendarWidget>
               </DashboardCard>
               <DashboardCard title="Settings">
                 <Settings />
