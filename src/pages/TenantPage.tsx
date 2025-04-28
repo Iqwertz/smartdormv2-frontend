@@ -8,16 +8,10 @@ import "../styles/global.scss";
 import Settings from "../components/tenants/dashboard/content/Settings";
 import Sidebar, { SidebarItemProps } from "../components/shared/Sidebar"; // Import Sidebar
 import HomeIcon from "@mui/icons-material/Home";
-import PersonIcon from "@mui/icons-material/Person";
-import ChatIcon from "@mui/icons-material/Chat";
-import PieChartIcon from "@mui/icons-material/PieChart";
-import FolderIcon from "@mui/icons-material/Folder";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import SettingsIcon from "@mui/icons-material/Settings";
 import { useAuth } from "../context/AuthContext";
 import CalendarWidget from "../components/tenants/dashboard/content/CalendarWidget";
 import MyEngagements from "../components/tenants/dashboard/content/MyEngagements";
+import { AssignmentIndOutlined } from "@mui/icons-material";
 
 const TenantPage: React.FC = () => {
   const { logout } = useAuth();
@@ -29,49 +23,10 @@ const TenantPage: React.FC = () => {
       path: "/dashboard",
     },
     {
-      id: "user",
-      icon: <PersonIcon />,
-      title: "User",
-      path: "/user",
-    },
-    {
-      id: "messages",
-      icon: <ChatIcon />,
-      title: "Messages",
-      path: "/messages",
-    },
-    {
-      id: "analytics",
-      icon: <PieChartIcon />,
-      title: "Analytics",
-      path: "/analytics",
-      groups: ["admin", "netzwerkreferat"],
-    },
-    {
-      id: "files",
-      icon: <FolderIcon />,
-      title: "File Manager",
-      path: "/files",
-    },
-    {
-      id: "orders",
-      icon: <ShoppingCartIcon />,
-      title: "Orders",
-      path: "/orders",
-      groups: ["admin", "sales"],
-    },
-    {
-      id: "saved",
-      icon: <FavoriteIcon />,
-      title: "Saved",
-      path: "/saved",
-    },
-    {
-      id: "settings",
-      icon: <SettingsIcon />,
-      title: "Setting",
-      path: "/settings",
-      groups: ["admin"],
+      id: "hsv",
+      icon: <AssignmentIndOutlined />,
+      title: "HSV",
+      path: "/hsv",
     },
   ];
 
@@ -82,26 +37,20 @@ const TenantPage: React.FC = () => {
     // Use Flexbox for the overall layout
     <div className="background">
       <Box sx={{ display: "flex", minHeight: "100vh" }}>
-        {/* Sidebar takes its defined width */}
         <Sidebar items={sidebarItems} onLogout={handleLogout} />
         <Box
           component="main"
           sx={{
-            flexGrow: 1, // Takes up remaining horizontal space
-            p: 1, // Add padding around the content area
-            // The sidebar library might handle margin/padding adjustment automatically when open/closed.
-            // If not, you might need to add dynamic marginLeft based on sidebar state/width.
-            // However, modern sidebar implementations often handle this via transforms or internal padding.
-            overflowX: "hidden", // Prevent horizontal overflow
+            flexGrow: 1,
+            p: 1,
+            overflowX: "hidden",
             overflowY: "auto",
-            height: "100vh", // Ensure it takes full height
-            position: "relative", // Needed for the ::before pseudo-element if you keep it
-            zIndex: 1, // Ensure content is above the potential background pseudo-element
+            height: "100vh",
+            position: "relative",
+            zIndex: 1,
           }}
         >
-          {/* Your existing grid layout */}
           <div className="grid">
-            {/* The ::before element for background blur is now applied here if needed */}
             <div className="left">
               <DashboardCard title="Deine Daten">
                 <UserProfile />
