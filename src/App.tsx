@@ -4,6 +4,7 @@ import LoginPage from "./pages/LoginPage";
 import AdminPage from "./pages/AdminPage";
 import TenantPage from "./pages/TenantPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import HSVPage from "./pages/shared/HSVPage";
 
 function App() {
   return (
@@ -12,13 +13,16 @@ function App() {
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
 
-        {/* Protected Routes */}
+        {/* Protected Routes for Tenants */}
         <Route element={<ProtectedRoute requiredUserType={["TENANT"]} />}>
           <Route path="/tenant" element={<TenantPage />} />
+          <Route path="/tenant/hsv" element={<HSVPage />} />
         </Route>
 
+        {/* Protected Routes for Departments */}
         <Route element={<ProtectedRoute requiredUserType={["DEPARTMENT"]} />}>
           <Route path="/admin" element={<AdminPage />} />
+          <Route path="/admin/hsv" element={<HSVPage />} />
         </Route>
 
         {/* Example Role Protected Route */}

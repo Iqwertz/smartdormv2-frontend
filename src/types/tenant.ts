@@ -38,3 +38,21 @@ export interface Engagement {
   department: DepartmentInfo;
   external_id: string;
 }
+
+export interface HsvTenant {
+  name: string;
+  surname: string;
+  email: string | null;
+  tel_number: string | null;
+  current_room: string | null;
+  current_floor: string | null;
+}
+
+export interface HsvEngagementGroup {
+  department_id: number;
+  department_name: string;
+  department_full_name: string;
+  semester: string;
+  tenants: HsvTenant[];
+  group_id: string;
+}
