@@ -6,38 +6,16 @@ import DashboardCard from "../components/tenants/dashboard/DashboardCard";
 import "../styles/bento-layout.scss";
 import "../styles/global.scss";
 import Settings from "../components/tenants/dashboard/content/Settings";
-import Sidebar, { SidebarItemProps } from "../components/shared/Sidebar"; // Import Sidebar
-import HomeIcon from "@mui/icons-material/Home";
-import { useAuth } from "../context/AuthContext";
 import CalendarWidget from "../components/tenants/dashboard/content/CalendarWidget";
 import MyEngagements from "../components/tenants/dashboard/content/MyEngagements";
-import { AssignmentIndOutlined } from "@mui/icons-material";
+import TenantSidebar from "../components/tenants/TenantSidebar";
 
 const TenantPage: React.FC = () => {
-  const { logout } = useAuth();
-  const sidebarItems: SidebarItemProps[] = [
-    {
-      id: "dashboard",
-      icon: <HomeIcon />,
-      title: "Dashboard",
-      path: "/dashboard",
-    },
-    {
-      id: "hsv",
-      icon: <AssignmentIndOutlined />,
-      title: "HSV",
-      path: "/hsv",
-    },
-  ];
-
-  const handleLogout = async () => {
-    await logout();
-  };
   return (
     // Use Flexbox for the overall layout
     <div className="background">
       <Box sx={{ display: "flex", minHeight: "100vh" }}>
-        <Sidebar items={sidebarItems} onLogout={handleLogout} />
+        <TenantSidebar />
         <Box
           component="main"
           sx={{
