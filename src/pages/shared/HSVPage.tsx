@@ -28,6 +28,7 @@ import apiClient from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import TenantSidebar from "../../components/tenants/TenantSidebar";
 import AdminSidebar from "../../components/admin/AdminSidebar";
+import DashboardCard from "../../components/tenants/dashboard/DashboardCard";
 
 const HSVPage: React.FC = () => {
   const [engagementGroups, setEngagementGroups] = useState<HsvEngagementGroup[]>([]);
@@ -78,7 +79,6 @@ const HSVPage: React.FC = () => {
       .map((group) => {
         const groupTitle = `${group.department_full_name} ${group.semester}`.toLowerCase();
         const groupMatches = groupTitle.includes(lowerCaseSearchTerm);
-        // Match tenants
         const matchingTenants = group.tenants.filter(
           (tenant) =>
             `${tenant.name} ${tenant.surname}`.toLowerCase().includes(lowerCaseSearchTerm) ||
@@ -126,7 +126,6 @@ const HSVPage: React.FC = () => {
             component="span"
             sx={{ display: "flex", flexDirection: "column", fontSize: "0.8rem", color: "text.secondary", mt: 0.5 }}
           >
-            {/* Email Link */}
             <Box component="span" sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
               <EmailOutlined fontSize="inherit" sx={{ mr: 0.5, flexShrink: 0 }} />
               {tenant.email ? (
@@ -137,7 +136,6 @@ const HSVPage: React.FC = () => {
                 "N/A"
               )}
             </Box>
-            {/* Phone Link */}
             <Box component="span" sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
               <PhoneOutlined fontSize="inherit" sx={{ mr: 0.5, flexShrink: 0 }} />
               {tenant.tel_number ? (
@@ -148,12 +146,10 @@ const HSVPage: React.FC = () => {
                 "N/A"
               )}
             </Box>
-            {/* Room */}
             <Box component="span" sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
               <MeetingRoomOutlined fontSize="inherit" sx={{ mr: 0.5, flexShrink: 0 }} />
               Zimmer: {tenant.current_room || "N/A"}
             </Box>
-            {/* Floor */}
             <Box component="span" sx={{ display: "flex", alignItems: "center" }}>
               <LocationCityOutlined fontSize="inherit" sx={{ mr: 0.5, flexShrink: 0 }} />
               Flur: {tenant.current_floor || "N/A"}
@@ -208,11 +204,7 @@ const HSVPage: React.FC = () => {
             height: "100vh",
           }}
         >
-          <Typography variant="h4" gutterBottom component="h1">
-            HSV Übersicht ({filteredGroups.length > 0 ? filteredGroups[0].semester : "..."}) {/* Show semester */}
-          </Typography>
-
-          <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
+          <DashboardCard title="Suche">
             <TextField
               fullWidth
               label="Suche nach Referat, Semester, Name, E-Mail, Telefon, Zimmer..."
@@ -221,89 +213,98 @@ const HSVPage: React.FC = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               size="small"
             />
-          </Paper>
+          </DashboardCard>
 
-          {loading && (
-            <Box display="flex" justifyContent="center" p={5}>
-              <CircularProgress />
-            </Box>
-          )}
-          {error && !loading && <Alert severity="error">{error}</Alert>}
-          {!loading && !error && filteredGroups.length === 0 && (
-            <Typography sx={{ textAlign: "center", mt: 4 }}>
-              {searchTerm ? "Keine passenden Einträge gefunden." : "Keine HSV-Daten für diesen Semester verfügbar."}
-            </Typography>
-          )}
+          <DashboardCard title="HSV">
+            {loading && (
+              <Box display="flex" justifyContent="center" p={5}>
+                <CircularProgress />
+              </Box>
+            )}
+            {error && !loading && <Alert severity="error">{error}</Alert>}
+            {!loading && !error && filteredGroups.length === 0 && (
+              <Typography sx={{ textAlign: "center", mt: 4 }}>
+                {searchTerm ? "Keine passenden Einträge gefunden." : "Keine HSV-Daten für diesen Semester verfügbar."}
+              </Typography>
+            )}
 
-          {!loading && !error && filteredGroups.length > 0 && (
-            <Paper elevation={3} sx={{ overflow: "hidden" }}>
-              <List disablePadding>
-                {filteredGroups.map((group, index) => {
-                  // --- Special FS Grouping Logic ---
-                  const isFlursprecher = group.department_name === "FS";
-                  let groupedByFloor: Record<string, HsvTenant[]> | null = null;
-                  let sortedFloorKeys: string[] = [];
-                  if (isFlursprecher) {
-                    groupedByFloor = groupTenantsByFloor(group.tenants);
-                    sortedFloorKeys = sortFloorKeys(Object.keys(groupedByFloor));
-                  }
-                  // --- End Special FS Logic ---
+            {!loading && !error && filteredGroups.length > 0 && (
+              <Paper elevation={0} sx={{ overflow: "hidden" }}>
+                <List disablePadding>
+                  {filteredGroups.map((group, index) => {
+                    // --- Special FS Grouping Logic ---
+                    const isFlursprecher = group.department_name === "FS";
+                    let groupedByFloor: Record<string, HsvTenant[]> | null = null;
+                    let sortedFloorKeys: string[] = [];
+                    if (isFlursprecher) {
+                      groupedByFloor = groupTenantsByFloor(group.tenants);
+                      sortedFloorKeys = sortFloorKeys(Object.keys(groupedByFloor));
+                    }
+                    // --- End Special FS Logic ---
 
-                  return (
-                    <React.Fragment key={group.group_id}>
-                      <ListItem
-                        button
-                        onClick={() => handleToggleExpand(group.group_id)}
-                        sx={{ backgroundColor: "rgba(0, 0, 0, 0.03)" }}
-                      >
-                        <ListItemText
-                          // Use department_full_name here
-                          primary={`${group.department_full_name} (${group.semester})`}
-                          primaryTypographyProps={{ fontWeight: "medium" }}
-                          secondary={`${group.tenants.length} Referenten`}
-                        />
-                        <IconButton edge="end" size="small">
-                          {expanded[group.group_id] ? <ExpandLess /> : <ExpandMore />}
-                        </IconButton>
-                      </ListItem>
-                      <Collapse in={expanded[group.group_id]} timeout="auto" unmountOnExit>
-                        {/* --- Conditional Rendering based on FS --- */}
-                        {isFlursprecher && groupedByFloor ? (
-                          // Render FS grouped by floor
-                          <List component="div" disablePadding dense sx={{ pl: 2 }}>
-                            {" "}
-                            {/* Indent floor groups */}
-                            {sortedFloorKeys.map((floorKey) => (
-                              <React.Fragment key={floorKey}>
-                                <Typography
-                                  variant="overline"
-                                  sx={{ display: "block", pl: 2, mt: 1, fontWeight: "bold", color: "text.secondary" }}
-                                >
-                                  {floorKey}
-                                </Typography>
-                                {groupedByFloor![floorKey].map((tenant) => renderTenantDetails(tenant))}
-                              </React.Fragment>
-                            ))}
-                          </List>
-                        ) : // Render other departments normally
-                        group.tenants.length > 0 ? (
-                          <List component="div" disablePadding dense>
-                            {group.tenants.map((tenant) => renderTenantDetails(tenant))}
-                          </List>
-                        ) : (
-                          <Typography sx={{ p: 2, pl: 4, fontStyle: "italic", color: "text.secondary" }}>
-                            Keine Referenten gefunden (basierend auf Filterung).
-                          </Typography>
-                        )}
-                        {/* --- End Conditional Rendering --- */}
-                      </Collapse>
-                      {index < filteredGroups.length - 1 && <Divider />}
-                    </React.Fragment>
-                  );
-                })}
-              </List>
-            </Paper>
-          )}
+                    return (
+                      <React.Fragment key={group.group_id}>
+                        <ListItem
+                          button
+                          onClick={() => handleToggleExpand(group.group_id)}
+                          sx={{ backgroundColor: "rgba(0, 0, 0, 0.03)" }}
+                        >
+                          <ListItemText
+                            // Use department_full_name here
+                            primary={`${group.department_full_name} (${group.semester})`}
+                            primaryTypographyProps={{ fontWeight: "medium" }}
+                            secondary={`${group.tenants.length} Referenten`}
+                          />
+                          <IconButton edge="end" size="small">
+                            {expanded[group.group_id] ? <ExpandLess /> : <ExpandMore />}
+                          </IconButton>
+                        </ListItem>
+                        <Collapse in={expanded[group.group_id]} timeout="auto" unmountOnExit>
+                          {/* --- Conditional Rendering based on FS --- */}
+                          {isFlursprecher && groupedByFloor ? (
+                            // Render FS grouped by floor
+                            <List component="div" disablePadding dense sx={{ pl: 2 }}>
+                              {" "}
+                              {/* Indent floor groups */}
+                              {sortedFloorKeys.map((floorKey) => (
+                                <React.Fragment key={floorKey}>
+                                  <Typography
+                                    variant="overline"
+                                    sx={{
+                                      display: "block",
+                                      pl: 2,
+                                      mt: 1,
+                                      fontSize: 15,
+                                      fontWeight: "bold",
+                                      color: "primary.main",
+                                    }}
+                                  >
+                                    {floorKey}
+                                  </Typography>
+                                  {groupedByFloor![floorKey].map((tenant) => renderTenantDetails(tenant))}
+                                </React.Fragment>
+                              ))}
+                            </List>
+                          ) : // Render other departments normally
+                          group.tenants.length > 0 ? (
+                            <List component="div" disablePadding dense>
+                              {group.tenants.map((tenant) => renderTenantDetails(tenant))}
+                            </List>
+                          ) : (
+                            <Typography sx={{ p: 2, pl: 4, fontStyle: "italic", color: "text.secondary" }}>
+                              Keine Referenten gefunden (basierend auf Filterung).
+                            </Typography>
+                          )}
+                          {/* --- End Conditional Rendering --- */}
+                        </Collapse>
+                        {index < filteredGroups.length - 1 && <Divider />}
+                      </React.Fragment>
+                    );
+                  })}
+                </List>
+              </Paper>
+            )}
+          </DashboardCard>
         </Box>
       </Box>
     </div>
