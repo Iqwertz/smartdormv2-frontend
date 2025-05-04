@@ -1,5 +1,6 @@
 // src/components/shared/Sidebar.tsx
 import React, { useState, useEffect, MouseEvent } from "react";
+import { Link, useLocation } from "react-router-dom";
 import "../../styles/Sidebar.scss";
 import MenuIcon from "@mui/icons-material/Menu";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
@@ -24,6 +25,7 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onLogout }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const { authState } = useAuth();
+  const location = useLocation();
 
   // Handle sidebar toggle (used by the explicit button)
   const toggleSidebar = () => {
@@ -45,7 +47,6 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onLogout }) => {
   // Close sidebar on mobile if clicking outside
   useEffect(() => {
     const handleClickOutside = (event: globalThis.MouseEvent) => {
-      // Use globalThis.MouseEvent
       const target = event.target as HTMLElement;
       if (isMobile && isOpen && !target.closest(".sidebar")) {
         setIsOpen(false);
@@ -56,6 +57,13 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onLogout }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isMobile, isOpen]);
+
+  // Auto close sidebar on mobile after navigation
+  useEffect(() => {
+    if (isMobile && isOpen) {
+      setIsOpen(false);
+    }
+  }, [location.pathname, isMobile]);
 
   // Check access
   const hasAccess = (item: SidebarItemProps): boolean => {
@@ -80,7 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onLogout }) => {
     return null;
   };
 
-  // --- New Handler for Clicking the Sidebar Background ---
+  // Handler for Clicking the Sidebar Background
   const handleSidebarClick = (event: MouseEvent<HTMLDivElement>) => {
     // Only proceed if the sidebar is currently closed
     if (isOpen) {
@@ -90,10 +98,8 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onLogout }) => {
     // Get the element that was actually clicked
     const target = event.target as HTMLElement;
 
-    // Check if the click originated from an interactive element (link, button, specific icons)
-    // We use closest() to see if the click happened *on or inside* these elements.
+    // Check if the click originated from an interactive element
     if (target.closest("a, button, .menu-btn, .logout-icon")) {
-      // If it's an interactive element, do nothing here; let their own handlers work.
       return;
     }
 
@@ -110,7 +116,6 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onLogout }) => {
         <div className="logo-details">
           <img src="/logo.svg" alt="logo" />
           <div className="logo_name">Smartdorm</div>
-          {/* Menu button's onClick already handles toggling */}
           {(isOpen || !isMobile) && (
             <div className="menu-btn" onClick={toggleSidebar}>
               {isOpen ? <MenuOpenIcon /> : <MenuIcon />}
@@ -121,11 +126,11 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onLogout }) => {
           {items.map(
             (item) =>
               hasAccess(item) && (
-                <li key={item.id}>
-                  <a href={item.path}>
+                <li key={item.id} className={location.pathname === item.path ? "active" : ""}>
+                  <Link to={item.path}>
                     {item.icon}
                     <span className="links_name">{item.title}</span>
-                  </a>
+                  </Link>
                   <span className="tooltip">{item.title}</span>
                 </li>
               )
