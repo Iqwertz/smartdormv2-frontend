@@ -1,4 +1,4 @@
-// components/ProtectedRoute.tsx
+// src/components/ProtectedRoute.tsx (Simplified)
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -9,27 +9,22 @@ interface ProtectedRouteProps extends RoutePermissions {}
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredUserType = [], requiredRoles = [] }) => {
   const { authState } = useAuth();
 
-  if (authState.loading) {
-    return <div>Loading...</div>; // Nice loading spinner needs to be added
-  }
-
   if (!authState.isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
-
   const { user } = authState;
 
-  // Check user_type
   const hasRequiredUserType = requiredUserType.length === 0 || (user && requiredUserType.includes(user.user_type));
-
-  // Check roles
   const hasRequiredRole =
     requiredRoles.length === 0 || (user && user.groups.some((group) => requiredRoles.includes(group)));
 
+  // If not authorized, redirect (consider an unauthorized page or back to login)
   if (!hasRequiredUserType || !hasRequiredRole) {
-    return <Navigate to="/login" replace />;
+    console.warn(
+      `Authorization failed: User type ${user?.user_type}, Required: ${requiredUserType}, Roles: ${user?.groups}, Required: ${requiredRoles}`
+    );
+    return <Navigate to="/" replace />;
   }
-
   return <Outlet />;
 };
 
