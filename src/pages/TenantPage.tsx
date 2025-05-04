@@ -6,6 +6,7 @@ import "../styles/bento-layout.scss";
 import Settings from "../components/tenants/dashboard/content/Settings";
 import CalendarWidget from "../components/tenants/dashboard/content/CalendarWidget";
 import MyEngagements from "../components/tenants/dashboard/content/MyEngagements";
+import QuickLinks from "../components/tenants/dashboard/content/QuickLinks";
 
 const TenantPage: React.FC = () => {
   return (
@@ -25,8 +26,8 @@ const TenantPage: React.FC = () => {
           </DashboardCard>
         </div>
         <div className="right">
-          <DashboardCard title="Notifications">
-            <div>Some notifications here</div>
+          <DashboardCard title="Quick Links">
+            <QuickLinks></QuickLinks>
           </DashboardCard>
           <DashboardCard title="Kalendar">
             <CalendarWidget></CalendarWidget>

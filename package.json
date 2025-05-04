@@ -26,6 +26,7 @@
     "dayjs": "^1.11.13",
     "ical": "^0.8.0",
     "ical.js": "^2.1.0",
+    "lucide-react": "^0.507.0",
     "react": "^19.0.0",
     "react-big-calendar": "^1.18.0",
     "react-calendar": "^5.1.0",
