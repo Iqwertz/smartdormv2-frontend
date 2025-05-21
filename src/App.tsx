@@ -9,6 +9,7 @@ import HSVPage from "./pages/shared/HSVPage";
 import { useAuth } from "./context/AuthContext"; // Import useAuth
 import TenantLayout from "./layout/TenantLayout";
 import AdminLayout from "./layout/AdminLayout";
+import ParcelPage from "./pages/admin/ParcelPage";
 
 // Simple component for the initial loading state
 const InitialLoadingScreen: React.FC = () => (
@@ -45,6 +46,7 @@ function App() {
           <Route element={<AdminLayout />}>
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/admin/hsv" element={<HSVPage />} />
+            <Route path="/admin/parcels" element={<ParcelPage />} />
           </Route>
         </Route>
 

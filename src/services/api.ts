@@ -1,6 +1,7 @@
 import axios from "axios";
 import { API_BASE_URL } from "../config";
 import { getCookie } from "../utils/getCookie";
+import { CreateParcelPayload, Parcel, TenantForSelect } from "../types/parcel";
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,

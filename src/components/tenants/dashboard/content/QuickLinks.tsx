@@ -6,6 +6,7 @@ import {
   CloudOutlined,
   MenuBookOutlined,
   MeetingRoomOutlined,
+  LocalLaundryServiceOutlined,
 } from "@mui/icons-material";
 
 // JSON configuration for quick links
@@ -33,6 +34,12 @@ const quickLinksConfig = [
     label: "Rooms",
     icon: <MeetingRoomOutlined fontSize="small" />,
     url: "https://rooms.Schollheim.net",
+  },
+  {
+    id: "waschmaschinen",
+    label: "Waschmaschinen",
+    icon: <LocalLaundryServiceOutlined fontSize="small" />,
+    url: "https://waschmaschinen.Schollheim.net",
   },
 ];
 

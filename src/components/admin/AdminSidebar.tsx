@@ -45,7 +45,7 @@ const adminSidebarItems: SidebarItemProps[] = [
     id: "pakete",
     icon: <Inventory2Outlined />,
     title: "Pakete",
-    path: "/admin/orders",
+    path: "/admin/parcels",
   },
 ];
 
