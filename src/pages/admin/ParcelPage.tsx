@@ -13,7 +13,7 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import DashboardCard from "../../components/tenants/dashboard/DashboardCard";
 import { TenantForSelect, Parcel, CreateParcelPayload } from "../../types/parcel";
 import {
-  fetchTenantsForSelect,
+  fetchRecipientsForSelect,
   createParcel,
   fetchPendingParcels,
   markParcelAsPickedUp,
@@ -23,7 +23,7 @@ import { DataGrid, GridColDef, GridActionsCellItem } from "@mui/x-data-grid";
 import dayjs from "dayjs";
 
 const ParcelPage: React.FC = () => {
-  const [tenants, setTenants] = useState<TenantForSelect[]>([]);
+  const [recipients, setRecipients] = useState<TenantForSelect[]>([]);
   const [selectedTenant, setSelectedTenant] = useState<TenantForSelect | null>(null);
   const [quantity, setQuantity] = useState<number>(1);
   const [isRegistered, setIsRegistered] = useState<boolean>(false);
@@ -37,11 +37,11 @@ const ParcelPage: React.FC = () => {
 
   const { showNotification } = useNotification();
 
-  const loadTenants = useCallback(async () => {
+  const loadRecipients = useCallback(async () => {
     setLoadingTenants(true);
     try {
-      const data = await fetchTenantsForSelect();
-      setTenants(data);
+      const data = await fetchRecipientsForSelect("all"); // Fetch all (tenants and subtenants)
+      setRecipients(data);
     } catch (error) {
       console.error("Failed to fetch tenants", error);
       showNotification("Mieterliste konnte nicht geladen werden.", "error");
@@ -66,9 +66,9 @@ const ParcelPage: React.FC = () => {
   }, [showNotification]);
 
   useEffect(() => {
-    loadTenants();
+    loadRecipients();
     loadPendingParcels();
-  }, [loadTenants, loadPendingParcels]);
+  }, [loadRecipients, loadPendingParcels]);
 
   const handleCreateParcel = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -88,17 +88,22 @@ const ParcelPage: React.FC = () => {
       registered: isRegistered,
     };
 
-    if (selectedTenant.current_room) {
+    // The backend create_parcel_view uses room for tenant identification preferentially,
+    // or name/surname for either tenant or subtenant.
+    // If it's a tenant and has a room, using the room is more specific.
+    // If it's a subtenant, or a tenant without a current_room in the selection data (should not happen for current tenants),
+    // then name/surname is the fallback.
+    if (selectedTenant.type === "tenant" && selectedTenant.current_room) {
       payload.room = selectedTenant.current_room;
     } else if (selectedTenant.name && selectedTenant.surname) {
+      // This branch will be used for subtenants, or tenants if room isn't specified/available
       payload.name = selectedTenant.name;
       payload.surname = selectedTenant.surname;
     } else {
-      setFormError("Ausgewählter Mieter hat weder Zimmer noch vollständigen Namen.");
+      setFormError("Ausgewählter Empfänger hat weder Zimmer (für Mieter) noch vollständigen Namen.");
       setIsSubmitting(false);
       return;
     }
-
     try {
       await createParcel(payload);
       showNotification("Paket erfolgreich hinzugefügt!", "success");
@@ -181,12 +186,12 @@ const ParcelPage: React.FC = () => {
       <DashboardCard title="Paket hinzufügen">
         <Box component="form" onSubmit={handleCreateParcel} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <Autocomplete
-            options={tenants}
+            options={recipients}
             getOptionLabel={(option) => option.label || `${option.name} ${option.surname}`}
             value={selectedTenant}
             onChange={(_, newValue) => setSelectedTenant(newValue)}
             loading={loadingTenants}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id && option.type === value.type}
             renderInput={(params) => (
               <TextField
                 {...params}

@@ -1,9 +1,11 @@
 import apiClient from "./api"; // Note: Changed from "./api" to "./apiClient" if you rename api.ts
 import { CreateParcelPayload, Parcel, TenantForSelect } from "../types/parcel";
+export type RecipientIncludeFilter = "tenants" | "subtenants" | "all";
 
-export const fetchTenantsForSelect = async (): Promise<TenantForSelect[]> => {
-  //This function may have to be moved to a shared service file if it is used more in the future
-  const response = await apiClient.get<TenantForSelect[]>("/api/common/tenant-list");
+export const fetchRecipientsForSelect = async (
+  include: RecipientIncludeFilter = "tenants"
+): Promise<TenantForSelect[]> => {
+  const response = await apiClient.get<TenantForSelect[]>(`/api/common/tenant-list/?include=${include}`);
   return response.data;
 };
 

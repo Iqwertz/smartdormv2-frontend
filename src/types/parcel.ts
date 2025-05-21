@@ -1,10 +1,11 @@
 export interface TenantForSelect {
-  id: number; // or string if external_id is used by your select logic
+  id: string;
   name: string;
   surname: string;
   username: string | null;
   current_room: string | null;
   label: string; // Pre-formatted display string for Autocomplete
+  type: "tenant" | "subtenant";
 }
 
 export interface Parcel {
