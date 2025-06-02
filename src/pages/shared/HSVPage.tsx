@@ -25,9 +25,6 @@ import {
 } from "@mui/icons-material";
 import { HsvEngagementGroup, HsvTenant } from "../../types/tenant";
 import apiClient from "../../services/api";
-import { useAuth } from "../../context/AuthContext";
-import TenantSidebar from "../../components/tenants/TenantSidebar";
-import AdminSidebar from "../../components/admin/AdminSidebar";
 import DashboardCard from "../../components/tenants/dashboard/DashboardCard";
 
 const HSVPage: React.FC = () => {
@@ -37,7 +34,6 @@ const HSVPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  const { authState } = useAuth();
 
   useEffect(() => {
     setLoading(true);

@@ -1,4 +1,3 @@
-// src/components/LoginForm.tsx
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
@@ -12,6 +11,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Alert from "@mui/material/Alert";
 import { useAuth } from "../context/AuthContext";
+import { getInitialRedirectPath } from "../routesConfig";
 
 const LoginForm: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -22,20 +22,16 @@ const LoginForm: React.FC = () => {
   const location = useLocation();
   const { login, authState } = useAuth();
 
-  const from = location.state?.from?.pathname || "/tenant";
+  const from = location.state?.from?.pathname || null;
 
   useEffect(() => {
     if (authState.isAuthenticated && authState.user) {
-      const user = authState.user;
-      if (user.user_type === "DEPARTMENT") {
-        navigate(location.state?.from?.pathname || "/admin", { replace: true });
-      } else if (user.user_type === "TENANT") {
-        navigate(from, { replace: true });
-      } else {
-        navigate(from, { replace: true });
-      }
+      // If redirected from a protected route, 'from' will have the path.
+      // Otherwise, or if 'from' is no longer relevant, use getInitialRedirectPath.
+      const redirectTo = from || getInitialRedirectPath(authState.user.groups);
+      navigate(redirectTo, { replace: true });
     }
-  }, [authState, navigate, from, location.state]);
+  }, [authState, navigate, from]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

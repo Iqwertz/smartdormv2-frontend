@@ -1,38 +1,48 @@
-// src/components/shared/Sidebar.tsx
-import React, { useState, useEffect, MouseEvent } from "react";
+import React, { useState, useEffect, MouseEvent, useMemo, useRef } from "react"; // Added useRef
 import { Link, useLocation } from "react-router-dom";
 import "../../styles/Sidebar.scss";
 import MenuIcon from "@mui/icons-material/Menu";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useAuth } from "../../context/AuthContext";
+import { getSidebarItems, AppRoute } from "../../routesConfig";
 
-// Define the types for our props
-export interface SidebarItemProps {
+export interface AppSidebarItem {
   id: string;
   icon: React.ReactNode;
   title: string;
   path: string;
-  groups?: string[];
+  requiredGroups?: string[];
 }
 
-interface SidebarProps {
-  items: SidebarItemProps[];
-  onLogout?: () => void;
-}
-
-const Sidebar: React.FC<SidebarProps> = ({ items, onLogout }) => {
+const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const { authState } = useAuth();
+  const { authState, logout } = useAuth();
   const location = useLocation();
+  const previousPathnameRef = useRef(location.pathname);
 
-  // Handle sidebar toggle (used by the explicit button)
+  const sidebarItems: AppSidebarItem[] = useMemo(() => {
+    if (authState.user?.groups) {
+      return getSidebarItems(authState.user.groups).map((route: AppRoute) => ({
+        id: route.id,
+        icon: route.icon,
+        title: route.title!,
+        path: route.path,
+        requiredGroups: route.requiredGroups,
+      }));
+    }
+    return [];
+  }, [authState.user?.groups]);
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
 
-  // Check if screen is mobile size
   useEffect(() => {
     const checkIfMobile = () => {
       setIsMobile(window.innerWidth <= 1100);
@@ -44,7 +54,6 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onLogout }) => {
     };
   }, []);
 
-  // Close sidebar on mobile if clicking outside
   useEffect(() => {
     const handleClickOutside = (event: globalThis.MouseEvent) => {
       const target = event.target as HTMLElement;
@@ -58,25 +67,23 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onLogout }) => {
     };
   }, [isMobile, isOpen]);
 
-  // Auto close sidebar on mobile after navigation
   useEffect(() => {
-    if (isMobile && isOpen) {
+    if (isMobile && isOpen && location.pathname !== previousPathnameRef.current) {
       setIsOpen(false);
     }
-  }, [location.pathname, isMobile]);
+    previousPathnameRef.current = location.pathname;
+  }, [location.pathname, isMobile, isOpen]);
 
-  // Check access
-  const hasAccess = (item: SidebarItemProps): boolean => {
-    if (!item.groups || item.groups.length === 0) return true;
+  const hasAccess = (item: AppSidebarItem): boolean => {
+    if (!item.requiredGroups || item.requiredGroups.length === 0) return true;
     if (!authState?.user?.groups || authState.user.groups.length === 0) return false;
     if (authState.user == null) {
-      console.error("user not authenticated");
+      console.error("User not authenticated for sidebar access check");
       return false;
     }
-    return item.groups.some((group) => authState.user?.groups.includes(group));
+    return item.requiredGroups.some((group) => authState.user?.groups.includes(group));
   };
 
-  // Render mobile menu button only when collapsed
   const renderMobileMenuButton = () => {
     if (isMobile && !isOpen) {
       return (
@@ -88,22 +95,14 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onLogout }) => {
     return null;
   };
 
-  // Handler for Clicking the Sidebar Background
   const handleSidebarClick = (event: MouseEvent<HTMLDivElement>) => {
-    // Only proceed if the sidebar is currently closed
     if (isOpen) {
       return;
     }
-
-    // Get the element that was actually clicked
     const target = event.target as HTMLElement;
-
-    // Check if the click originated from an interactive element
     if (target.closest("a, button, .menu-btn, .logout-icon")) {
       return;
     }
-
-    // If the click was not on an interactive element and the sidebar is closed, open it.
     setIsOpen(true);
   };
 
@@ -123,7 +122,7 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onLogout }) => {
           )}
         </div>
         <ul className="nav-list">
-          {items.map(
+          {sidebarItems.map(
             (item) =>
               hasAccess(item) && (
                 <li key={item.id} className={location.pathname === item.path ? "active" : ""}>
@@ -138,11 +137,11 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onLogout }) => {
           <li className="profile">
             <div className="profile-details">
               <div className="name_job">
-                <div className="name">{authState?.user?.username || "Loading..."}</div>
-                <div className="job">{authState?.user?.name || "Loading..."}</div>
+                <div className="name">{authState?.user?.username || "Laden..."}</div>
+                <div className="job">{authState?.user?.name || "Laden..."}</div>
               </div>
             </div>
-            <LogoutIcon className="logout-icon" onClick={onLogout} />
+            <LogoutIcon className="logout-icon" onClick={handleLogout} />
           </li>
         </ul>
       </div>

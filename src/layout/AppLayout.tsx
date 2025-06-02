@@ -1,20 +1,20 @@
-// src/layouts/AdminLayout.tsx
 import React from "react";
 import { Outlet } from "react-router-dom";
 import { Box } from "@mui/material";
-import AdminSidebar from "../components/admin/AdminSidebar";
+import AppSidebar from "../components/shared/Sidebar";
 import "../styles/global.scss";
 
-const AdminLayout: React.FC = () => {
+const AppLayout: React.FC = () => {
   return (
     <div className="background">
       <Box sx={{ display: "flex", minHeight: "100vh" }}>
-        <AdminSidebar />
+        <AppSidebar />
         <Box
           component="main"
           sx={{
             flexGrow: 1,
-            p: 2,
+            p: { xs: 1, sm: 2, md: 3 },
+            overflowX: "hidden",
             overflowY: "auto",
             height: "100vh",
             position: "relative",
@@ -28,4 +28,4 @@ const AdminLayout: React.FC = () => {
   );
 };
 
-export default AdminLayout;
+export default AppLayout;

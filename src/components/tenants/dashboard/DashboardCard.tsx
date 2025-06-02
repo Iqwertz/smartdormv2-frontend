@@ -2,7 +2,7 @@ import React from "react";
 import { Box, CardContent, Typography, Paper } from "@mui/material";
 
 interface DashboardCardProps {
-  title: string;
+  title?: string;
   children: React.ReactNode;
   action?: React.ReactNode;
   cardSx?: object;
@@ -12,23 +12,25 @@ interface DashboardCardProps {
 const DashboardCard: React.FC<DashboardCardProps> = ({ title, children, action, cardSx = {}, contentSx = {} }) => (
   <Box sx={{ position: "relative", mt: 2 }}>
     {/* Title Box */}
-    <Paper
-      elevation={3}
-      sx={{
-        position: "absolute",
-        top: -12,
-        left: 20,
-        zIndex: 9,
-        backgroundColor: "rgb(128, 22, 44);",
-        px: 2,
-        py: 0.5,
-        borderRadius: 1,
-      }}
-    >
-      <Typography variant="h6" color="#f1f1f1">
-        {title}
-      </Typography>
-    </Paper>
+    {title && (
+      <Paper
+        elevation={3}
+        sx={{
+          position: "absolute",
+          top: -12,
+          left: 20,
+          zIndex: 9,
+          backgroundColor: "rgb(128, 22, 44);",
+          px: 2,
+          py: 0.5,
+          borderRadius: 1,
+        }}
+      >
+        <Typography variant="h6" color="#f1f1f1">
+          {title}
+        </Typography>
+      </Paper>
+    )}
 
     {/* Main Card */}
     <Paper

@@ -1,57 +1,68 @@
 // src/App.tsx
-import { Routes, Route, BrowserRouter } from "react-router-dom";
-import { Box, CircularProgress, Typography } from "@mui/material"; // Import components for loading indicator
+import { Routes, Route, BrowserRouter, Navigate } from "react-router-dom";
+import { CircularProgress, Typography, Box } from "@mui/material";
 import LoginPage from "./pages/LoginPage";
-import AdminPage from "./pages/AdminPage";
-import TenantPage from "./pages/TenantPage";
 import ProtectedRoute from "./components/ProtectedRoute";
-import HSVPage from "./pages/shared/HSVPage";
-import { useAuth } from "./context/AuthContext"; // Import useAuth
-import TenantLayout from "./layout/TenantLayout";
-import AdminLayout from "./layout/AdminLayout";
-import ParcelPage from "./pages/admin/ParcelPage";
+import { useAuth } from "./context/AuthContext";
+import AppLayout from "./layout/AppLayout";
+import { appRoutes, loginRoute, getInitialRedirectPath } from "./routesConfig";
+import Error404Page from "./pages/Error404Page";
 
-// Simple component for the initial loading state
 const InitialLoadingScreen: React.FC = () => (
   <div className="background">
-    <CircularProgress />
-    <Typography variant="body1" sx={{ mt: 2 }}>
-      Loading application...
-    </Typography>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: "100vh",
+        width: "100%",
+      }}
+    >
+      <CircularProgress />
+      <Typography variant="body1" sx={{ mt: 2, color: "text.primary" }}>
+        Loading application...
+      </Typography>
+    </Box>
   </div>
 );
 
 function App() {
   const { authState } = useAuth();
+
   if (authState.loading) {
     return <InitialLoadingScreen />;
   }
 
   return (
     <BrowserRouter>
+      {/* Routes are defined in the routesConfig file */}
       <Routes>
-        {/* Public Routes */}
-        <Route path="/login" element={<LoginPage />} />
+        <Route path={loginRoute} element={<LoginPage />} />
 
-        {/* Tenant Routes */}
-        <Route element={<ProtectedRoute requiredUserType={["TENANT"]} />}>
-          <Route element={<TenantLayout />}>
-            <Route path="/tenant" element={<TenantPage />} />
-            <Route path="/tenant/hsv" element={<HSVPage />} />
-          </Route>
+        {/* Routes that use AppLayout and require authentication */}
+        <Route element={<AppLayout />}>
+          {appRoutes.map((route) => (
+            <Route key={route.id} element={<ProtectedRoute requiredGroups={route.requiredGroups} />}>
+              <Route path={route.path} element={route.element} />
+            </Route>
+          ))}
+          {authState.isAuthenticated && <Route path="*" element={<Error404Page />} />}
         </Route>
 
-        {/* Admin Routes */}
-        <Route element={<ProtectedRoute requiredUserType={["DEPARTMENT"]} />}>
-          <Route element={<AdminLayout />}>
-            <Route path="/admin" element={<AdminPage />} />
-            <Route path="/admin/hsv" element={<HSVPage />} />
-            <Route path="/admin/parcels" element={<ParcelPage />} />
-          </Route>
-        </Route>
+        <Route
+          path="/"
+          element={
+            authState.isAuthenticated && authState.user ? (
+              <Navigate to={getInitialRedirectPath(authState.user.groups)} replace />
+            ) : (
+              <Navigate to={loginRoute} replace />
+            )
+          }
+        />
 
-        {/* Default Route */}
-        <Route path="/" element={<LoginPage />} />
+        {!authState.isAuthenticated && <Route path="*" element={<Error404Page />} />}
       </Routes>
     </BrowserRouter>
   );
