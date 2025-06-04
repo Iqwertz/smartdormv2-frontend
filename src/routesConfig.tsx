@@ -16,6 +16,8 @@ import DepartmentPage from "./pages/DepartmentPage";
 import HSVPage from "./pages/shared/HSVPage";
 import ParcelPage from "./pages/admin/ParcelPage";
 import Error403Page from "./pages/Error403Page";
+import { FilterVintageOutlined } from "@mui/icons-material";
+import HeimratPage from "./pages/engagements/HeimratPage";
 
 // Placeholder for pages that might need to be created
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
@@ -99,6 +101,18 @@ export const appRoutes: AppRoute[] = [
     requiredGroups: ["VERWALTUNG"],
     sidebar: true,
   },
+  ////////////////////////////////////////////////////////////
+  // Engagement Specific Routes:
+  ////////////////////////////////////////////////////////////
+  {
+    id: "heimrat",
+    path: "/heimrat",
+    element: <HeimratPage />,
+    title: "Heimrat",
+    icon: <FilterVintageOutlined />,
+    requiredGroups: ["Heimrat"],
+    sidebar: true,
+  },
   //////////////////////////////////////////////////////////////
   // General Routes:
   //////////////////////////////////////////////////////////////
@@ -110,6 +124,7 @@ export const appRoutes: AppRoute[] = [
     icon: <AssignmentIndOutlinedIcon />,
     requiredGroups: [],
     sidebar: true,
+    defaultRedirectOrder: 3,
   },
   {
     id: "not-authorized",
