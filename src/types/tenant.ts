@@ -8,7 +8,7 @@ export interface TenantProfile {
   email: string;
   extension: number | null;
   external_id: string;
-  gender: string; // Do we limit them to M/F?
+  gender: string;
   move_in: string;
   move_out: string;
   name: string;
@@ -22,6 +22,22 @@ export interface TenantProfile {
   university: string;
   username: string | null;
   new_address: string | null;
+}
+
+export interface NewTenantPayload {
+  name: string;
+  surname: string;
+  email: string;
+  gender: string;
+  nationality: string;
+  birthday: string | null; // e.g., 'YYYY-MM-DD'
+  tel_number?: string;
+  move_in: string | null; // e.g., 'YYYY-MM-DD'
+  current_room: string;
+  deposit: number | string; // Use string for input, convert to number on submit
+  university: string;
+  study_field: string;
+  note?: string;
 }
 
 export interface DepartmentInfo {
