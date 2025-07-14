@@ -16,8 +16,9 @@ import DepartmentPage from "./pages/DepartmentPage";
 import HSVPage from "./pages/shared/HSVPage";
 import ParcelPage from "./pages/admin/ParcelPage";
 import Error403Page from "./pages/Error403Page";
-import { FilterVintageOutlined } from "@mui/icons-material";
+import { FilterVintageOutlined, PersonAdd } from "@mui/icons-material";
 import HeimratPage from "./pages/engagements/HeimratPage";
+import NewTenantPage from "./pages/admin/NewTenantPage";
 
 // Placeholder for pages that might need to be created
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
@@ -48,7 +49,7 @@ export const appRoutes: AppRoute[] = [
     element: <TenantPage />,
     title: "Dashboard",
     icon: <HomeIcon />,
-    requiredGroups: ["tenant"],
+    requiredGroups: ["tenant", "ADMIN"],
     sidebar: true,
     defaultRedirectOrder: 1,
   },
@@ -59,11 +60,20 @@ export const appRoutes: AppRoute[] = [
     id: "department-overview",
     path: "/department/overview",
     element: <DepartmentPage />,
-    title: "Referenten Übersicht",
+    title: "Bewohner",
     icon: <PeopleIcon />,
-    requiredGroups: ["VERWALTUNG"],
+    requiredGroups: ["VERWALTUNG", "ADMIN"],
     sidebar: true,
     defaultRedirectOrder: 2,
+  },
+  {
+    id: "new-tenant",
+    path: "/department/new-tenant",
+    element: <NewTenantPage />,
+    title: "Neuer Bewohner",
+    icon: <PersonAdd />,
+    requiredGroups: ["VERWALTUNG", "ADMIN"],
+    sidebar: true,
   },
   {
     id: "departures",
@@ -71,7 +81,7 @@ export const appRoutes: AppRoute[] = [
     element: <PlaceholderPage title="Auszüge" />,
     title: "Auszüge",
     icon: <DirectionsRunOutlined />,
-    requiredGroups: ["VERWALTUNG"],
+    requiredGroups: ["VERWALTUNG", "ADMIN"],
     sidebar: true,
   },
   {
@@ -80,7 +90,7 @@ export const appRoutes: AppRoute[] = [
     element: <PlaceholderPage title="Verlängerungen" />,
     title: "Verlängerungen",
     icon: <ArticleOutlined />,
-    requiredGroups: ["VERWALTUNG"],
+    requiredGroups: ["VERWALTUNG", "ADMIN"],
     sidebar: true,
   },
   {
@@ -89,7 +99,7 @@ export const appRoutes: AppRoute[] = [
     element: <PlaceholderPage title="Untermiete" />,
     title: "Untermiete",
     icon: <BedOutlined />,
-    requiredGroups: ["VERWALTUNG"],
+    requiredGroups: ["VERWALTUNG", "ADMIN"],
     sidebar: true,
   },
   {
@@ -98,7 +108,7 @@ export const appRoutes: AppRoute[] = [
     element: <ParcelPage />,
     title: "Pakete",
     icon: <Inventory2OutlinedIcon />,
-    requiredGroups: ["VERWALTUNG"],
+    requiredGroups: ["VERWALTUNG", "ADMIN"],
     sidebar: true,
   },
   ////////////////////////////////////////////////////////////
@@ -110,7 +120,7 @@ export const appRoutes: AppRoute[] = [
     element: <HeimratPage />,
     title: "Heimrat",
     icon: <FilterVintageOutlined />,
-    requiredGroups: ["Heimrat"],
+    requiredGroups: ["Heimrat", "ADMIN"],
     sidebar: true,
   },
   //////////////////////////////////////////////////////////////

@@ -14,6 +14,12 @@ export const createParcel = async (data: CreateParcelPayload): Promise<Parcel> =
   return response.data;
 };
 
+/**
+ * Fetches the list of pending parcels from the backend API.
+ *
+ * @returns {Promise<Parcel[]>} A promise that resolves to an array of `Parcel` objects representing the pending parcels.
+ * @throws Will throw an error if the API request fails.
+ */
 export const fetchPendingParcels = async (): Promise<Parcel[]> => {
   const response = await apiClient.get<Parcel[]>("/api/department/parcels/list/");
   return response.data;
