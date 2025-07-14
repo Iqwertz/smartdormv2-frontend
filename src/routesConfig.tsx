@@ -19,6 +19,7 @@ import Error403Page from "./pages/Error403Page";
 import { FilterVintageOutlined, PersonAdd } from "@mui/icons-material";
 import HeimratPage from "./pages/engagements/HeimratPage";
 import NewTenantPage from "./pages/admin/NewTenantPage";
+import EditTenantPage from "./pages/admin/EditTenantPage";
 
 // Placeholder for pages that might need to be created
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
@@ -74,6 +75,13 @@ export const appRoutes: AppRoute[] = [
     icon: <PersonAdd />,
     requiredGroups: ["VERWALTUNG", "ADMIN"],
     sidebar: true,
+  },
+  {
+    id: "edit-tenant",
+    path: "/department/edit-tenant/:id",
+    element: <EditTenantPage />,
+    requiredGroups: ["VERWALTUNG", "ADMIN"],
+    sidebar: false,
   },
   {
     id: "departures",

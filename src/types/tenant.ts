@@ -40,6 +40,16 @@ export interface NewTenantPayload {
   note?: string;
 }
 
+export interface Subtenant {
+  id: number;
+  name: string;
+  surname: string;
+  email: string;
+  move_id: string; // move_in date for subtenant
+  move_out: string;
+  // Add other fields as needed from the backend model
+}
+
 export interface DepartmentInfo {
   name: string;
   full_name: string;

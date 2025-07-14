@@ -21,20 +21,7 @@ import { NewTenantPayload } from "../../types/tenant";
 import apiClient from "../../services/api";
 import dayjs, { Dayjs } from "dayjs";
 import { nationalities } from "../../utils/nationalities";
-
-const universities = [
-  "Technische Universität München (TUM)",
-  "Ludwig-Maximilians-Universität München (LMU)",
-  "Hochschule für angewandte Wissenschaften München (HM)",
-  "Hochschule für Fernsehen und Film München (HFF)",
-  "Akademie der Bildenden Künste München (AdBK)",
-  "Hochschule für Musik und Theater München (HMTM)",
-  "FOM Hochschule für Oekonomie & Management",
-  "Katholische Stiftungshochschule München (KSH)",
-  "Hochschule für Philosophie München (HFPH)",
-  "Hochschule für Politik München (HfP)",
-  "Andere",
-];
+import { universities } from "../../utils/universities";
 
 const createNewTenant = async (data: NewTenantPayload) => {
   const payload = {
@@ -151,9 +138,9 @@ const NewTenantPage: React.FC = () => {
                   label="Geschlecht"
                   onChange={handleSelectChange}
                 >
-                  <MenuItem value="Männlich">Männlich</MenuItem>
-                  <MenuItem value="Weiblich">Weiblich</MenuItem>
-                  <MenuItem value="Divers">Divers</MenuItem>
+                  <MenuItem value="FEMALE">FEMALE</MenuItem>
+                  <MenuItem value="MALE">MALE</MenuItem>
+                  <MenuItem value="DIVERSE">DIVERSE</MenuItem>
                 </Select>
               </FormControl>
             </Grid>

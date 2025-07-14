@@ -1,7 +1,9 @@
 // src/components/admin/TenantDataTable.tsx
 import React, { useState, useEffect } from "react";
 import { Box, Alert } from "@mui/material";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridActionsCellItem } from "@mui/x-data-grid";
+import EditIcon from "@mui/icons-material/Edit";
+import { useNavigate } from "react-router-dom";
 import apiClient from "../../services/api";
 import { TenantProfile } from "../../types/tenant";
 
@@ -9,6 +11,7 @@ const TenantDataTable: React.FC = () => {
   const [rows, setRows] = useState<TenantProfile[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setLoading(true);
@@ -31,8 +34,28 @@ const TenantDataTable: React.FC = () => {
       });
   }, []);
 
+  const handleEditClick = (id: number) => {
+    navigate(`/department/edit-tenant/${id}`);
+  };
+
   const columns: GridColDef<TenantProfile>[] = [
-    { field: "id", headerName: "ID", width: 80, type: "number" },
+    {
+      field: "actions",
+      type: "actions",
+      headerName: "Aktionen",
+      width: 80,
+      cellClassName: "actions",
+      getActions: ({ id }) => {
+        return [
+          <GridActionsCellItem
+            icon={<EditIcon />}
+            label="Edit"
+            onClick={() => handleEditClick(id as number)}
+            color="inherit"
+          />,
+        ];
+      },
+    },
     { field: "surname", headerName: "Nachname", width: 140 },
     { field: "name", headerName: "Vorname", width: 140 },
     { field: "username", headerName: "Benutzername", width: 130 },
@@ -47,12 +70,8 @@ const TenantDataTable: React.FC = () => {
     { field: "gender", headerName: "Geschlecht", width: 110 },
     { field: "nationality", headerName: "Nationalität", width: 130 },
     { field: "tel_number", headerName: "Telefon", width: 150, sortable: false },
-
-    // Study Info
     { field: "university", headerName: "Universität", width: 120 },
     { field: "study_field", headerName: "Studienfach", width: 160 },
-
-    // Contract / Room Info
     { field: "current_room", headerName: "Zimmer", width: 100 },
     { field: "current_floor", headerName: "Flur", width: 80 },
     {
@@ -88,13 +107,12 @@ const TenantDataTable: React.FC = () => {
       type: "number",
       width: 90,
     },
-    { field: "extension", headerName: "Verlängerungen", type: "number", width: 120 }, // Assuming integer
-    { field: "sublet", headerName: "Untermiete (Monate)", type: "number", width: 150 }, // Assuming number of months
-
-    // Internal / Other
-    { field: "external_id", headerName: "Externe ID", width: 150, hideable: true }, // Often less relevant day-to-day
+    { field: "extension", headerName: "Verlängerungen", type: "number", width: 120 },
+    { field: "sublet", headerName: "Untermiete (Monate)", type: "number", width: 150 },
     { field: "note", headerName: "Notiz", width: 200, sortable: false, hideable: true },
     { field: "new_address", headerName: "Neue Adresse", width: 220, sortable: false, hideable: true },
+    { field: "id", headerName: "ID", width: 80, type: "number", hideable: true },
+    { field: "external_id", headerName: "Externe ID", width: 150, hideable: true },
   ];
 
   if (error) {
@@ -131,7 +149,6 @@ const TenantDataTable: React.FC = () => {
           },
         }}
         pageSizeOptions={[10, 25, 50, 100]}
-        checkboxSelection
         disableRowSelectionOnClick
       />
     </Box>
