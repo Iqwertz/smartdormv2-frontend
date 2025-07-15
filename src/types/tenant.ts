@@ -40,14 +40,41 @@ export interface NewTenantPayload {
   note?: string;
 }
 
+export interface SubtenantProfile {
+  id: number;
+  name: string;
+  surname: string;
+  email: string;
+  username: string | null;
+  move_in: string;
+  move_out: string;
+  tenant: number;
+  tenant_name?: string;
+  room: number;
+  room_name?: string;
+  university_confirmation: boolean;
+  created_on: string;
+  external_id: string;
+}
+
+export interface NewSubtenantPayload {
+  name: string;
+  surname: string;
+  email: string;
+  move_in: string | null;
+  move_out: string | null;
+  tenant_id: number | null;
+  room_id: number | null;
+  university_confirmation: boolean;
+}
+
 export interface Subtenant {
   id: number;
   name: string;
   surname: string;
   email: string;
-  move_id: string; // move_in date for subtenant
+  move_in: string; // move_in date for subtenant is a typo from the original code, should be move_in
   move_out: string;
-  // Add other fields as needed from the backend model
 }
 
 export interface DepartmentInfo {

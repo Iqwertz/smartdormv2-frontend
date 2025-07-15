@@ -20,6 +20,9 @@ import { FilterVintageOutlined, PersonAdd } from "@mui/icons-material";
 import HeimratPage from "./pages/engagements/HeimratPage";
 import NewTenantPage from "./pages/admin/NewTenantPage";
 import EditTenantPage from "./pages/admin/EditTenantPage";
+import EditSubtenantPage from "./pages/admin/EditSubtenantPage";
+import NewSubtenantPage from "./pages/admin/NewSubtenantPage";
+import SubtenantPage from "./pages/admin/SubtenantPage";
 
 // Placeholder for pages that might need to be created
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
@@ -104,11 +107,25 @@ export const appRoutes: AppRoute[] = [
   {
     id: "subtenancies",
     path: "/department/subtenancies",
-    element: <PlaceholderPage title="Untermiete" />,
+    element: <SubtenantPage />,
     title: "Untermiete",
     icon: <BedOutlined />,
     requiredGroups: ["VERWALTUNG", "ADMIN"],
     sidebar: true,
+  },
+  {
+    id: "new-subtenant",
+    path: "/department/new-subtenant",
+    element: <NewSubtenantPage />,
+    requiredGroups: ["VERWALTUNG", "ADMIN"],
+    sidebar: false,
+  },
+  {
+    id: "edit-subtenant",
+    path: "/department/edit-subtenant/:id",
+    element: <EditSubtenantPage />,
+    requiredGroups: ["VERWALTUNG", "ADMIN"],
+    sidebar: false,
   },
   {
     id: "parcels",

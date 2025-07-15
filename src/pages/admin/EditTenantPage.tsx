@@ -317,10 +317,17 @@ const EditTenantPage: React.FC = () => {
           {subtenants.length > 0 ? (
             <List>
               {subtenants.map((sub) => (
-                <ListItem key={sub.id} secondaryAction={<Button size="small">Bearbeiten</Button>}>
+                <ListItem
+                  key={sub.id}
+                  secondaryAction={
+                    <Button onClick={() => navigate(`/department/edit-subtenant/${sub.id}`)} size="small">
+                      Bearbeiten
+                    </Button>
+                  }
+                >
                   <ListItemText
                     primary={`${sub.name} ${sub.surname}`}
-                    secondary={`Untermieter vom ${dayjs(sub.move_id).format("DD.MM.YYYY")} bis ${dayjs(
+                    secondary={`Untermieter vom ${dayjs(sub.move_in).format("DD.MM.YYYY")} bis ${dayjs(
                       sub.move_out
                     ).format("DD.MM.YYYY")}`}
                   />
