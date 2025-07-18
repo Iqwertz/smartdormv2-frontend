@@ -5,7 +5,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import GppBadIcon from "@mui/icons-material/GppBad"; // Forbidden icon
 import { useAuth } from "../context/AuthContext";
 import { getInitialRedirectPath } from "../routesConfig";
-import DashboardCard from "../components/tenants/dashboard/DashboardCard";
+import DashboardCard from "../components/shared/DashboardCard";
 
 const Error403Page: React.FC = () => {
   const { authState } = useAuth();

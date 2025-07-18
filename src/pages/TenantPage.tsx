@@ -1,7 +1,7 @@
 import React from "react";
 import { Box } from "@mui/material";
 import UserProfile from "../components/tenants/dashboard/content/UserProfile";
-import DashboardCard from "../components/tenants/dashboard/DashboardCard";
+import DashboardCard from "../components/shared/DashboardCard";
 import "../styles/bento-layout.scss";
 import Settings from "../components/tenants/dashboard/content/Settings";
 import CalendarWidget from "../components/tenants/dashboard/content/CalendarWidget";

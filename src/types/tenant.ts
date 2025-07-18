@@ -77,6 +77,18 @@ export interface Subtenant {
   move_out: string;
 }
 
+export interface Rental {
+  id: number;
+  move_in: string;
+  moved_out: string;
+  room_name: string;
+}
+
+export interface MovePayload {
+  room_id: number;
+  move_date: string;
+}
+
 export interface DepartmentInfo {
   name: string;
   full_name: string;

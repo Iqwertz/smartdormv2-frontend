@@ -4,7 +4,7 @@ import { Link as RouterLink } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
 import { useAuth } from "../context/AuthContext";
 import { getInitialRedirectPath, loginRoute } from "../routesConfig";
-import DashboardCard from "../components/tenants/dashboard/DashboardCard";
+import DashboardCard from "../components/shared/DashboardCard";
 
 const Error404Page: React.FC = () => {
   const { authState } = useAuth();

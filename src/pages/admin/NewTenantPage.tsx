@@ -15,7 +15,7 @@ import {
   Divider,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import DashboardCard from "../../components/tenants/dashboard/DashboardCard";
+import DashboardCard from "../../components/shared/DashboardCard";
 import { useNotification } from "../../context/NotificationContext";
 import { NewTenantPayload } from "../../types/tenant";
 import apiClient from "../../services/api";

@@ -25,7 +25,7 @@ import {
 } from "@mui/icons-material";
 import { HsvEngagementGroup, HsvTenant } from "../../types/tenant";
 import apiClient from "../../services/api";
-import DashboardCard from "../../components/tenants/dashboard/DashboardCard";
+import DashboardCard from "../../components/shared/DashboardCard";
 
 const HSVPage: React.FC = () => {
   const [engagementGroups, setEngagementGroups] = useState<HsvEngagementGroup[]>([]);

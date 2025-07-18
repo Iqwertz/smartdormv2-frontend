@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useNavigate } from "react-router-dom";
-import DashboardCard from "../../components/tenants/dashboard/DashboardCard";
+import DashboardCard from "../../components/shared/DashboardCard";
 import { useNotification } from "../../context/NotificationContext";
 import { NewSubtenantPayload } from "../../types/tenant";
 import apiClient from "../../services/api";

@@ -1,6 +1,6 @@
 import React from "react";
 import { Box } from "@mui/material";
-import DashboardCard from "../../components/tenants/dashboard/DashboardCard";
+import DashboardCard from "../../components/shared/DashboardCard";
 import "../../styles/bento-layout.scss";
 
 const HeimratPage: React.FC = () => {
