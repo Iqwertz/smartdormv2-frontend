@@ -1,21 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Box, Alert, Button } from "@mui/material";
-import { DataGrid, GridColDef, GridActionsCellItem, GridToolbarQuickFilter } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridActionsCellItem } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import { SubtenantProfile } from "../../types/tenant";
 import apiClient from "../../services/api";
 import dayjs from "dayjs";
 import AddIcon from "@mui/icons-material/Add";
-
-function QuickSearchToolbar() {
-  // Currently doesnt work, needs to be fixed
-  return (
-    <Box sx={{ p: 1, pb: 0, display: "flex", justifyContent: "flex-start" }}>
-      <GridToolbarQuickFilter debounceMs={500} />
-    </Box>
-  );
-}
+import { GridToolbar } from "@mui/x-data-grid/internals";
 
 interface SubtenantDataTableProps {
   status: "current" | "future" | "all";
@@ -101,13 +93,19 @@ const SubtenantDataTable: React.FC<SubtenantDataTableProps> = ({ status }) => {
         rows={subtenants}
         columns={columns}
         loading={loading}
-        slots={{ toolbar: QuickSearchToolbar }}
+        slots={{ toolbar: GridToolbar }}
         initialState={{
           sorting: { sortModel: [{ field: "move_in", sort: "desc" }] },
           pagination: { paginationModel: { pageSize: 25 } },
         }}
         pageSizeOptions={[10, 25, 50]}
         disableRowSelectionOnClick
+        showToolbar
+        slotProps={{
+          toolbar: {
+            showQuickFilter: true,
+          },
+        }}
       />
     </Box>
   );

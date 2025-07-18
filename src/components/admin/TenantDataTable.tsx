@@ -1,20 +1,12 @@
 // src/components/admin/TenantDataTable.tsx
 import React, { useState, useEffect } from "react";
 import { Box, Alert } from "@mui/material";
-import { DataGrid, GridColDef, GridActionsCellItem, QuickFilter } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridActionsCellItem } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import { useNavigate } from "react-router-dom";
 import apiClient from "../../services/api";
 import { TenantProfile } from "../../types/tenant";
-
-function QuickSearchToolbar() {
-  // Currently doesnt work, needs to be fixed
-  return (
-    <Box sx={{ p: 1, pb: 0, display: "flex", justifyContent: "flex-start" }}>
-      <QuickFilter debounceMs={500} />
-    </Box>
-  );
-}
+import { GridToolbar } from "@mui/x-data-grid/internals";
 
 const TenantDataTable: React.FC = () => {
   const [rows, setRows] = useState<TenantProfile[]>([]);
@@ -134,12 +126,11 @@ const TenantDataTable: React.FC = () => {
         rows={rows}
         columns={columns}
         loading={loading}
-        slots={{ toolbar: QuickSearchToolbar }}
+        slots={{ toolbar: GridToolbar }}
         showToolbar
         slotProps={{
           toolbar: {
             showQuickFilter: true,
-            quickFilterProps: { debounceMs: 500 },
           },
         }}
         initialState={{
