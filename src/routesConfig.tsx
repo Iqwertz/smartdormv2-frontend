@@ -10,6 +10,7 @@ import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import DirectionsRunOutlined from "@mui/icons-material/DirectionsRunOutlined";
 import ArticleOutlined from "@mui/icons-material/ArticleOutlined";
 import BedOutlined from "@mui/icons-material/BedOutlined";
+import EditNoteIcon from "@mui/icons-material/EditNote";
 
 import TenantPage from "./pages/TenantPage";
 import DepartmentPage from "./pages/DepartmentPage";
@@ -23,6 +24,8 @@ import EditTenantPage from "./pages/admin/EditTenantPage";
 import EditSubtenantPage from "./pages/admin/EditSubtenantPage";
 import NewSubtenantPage from "./pages/admin/NewSubtenantPage";
 import SubtenantPage from "./pages/admin/SubtenantPage";
+import DeparturesPage from "./pages/admin/DeparturesPage";
+import DepartureSigningPage from "./pages/admin/DepartureSigningPage";
 
 // Placeholder for pages that might need to be created
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
@@ -89,7 +92,7 @@ export const appRoutes: AppRoute[] = [
   {
     id: "departures",
     path: "/department/departures",
-    element: <PlaceholderPage title="Auszüge" />,
+    element: <DeparturesPage />,
     title: "Auszüge",
     icon: <DirectionsRunOutlined />,
     requiredGroups: ["VERWALTUNG", "ADMIN"],
@@ -146,6 +149,15 @@ export const appRoutes: AppRoute[] = [
     title: "Heimrat",
     icon: <FilterVintageOutlined />,
     requiredGroups: ["Heimrat", "ADMIN"],
+    sidebar: true,
+  },
+  {
+    id: "departure-signing",
+    path: "/department/sign-off",
+    element: <DepartureSigningPage />,
+    title: "Auszüge Freigabe",
+    icon: <EditNoteIcon />,
+    requiredGroups: ["Finanzen", "Technik", "Netzwerkreferat", "Verwaltung", "ADMIN"],
     sidebar: true,
   },
   //////////////////////////////////////////////////////////////

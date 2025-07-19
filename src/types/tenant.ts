@@ -121,3 +121,23 @@ export interface HsvEngagementGroup {
   tenants: HsvTenant[];
   group_id: string;
 }
+
+export interface DepartmentSignature {
+  id: number;
+  department_name: string;
+  amount: number;
+  signed_on: string | null; // ISO date string
+  external_id: string;
+}
+
+export interface Departure {
+  tenant: TenantProfile;
+  created_on: string; // ISO date string
+  status: "PENDING" | "CLOSED";
+  signatures: DepartmentSignature[];
+  is_fully_signed: boolean;
+}
+
+export interface SignSignaturePayload {
+  amount: number;
+}
