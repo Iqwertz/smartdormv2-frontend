@@ -121,3 +121,18 @@ export interface HsvEngagementGroup {
   tenants: HsvTenant[];
   group_id: string;
 }
+
+export interface Departure {
+  tenant: number; // This is the tenant_id, which is the PK of the departure
+  status: "POSTPONED" | "CREATED" | "CLOSED" | "CONFIRMED";
+  tenant_name: string;
+}
+
+export interface DepartmentSignature {
+  id: number;
+  external_id: string;
+  amount: number;
+  department_name: string;
+  signed_on: string | null; // ISO date string or null
+  departure: Departure;
+}

@@ -10,6 +10,7 @@ import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import DirectionsRunOutlined from "@mui/icons-material/DirectionsRunOutlined";
 import ArticleOutlined from "@mui/icons-material/ArticleOutlined";
 import BedOutlined from "@mui/icons-material/BedOutlined";
+import DrawOutlinedIcon from "@mui/icons-material/DrawOutlined";
 
 import TenantPage from "./pages/TenantPage";
 import DepartmentPage from "./pages/DepartmentPage";
@@ -23,6 +24,7 @@ import EditTenantPage from "./pages/admin/EditTenantPage";
 import EditSubtenantPage from "./pages/admin/EditSubtenantPage";
 import NewSubtenantPage from "./pages/admin/NewSubtenantPage";
 import SubtenantPage from "./pages/admin/SubtenantPage";
+import DepartmentSignaturePage from "./pages/engagements/DepartmentSignaturePage";
 
 // Placeholder for pages that might need to be created
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
@@ -146,6 +148,51 @@ export const appRoutes: AppRoute[] = [
     title: "Heimrat",
     icon: <FilterVintageOutlined />,
     requiredGroups: ["Heimrat", "ADMIN"],
+    sidebar: true,
+  },
+  {
+    id: "signatures-tutoren",
+    path: "/signatures/tutoren",
+    element: <DepartmentSignaturePage departmentSlug="tutoren" departmentDisplayName="Tutoren" />,
+    title: "Auszüge Tutoren",
+    icon: <DrawOutlinedIcon />,
+    requiredGroups: ["Tutoren", "ADMIN"],
+    sidebar: true,
+  },
+  {
+    id: "signatures-bar",
+    path: "/signatures/bar",
+    element: <DepartmentSignaturePage departmentSlug="bar" departmentDisplayName="Barreferat" />,
+    title: "Auszüge Bar",
+    icon: <DrawOutlinedIcon />,
+    requiredGroups: ["Barreferat", "ADMIN"],
+    sidebar: true,
+  },
+  {
+    id: "signatures-werk",
+    path: "/signatures/werk",
+    element: <DepartmentSignaturePage departmentSlug="werk" departmentDisplayName="Werkreferat" />,
+    title: "Auszüge Werk",
+    icon: <DrawOutlinedIcon />,
+    requiredGroups: ["Werkreferat", "ADMIN"],
+    sidebar: true,
+  },
+  {
+    id: "signatures-innen",
+    path: "/signatures/innen",
+    element: <DepartmentSignaturePage departmentSlug="innen" departmentDisplayName="Innenreferat" />,
+    title: "Auszüge Innen",
+    icon: <DrawOutlinedIcon />,
+    requiredGroups: ["Innenreferat", "ADMIN"],
+    sidebar: true,
+  },
+  {
+    id: "signatures-finanzen",
+    path: "/signatures/finanzen",
+    element: <DepartmentSignaturePage departmentSlug="finanzen" departmentDisplayName="Finanzenreferat" />,
+    title: "Auszüge Finanzen",
+    icon: <DrawOutlinedIcon />,
+    requiredGroups: ["Finanzenreferat", "ADMIN"],
     sidebar: true,
   },
   //////////////////////////////////////////////////////////////
