@@ -100,7 +100,10 @@ const DepartmentSignatureList: React.FC<DepartmentSignatureListProps> = ({ depar
             divider
             sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 2 }}
           >
-            <ListItemText primary={sig.departure.tenant_name} secondary={`Status: ${sig.departure.status}`} />
+            <ListItemText
+              primary={`${sig.departure.tenant.name} ${sig.departure.tenant.surname}`}
+              secondary={`Status: ${sig.departure.status}`}
+            />
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
               <TextField
                 label="Betrag (€)"
