@@ -11,6 +11,7 @@ import {
   ListItemText,
   ListItemIcon,
   Button,
+  Paper,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -33,6 +34,8 @@ const ConfirmedDeparturesList: React.FC = () => {
     setError(null);
     try {
       const data = await fetchDeparturesByStatus("CONFIRMED");
+      console.log(data);
+      setDepartures(data);
     } catch (err) {
       setError("Bestätigte Auszüge konnten nicht geladen werden.");
     } finally {
@@ -76,59 +79,70 @@ const ConfirmedDeparturesList: React.FC = () => {
           <Card key={dep.tenant.id} variant="outlined">
             <CardContent>
               <Grid container spacing={2}>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="h6">
-                    {dep.tenant.name} {dep.tenant.surname}
-                  </Typography>
-                  <Typography color="text.secondary">Zimmer: {dep.tenant.current_room}</Typography>
-                  <Typography color="text.secondary">
-                    Auszug am: {dayjs(dep.tenant.move_out).format("DD.MM.YYYY")}
-                  </Typography>
-                  <Typography color="text.secondary" variant="body2">
-                    Email: {dep.tenant.email}
-                  </Typography>
+                <Grid item xs={12}>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 4 }}>
+                    <Box>
+                      <Typography variant="h6">
+                        {dep.tenant.name} {dep.tenant.surname}
+                      </Typography>
+                      <Typography color="text.secondary">Zimmer: {dep.tenant.current_room}</Typography>
+                      <Typography color="text.secondary">
+                        Auszug am: {dayjs(dep.tenant.move_out).format("DD.MM.YYYY")}
+                      </Typography>
+                      <Typography color="text.secondary" variant="body2">
+                        Email: {dep.tenant.email}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: "flex", flexDirection: "column", gap: 1, minWidth: 200 }}>
+                      <DatePicker
+                        label="Auszugsdatum (optional)"
+                        value={closingStates[dep.tenant.id]?.newDate || null}
+                        onChange={(d) => handleDateChange(dep.tenant.id, d)}
+                        slotProps={{ textField: { size: "small" } }}
+                        disabled={isClosing}
+                      />
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleCloseDeparture(dep.tenant.id)}
+                        disabled={!allSigned || isClosing}
+                      >
+                        {isClosing ? <CircularProgress size={24} /> : "Auszug schließen"}
+                      </Button>
+                      {!allSigned && (
+                        <Typography variant="caption" color="error">
+                          Es fehlen noch Signaturen.
+                        </Typography>
+                      )}
+                    </Box>
+                  </Box>
                 </Grid>
-                <Grid item xs={12} md={5}>
-                  <Typography variant="subtitle1">Signaturen</Typography>
-                  <List dense>
+                <Grid item xs={12}>
+                  <Typography variant="subtitle1">Signaturen:</Typography>
+                  <List dense sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
                     {dep.signatures?.map((sig) => (
-                      <ListItem key={sig.id} disablePadding>
-                        <ListItemIcon sx={{ minWidth: 32 }}>
-                          {sig.signed_on !== "1900-01-01" ? (
-                            <CheckCircleIcon color="success" fontSize="small" />
-                          ) : (
-                            <CancelIcon color="error" fontSize="small" />
-                          )}
-                        </ListItemIcon>
-                        <ListItemText primary={sig.department_name} secondary={`Betrag: ${sig.amount} €`} />
-                      </ListItem>
+                      <Paper
+                        key={sig.id}
+                        elevation={3}
+                        sx={{ display: "inline-flex", alignItems: "center", p: 1, minWidth: 180 }}
+                      >
+                        <ListItem disablePadding>
+                          <ListItemIcon sx={{ minWidth: 32 }}>
+                            {sig.signed_on !== "1900-01-01" ? (
+                              <CheckCircleIcon color="success" fontSize="small" />
+                            ) : (
+                              <CancelIcon color="error" fontSize="small" />
+                            )}
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={sig.department_name}
+                            secondary={`Betrag: ${sig.amount} €`}
+                            sx={{ color: sig.amount > 0 ? "error.main" : "inherit" }}
+                          />
+                        </ListItem>
+                      </Paper>
                     ))}
                   </List>
-                </Grid>
-                <Grid item xs={12} md={3}>
-                  <Typography variant="subtitle1">Aktion</Typography>
-                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1, mt: 1 }}>
-                    <DatePicker
-                      label="Neues Auszugsdatum (optional)"
-                      value={closingStates[dep.tenant.id]?.newDate || null}
-                      onChange={(d) => handleDateChange(dep.tenant.id, d)}
-                      slotProps={{ textField: { size: "small" } }}
-                      disabled={isClosing}
-                    />
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={() => handleCloseDeparture(dep.tenant.id)}
-                      disabled={!allSigned || isClosing}
-                    >
-                      {isClosing ? <CircularProgress size={24} /> : "Auszug schließen"}
-                    </Button>
-                    {!allSigned && (
-                      <Typography variant="caption" color="error">
-                        Es fehlen noch Signaturen.
-                      </Typography>
-                    )}
-                  </Box>
                 </Grid>
               </Grid>
             </CardContent>
