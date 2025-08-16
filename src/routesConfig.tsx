@@ -26,6 +26,7 @@ import NewSubtenantPage from "./pages/admin/NewSubtenantPage";
 import SubtenantPage from "./pages/admin/SubtenantPage";
 import DepartmentSignaturePage from "./pages/engagements/DepartmentSignaturePage";
 import DeparturesPage from "./pages/admin/DeparturesPage";
+import ExtensionsPage from "./pages/admin/ExtensionsPage";
 
 // Placeholder for pages that might need to be created
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
@@ -101,7 +102,7 @@ export const appRoutes: AppRoute[] = [
   {
     id: "extensions",
     path: "/department/extensions",
-    element: <PlaceholderPage title="Verlängerungen" />,
+    element: <ExtensionsPage />,
     title: "Verlängerungen",
     icon: <ArticleOutlined />,
     requiredGroups: ["VERWALTUNG", "ADMIN"],

@@ -11,8 +11,8 @@ import {
   ListItemText,
   ListItemIcon,
   Button,
-  Grid,
 } from "@mui/material";
+import Grid from "@mui/material/Grid";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { Departure } from "../../../types/tenant";
 import { fetchDeparturesByStatus, closeDeparture } from "../../../services/departureService";
@@ -33,7 +33,6 @@ const ConfirmedDeparturesList: React.FC = () => {
     setError(null);
     try {
       const data = await fetchDeparturesByStatus("CONFIRMED");
-      setDepartures(data);
     } catch (err) {
       setError("Bestätigte Auszüge konnten nicht geladen werden.");
     } finally {
@@ -101,10 +100,7 @@ const ConfirmedDeparturesList: React.FC = () => {
                             <CancelIcon color="error" fontSize="small" />
                           )}
                         </ListItemIcon>
-                        <ListItemText
-                          primary={sig.department_name}
-                          secondary={`Betrag: ${typeof sig.amount === "number" ? sig.amount.toFixed(2) : "0.00"} €`}
-                        />
+                        <ListItemText primary={sig.department_name} secondary={`Betrag: ${sig.amount} €`} />
                       </ListItem>
                     ))}
                   </List>

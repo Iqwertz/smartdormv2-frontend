@@ -141,3 +141,12 @@ export interface DepartmentSignature {
     external_id: string;
   };
 }
+
+export interface Claim {
+  id: number;
+  created_on: string;
+  status: "CREATED" | "PROCESSING" | "APPROVED" | "REJECTED";
+  type: "EXTENSION";
+  tenant: TenantProfile;
+  external_id: string;
+}
