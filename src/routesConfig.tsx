@@ -27,6 +27,7 @@ import SubtenantPage from "./pages/admin/SubtenantPage";
 import DepartmentSignaturePage from "./pages/engagements/DepartmentSignaturePage";
 import DeparturesPage from "./pages/admin/DeparturesPage";
 import ExtensionsPage from "./pages/admin/ExtensionsPage";
+import { ALL_FLOORS } from "./config";
 
 // Placeholder for pages that might need to be created
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
@@ -46,6 +47,19 @@ export interface AppRoute {
   sidebar: boolean;
   defaultRedirectOrder?: number;
 }
+
+//Generate routes for floorspeaker signatures
+const floorSignatureRoutes = ALL_FLOORS.map((floor) => ({
+  id: `signatures-${floor.toLowerCase()}`,
+  path: `/signatures/${floor.toLowerCase()}`,
+  element: <DepartmentSignaturePage departmentSlug={floor.toLowerCase()} departmentDisplayName={floor} />,
+  title: `Unterschriften ${floor}`,
+  icon: <DrawOutlinedIcon />,
+  requiredGroups: ["ADMIN", `Flursprecher-${floor}`],
+  sidebar: true,
+}));
+
+console.log("Generated floor signature routes:", floorSignatureRoutes);
 
 export const appRoutes: AppRoute[] = [
   ////////////////////////////////////////////////////////////
@@ -217,6 +231,8 @@ export const appRoutes: AppRoute[] = [
     requiredGroups: [],
     sidebar: false,
   },
+  //Generated floor speaker routes in the end since else it looks messy for the testadmin
+  ...floorSignatureRoutes,
 ];
 
 export const loginRoute = "/login";
