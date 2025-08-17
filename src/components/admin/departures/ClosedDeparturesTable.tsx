@@ -4,6 +4,7 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Departure } from "../../../types/tenant";
 import { fetchDeparturesByStatus } from "../../../services/departureService";
 import dayjs from "dayjs";
+import { GridToolbar } from "@mui/x-data-grid/internals";
 
 const ClosedDeparturesTable: React.FC = () => {
   const [departures, setDepartures] = useState<Departure[]>([]);
@@ -66,6 +67,13 @@ const ClosedDeparturesTable: React.FC = () => {
           sorting: { sortModel: [{ field: "tenant.move_out", sort: "desc" }] },
         }}
         autoHeight
+        slots={{ toolbar: GridToolbar }}
+        showToolbar
+        slotProps={{
+          toolbar: {
+            showQuickFilter: true,
+          },
+        }}
       />
     </Box>
   );

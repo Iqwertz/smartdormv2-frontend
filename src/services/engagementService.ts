@@ -4,6 +4,8 @@ import {
   EngagementApplicationData,
   GlobalAppSettings,
   MyEngagementApplication,
+  AdminEngagement,
+  EngagementCreatePayload,
 } from "../types/tenant";
 
 export const fetchGlobalSettings = async (): Promise<GlobalAppSettings> => {
@@ -37,6 +39,37 @@ export const fetchMyEngagementApplications = async (): Promise<MyEngagementAppli
 
 export const deleteEngagementApplication = async (applicationId: number): Promise<void> => {
   await apiClient.delete(`/api/tenants/engagement-application/${applicationId}/delete/`);
+};
+
+//Engagement Management
+
+export const fetchEngagementsAdmin = async (compensated: boolean): Promise<AdminEngagement[]> => {
+  const response = await apiClient.get<AdminEngagement[]>("/api/engagements/heimrat/engagements/list/", {
+    params: { compensated },
+  });
+  return response.data;
+};
+
+export const createEngagementAdmin = async (payload: EngagementCreatePayload): Promise<AdminEngagement> => {
+  const response = await apiClient.post<AdminEngagement>("/api/engagements/heimrat/engagements/create/", payload);
+  return response.data;
+};
+
+export const updateEngagementPoints = async (engagementId: number, points: number): Promise<AdminEngagement> => {
+  const response = await apiClient.put<AdminEngagement>(
+    `/api/engagements/heimrat/engagements/${engagementId}/update-points/`,
+    { points }
+  );
+  return response.data;
+};
+
+export const deleteEngagementAdmin = async (engagementId: number): Promise<void> => {
+  await apiClient.delete(`/api/engagements/heimrat/engagements/${engagementId}/delete/`);
+};
+
+export const compensateAllEngagements = async (): Promise<{ message: string }> => {
+  const response = await apiClient.post("/api/engagements/heimrat/engagements/compensate-all/");
+  return response.data;
 };
 
 // Heimrat specific services

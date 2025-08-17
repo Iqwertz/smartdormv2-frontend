@@ -6,6 +6,7 @@ import { fetchDeparturesByStatus, sendDepartureReminder } from "../../../service
 import { useNotification } from "../../../context/NotificationContext";
 import dayjs from "dayjs";
 import EmailIcon from "@mui/icons-material/Email";
+import { GridToolbar } from "@mui/x-data-grid/internals";
 
 const OpenDeparturesTable: React.FC = () => {
   const [departures, setDepartures] = useState<Departure[]>([]);
@@ -92,6 +93,13 @@ const OpenDeparturesTable: React.FC = () => {
           sorting: { sortModel: [{ field: "created_on", sort: "desc" }] },
         }}
         autoHeight
+        slots={{ toolbar: GridToolbar }}
+        showToolbar
+        slotProps={{
+          toolbar: {
+            showQuickFilter: true,
+          },
+        }}
       />
     </Box>
   );

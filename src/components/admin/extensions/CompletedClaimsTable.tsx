@@ -4,6 +4,7 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Claim } from "../../../types/tenant";
 import { fetchClaimsByStatus } from "../../../services/claimService";
 import dayjs from "dayjs";
+import { GridToolbar } from "@mui/x-data-grid/internals";
 
 const CompletedClaimsTable: React.FC = () => {
   const [claims, setClaims] = useState<Claim[]>([]);
@@ -57,7 +58,20 @@ const CompletedClaimsTable: React.FC = () => {
 
   return (
     <Box sx={{ height: "100%", width: "100%" }}>
-      <DataGrid rows={claims} columns={columns} loading={loading} getRowId={(row) => row.id} autoHeight />
+      <DataGrid
+        rows={claims}
+        columns={columns}
+        loading={loading}
+        getRowId={(row) => row.id}
+        autoHeight
+        slots={{ toolbar: GridToolbar }}
+        showToolbar
+        slotProps={{
+          toolbar: {
+            showQuickFilter: true,
+          },
+        }}
+      />
     </Box>
   );
 };

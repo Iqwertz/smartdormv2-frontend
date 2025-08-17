@@ -42,6 +42,7 @@ import { useNotification } from "../../context/NotificationContext";
 import { TenantForSelect } from "../../types/parcel";
 import imageCompression from "browser-image-compression";
 import { API_BASE_URL } from "../../config";
+import { GridToolbar } from "@mui/x-data-grid/internals";
 
 // --- Settings Component ---
 const HeimratSettings: React.FC = () => {
@@ -290,7 +291,20 @@ const HeimratApplicationList: React.FC = () => {
         PDF Herunterladen
       </Button>
       {error && <Alert severity="error">{error}</Alert>}
-      <DataGrid rows={applications} columns={columns} loading={loading} autoHeight getRowId={(row) => row.id} />
+      <DataGrid
+        rows={applications}
+        columns={columns}
+        loading={loading}
+        autoHeight
+        getRowId={(row) => row.id}
+        slots={{ toolbar: GridToolbar }}
+        showToolbar
+        slotProps={{
+          toolbar: {
+            showQuickFilter: true,
+          },
+        }}
+      />
       <Dialog open={deleteConfirm.open} onClose={() => setDeleteConfirm({ open: false, appId: null })}>
         <DialogTitle>Löschen bestätigen</DialogTitle>
         <DialogContent>

@@ -6,6 +6,7 @@ import { fetchDepartureCandidates, createDeparture } from "../../../services/dep
 import { useNotification } from "../../../context/NotificationContext";
 import dayjs from "dayjs";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import { GridToolbar } from "@mui/x-data-grid/internals";
 
 const DepartureCandidatesTable: React.FC = () => {
   const [candidates, setCandidates] = useState<TenantProfile[]>([]);
@@ -81,6 +82,13 @@ const DepartureCandidatesTable: React.FC = () => {
           sorting: { sortModel: [{ field: "move_out", sort: "asc" }] },
         }}
         autoHeight
+        slots={{ toolbar: GridToolbar }}
+        showToolbar
+        slotProps={{
+          toolbar: {
+            showQuickFilter: true,
+          },
+        }}
       />
     </Box>
   );

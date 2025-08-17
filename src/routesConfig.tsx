@@ -30,6 +30,7 @@ import ExtensionsPage from "./pages/admin/ExtensionsPage";
 import { ALL_FLOORS } from "./config";
 import ApplyEngagementPage from "./pages/tenants/ApplyEngagementPage";
 import ViewApplicationsPage from "./pages/tenants/ViewApplicationsPage";
+import EngagementManagementPage from "./pages/engagements/EngagementManagementPage";
 
 // Placeholder for pages that might need to be created
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
@@ -182,6 +183,15 @@ export const appRoutes: AppRoute[] = [
     title: "Heimrat",
     icon: <FilterVintageOutlined />,
     requiredGroups: ["Heimrat", "ADMIN"],
+    sidebar: true,
+  },
+  {
+    id: "engagement-management",
+    path: "/referate",
+    element: <EngagementManagementPage />,
+    title: "Referate",
+    icon: <AssignmentIndOutlinedIcon />,
+    requiredGroups: ["Heimrat", "Inforeferat", "ADMIN"],
     sidebar: true,
   },
   {

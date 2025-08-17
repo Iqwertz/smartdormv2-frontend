@@ -55,6 +55,31 @@ export interface MyEngagementApplication {
   motivation: string;
 }
 
+export interface AdminEngagement {
+  id: number;
+  semester: string;
+  points: number;
+  note: string | null;
+  compensate: boolean;
+  tenant: {
+    id: number;
+    name: string;
+    surname: string;
+    email: string;
+    current_room: string | null;
+    current_floor: string | null;
+  };
+  department: DepartmentForSelect;
+}
+
+export interface EngagementCreatePayload {
+  tenant_id: number;
+  department_id: number;
+  semester: string;
+  note: string;
+  compensate: boolean;
+}
+
 export interface NewTenantPayload {
   name: string;
   surname: string;

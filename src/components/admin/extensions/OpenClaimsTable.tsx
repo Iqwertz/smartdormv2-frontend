@@ -7,6 +7,7 @@ import { useNotification } from "../../../context/NotificationContext";
 import dayjs from "dayjs";
 import EmailIcon from "@mui/icons-material/Email";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import { GridToolbar } from "@mui/x-data-grid/internals";
 
 const OpenClaimsTable: React.FC = () => {
   const [claims, setClaims] = useState<Claim[]>([]);
@@ -93,7 +94,20 @@ const OpenClaimsTable: React.FC = () => {
 
   return (
     <Box sx={{ height: "100%", width: "100%" }}>
-      <DataGrid rows={claims} columns={columns} loading={loading} getRowId={(row) => row.id} autoHeight />
+      <DataGrid
+        rows={claims}
+        columns={columns}
+        loading={loading}
+        getRowId={(row) => row.id}
+        autoHeight
+        slots={{ toolbar: GridToolbar }}
+        showToolbar
+        slotProps={{
+          toolbar: {
+            showQuickFilter: true,
+          },
+        }}
+      />
     </Box>
   );
 };
