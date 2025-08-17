@@ -47,6 +47,14 @@ export interface EngagementApplicationData {
   motivation: string;
   image_base64: string | null;
 }
+
+export interface MyEngagementApplication {
+  id: number;
+  semester: string;
+  department: DepartmentForSelect;
+  motivation: string;
+}
+
 export interface NewTenantPayload {
   name: string;
   surname: string;
