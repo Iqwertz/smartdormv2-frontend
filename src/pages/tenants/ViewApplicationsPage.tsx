@@ -3,6 +3,7 @@ import { Box, Typography, CircularProgress, Alert, Paper, Grid } from "@mui/mate
 import DashboardCard from "../../components/shared/DashboardCard";
 import { GlobalAppSettings, EngagementApplicationData } from "../../types/tenant";
 import { fetchGlobalSettings, fetchEngagementApplications } from "../../services/engagementService";
+import LazyImage from "../../components/shared/LazyImage"; // Import the new component
 
 const ViewApplicationsPage: React.FC = () => {
   const [settings, setSettings] = useState<GlobalAppSettings | null>(null);
@@ -60,8 +61,8 @@ const ViewApplicationsPage: React.FC = () => {
         <DashboardCard key={deptName} title={deptName}>
           <Grid container spacing={2}>
             {apps.map((app) => {
-              const imgSrc = app.image_base64 ? `data:image/jpeg;base64,${app.image_base64}` : undefined;
               const initials = `${app.tenant.name?.charAt(0) ?? ""}${app.tenant.surname?.charAt(0) ?? ""}`;
+              const altText = `${app.tenant.name} ${app.tenant.surname}`;
 
               return (
                 <Grid item xs={12} md={6} key={app.id}>
@@ -88,41 +89,12 @@ const ViewApplicationsPage: React.FC = () => {
                         ml: { md: 2 },
                       }}
                     >
-                      {imgSrc ? (
-                        <Box
-                          component="img"
-                          src={imgSrc}
-                          alt={`${app.tenant.name} ${app.tenant.surname}`}
-                          sx={{
-                            width: "100%",
-                            height: { xs: "auto", md: 240 },
-                            objectFit: "cover",
-                            borderRadius: 1,
-                            boxShadow: 1,
-                          }}
-                        />
-                      ) : (
-                        <Box
-                          sx={{
-                            width: "100%",
-                            height: { xs: 180, md: 240 },
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            bgcolor: "grey.200",
-                            borderRadius: 1,
-                          }}
-                        >
-                          <Typography variant="h4" sx={{ color: "text.secondary" }}>
-                            {initials}
-                          </Typography>
-                        </Box>
-                      )}
+                      <LazyImage imageUrl={app.image_url} initials={initials} altText={altText} />
                     </Box>
 
                     {/* Text content */}
                     <Box sx={{ flex: 1, order: { xs: 1, md: 0 }, minWidth: 0 }}>
-                      <Typography variant="h6" sx={{ display: { xs: "none", md: "block" } }}>
+                      <Typography variant="h6">
                         {app.tenant.name} {app.tenant.surname}
                       </Typography>
 

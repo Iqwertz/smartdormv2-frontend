@@ -72,6 +72,13 @@ export const compensateAllEngagements = async (): Promise<{ message: string }> =
   return response.data;
 };
 
+export const updateSemesterAndLdap = async (newSemester: string): Promise<{ message: string }> => {
+  const response = await apiClient.post("/api/engagements/heimrat/update-semester-and-ldap/", {
+    new_semester: newSemester,
+  });
+  return response.data;
+};
+
 // Heimrat specific services
 export const heimratFetchApplications = async (): Promise<EngagementApplicationData[]> => {
   const response = await apiClient.get<EngagementApplicationData[]>("/api/engagements/heimrat/applications/list/");

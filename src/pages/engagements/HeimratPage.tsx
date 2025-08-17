@@ -7,7 +7,6 @@ import {
   Alert,
   Typography,
   Button,
-  IconButton,
   Dialog,
   DialogActions,
   DialogContent,
@@ -15,20 +14,12 @@ import {
   DialogTitle,
   TextField,
   Autocomplete,
-  Avatar,
-  Paper,
-  Grid,
 } from "@mui/material";
 import { DataGrid, GridColDef, GridActionsCellItem } from "@mui/x-data-grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DownloadIcon from "@mui/icons-material/Download";
 import TabbedDashboardCard from "../../components/shared/TabbedDashboardCard";
-import {
-  GlobalAppSettings,
-  EngagementApplicationData,
-  DepartmentForSelect,
-  MyEngagementApplication,
-} from "../../types/tenant";
+import { GlobalAppSettings, EngagementApplicationData, DepartmentForSelect } from "../../types/tenant";
 import {
   fetchGlobalSettings,
   heimratFetchApplications,
@@ -43,6 +34,21 @@ import { TenantForSelect } from "../../types/parcel";
 import imageCompression from "browser-image-compression";
 import { API_BASE_URL } from "../../config";
 import { GridToolbar } from "@mui/x-data-grid/internals";
+import { updateSemesterAndLdap } from "../../services/engagementService";
+
+// --- Helper ---
+const generateSemesterOptions = (): string[] => {
+  //could be unified in a helper service
+  const currentYear = new Date().getFullYear();
+  const shortYear = currentYear % 100;
+  const semesters: string[] = [];
+  for (let i = 2; i >= -2; i--) {
+    const year = shortYear - i;
+    semesters.push(`WS${year}/${(year + 1).toString().padStart(2, "0")}`);
+    semesters.push(`SS${year + 1}`); // SS for the following year
+  }
+  return semesters.reverse();
+};
 
 // --- Settings Component ---
 const HeimratSettings: React.FC = () => {
@@ -291,20 +297,7 @@ const HeimratApplicationList: React.FC = () => {
         PDF Herunterladen
       </Button>
       {error && <Alert severity="error">{error}</Alert>}
-      <DataGrid
-        rows={applications}
-        columns={columns}
-        loading={loading}
-        autoHeight
-        getRowId={(row) => row.id}
-        slots={{ toolbar: GridToolbar }}
-        showToolbar
-        slotProps={{
-          toolbar: {
-            showQuickFilter: true,
-          },
-        }}
-      />
+      <DataGrid rows={applications} columns={columns} loading={loading} autoHeight getRowId={(row) => row.id} />
       <Dialog open={deleteConfirm.open} onClose={() => setDeleteConfirm({ open: false, appId: null })}>
         <DialogTitle>Löschen bestätigen</DialogTitle>
         <DialogContent>
@@ -321,12 +314,100 @@ const HeimratApplicationList: React.FC = () => {
   );
 };
 
+// --- Semester Update Component ---
+const UpdateSemesterComponent: React.FC = () => {
+  const { showNotification } = useNotification();
+  const [settings, setSettings] = useState<GlobalAppSettings | null>(null);
+  const [selectedSemester, setSelectedSemester] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    fetchGlobalSettings().then(setSettings);
+  }, []);
+
+  const handleUpdateClick = () => {
+    if (selectedSemester && selectedSemester !== settings?.current_semester) {
+      setConfirmOpen(true);
+    } else {
+      showNotification("Bitte ein neues Semester auswählen.", "info");
+    }
+  };
+
+  const handleConfirmUpdate = async () => {
+    if (!selectedSemester) return;
+    setIsSubmitting(true);
+    try {
+      const response = await updateSemesterAndLdap(selectedSemester);
+      showNotification(response.message, "success", 8000);
+      fetchGlobalSettings().then(setSettings); // Refresh current semester display
+    } catch (err: any) {
+      const msg = err.response?.data?.error || "Semester-Update fehlgeschlagen.";
+      showNotification(msg, "error", 10000);
+    } finally {
+      setIsSubmitting(false);
+      setConfirmOpen(false);
+      setSelectedSemester(null);
+    }
+  };
+
+  return (
+    <Box sx={{ p: 2, display: "flex", flexDirection: "column", gap: 2 }}>
+      <Typography variant="h6">Semester wechseln</Typography>
+      <Typography variant="body2" color="text.secondary">
+        Aktuelles Semester: <strong>{settings?.current_semester || "Laden..."}</strong>
+      </Typography>
+      <Alert severity="warning">
+        <b>Achtung:</b> Führt diese Aktion nur aus wenn alle neuen Referate eingetragen sind. Sie entfernt die
+        Berechtigungn für alle Ämter des aktuellen Semesters und fügt sie für alle Ämter des neuen Semesters hinzu.
+      </Alert>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        <Autocomplete
+          options={generateSemesterOptions()}
+          value={selectedSemester}
+          onChange={(_, v) => setSelectedSemester(v)}
+          sx={{ flexGrow: 1 }}
+          renderInput={(params) => <TextField {...params} label="Neues Semester auswählen" />}
+        />
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleUpdateClick}
+          disabled={!selectedSemester || isSubmitting}
+        >
+          Semester wechseln
+        </Button>
+      </Box>
+
+      <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
+        <DialogTitle>Bestätigung erforderlich</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Bist du sicher, dass du das Semester von <strong>{settings?.current_semester}</strong> auf{" "}
+            <strong>{selectedSemester}</strong> ändern möchtest?
+            <br />
+            <br />
+            Es werden alle Berechtigungen für alle Schollheim Anwendungen geupdated.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmOpen(false)}>Abbrechen</Button>
+          <Button onClick={handleConfirmUpdate} color="primary" variant="contained" disabled={isSubmitting}>
+            {isSubmitting ? <CircularProgress size={24} /> : "Ja, bestätigen und wechseln"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
+  );
+};
+
 // --- Main Page Component ---
 const HeimratPage: React.FC = () => {
   const tabs = [
     { label: "Bewerbungen", content: <HeimratApplicationList /> },
     { label: "Bewerbung erstellen", content: <HeimratCreateApplicationForm /> },
     { label: "Einstellungen", content: <HeimratSettings /> },
+    { label: "System", content: <UpdateSemesterComponent /> },
   ];
 
   return (

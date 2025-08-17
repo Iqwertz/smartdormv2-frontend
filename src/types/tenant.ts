@@ -45,7 +45,7 @@ export interface EngagementApplicationData {
   };
   department: DepartmentForSelect;
   motivation: string;
-  image_base64: string | null;
+  image_url: string | null;
 }
 
 export interface MyEngagementApplication {
