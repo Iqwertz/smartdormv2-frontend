@@ -31,7 +31,7 @@ const ViewApplicationsPage: React.FC = () => {
 
   const groupedApplications = useMemo(() => {
     if (!applications) return {};
-    return applications.reduce((acc, app) => {
+    const grouped = applications.reduce((acc, app) => {
       const deptName = app.department.full_name;
       if (!acc[deptName]) {
         acc[deptName] = [];
@@ -39,6 +39,10 @@ const ViewApplicationsPage: React.FC = () => {
       acc[deptName].push(app);
       return acc;
     }, {} as Record<string, EngagementApplicationData[]>);
+
+    // Sort departments by name
+    const sortedEntries = Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b));
+    return Object.fromEntries(sortedEntries);
   }, [applications]);
 
   if (loading) return <CircularProgress />;
