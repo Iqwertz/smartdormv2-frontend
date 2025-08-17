@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Box } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
+import { Link } from "react-router-dom";
 import UserProfile from "../components/tenants/dashboard/content/UserProfile";
 import DashboardCard from "../components/shared/DashboardCard";
 import "../styles/bento-layout.scss";
@@ -9,11 +10,13 @@ import MyEngagements from "../components/tenants/dashboard/content/MyEngagements
 import QuickLinks from "../components/tenants/dashboard/content/QuickLinks";
 import DepartureDecisionPopup from "../components/tenants/dashboard/content/DepartureDecisionPopup";
 import { fetchMyDeparture } from "../services/departureService";
-import { Departure } from "../types/tenant";
+import { Departure, GlobalAppSettings } from "../types/tenant";
+import { fetchGlobalSettings } from "../services/engagementService";
 
 const TenantPage: React.FC = () => {
   const [departure, setDeparture] = useState<Departure | null>(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [settings, setSettings] = useState<GlobalAppSettings | null>(null);
 
   useEffect(() => {
     const checkDeparture = async () => {
@@ -26,7 +29,16 @@ const TenantPage: React.FC = () => {
         console.log("No open departure request found for user.");
       }
     };
+    const loadSettings = async () => {
+      try {
+        const data = await fetchGlobalSettings();
+        setSettings(data);
+      } catch (error) {
+        console.error("Could not fetch global settings.", error);
+      }
+    };
     checkDeparture();
+    loadSettings();
   }, []);
 
   return (
@@ -46,6 +58,22 @@ const TenantPage: React.FC = () => {
           </DashboardCard>
         </div>
         <div className="right">
+          {settings?.applications_open && (
+            <DashboardCard title="Referatsbewerbung">
+              <Typography sx={{ mb: 2 }}>Die Bewerbungsphase für das nächste Semester ist jetzt geöffnet.</Typography>
+              <Button component={Link} to="/apply-engagement" variant="contained" fullWidth>
+                Jetzt bewerben
+              </Button>
+            </DashboardCard>
+          )}
+          {settings?.show_applications && (
+            <DashboardCard title="Bewerbungen einsehen">
+              <Typography sx={{ mb: 2 }}>Sieh dir die Bewerbungen für das kommende Semester an.</Typography>
+              <Button component={Link} to="/view-applications" variant="contained" fullWidth>
+                Bewerbungen ansehen
+              </Button>
+            </DashboardCard>
+          )}
           <DashboardCard title="Quick Links">
             <QuickLinks></QuickLinks>
           </DashboardCard>

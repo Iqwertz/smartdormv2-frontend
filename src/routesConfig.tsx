@@ -17,7 +17,7 @@ import DepartmentPage from "./pages/DepartmentPage";
 import HSVPage from "./pages/shared/HSVPage";
 import ParcelPage from "./pages/admin/ParcelPage";
 import Error403Page from "./pages/Error403Page";
-import { FilterVintageOutlined, PersonAdd } from "@mui/icons-material";
+import { Assignment, AssignmentOutlined, FilterVintageOutlined, PersonAdd } from "@mui/icons-material";
 import HeimratPage from "./pages/engagements/HeimratPage";
 import NewTenantPage from "./pages/admin/NewTenantPage";
 import EditTenantPage from "./pages/admin/EditTenantPage";
@@ -28,6 +28,8 @@ import DepartmentSignaturePage from "./pages/engagements/DepartmentSignaturePage
 import DeparturesPage from "./pages/admin/DeparturesPage";
 import ExtensionsPage from "./pages/admin/ExtensionsPage";
 import { ALL_FLOORS } from "./config";
+import ApplyEngagementPage from "./pages/tenants/ApplyEngagementPage";
+import ViewApplicationsPage from "./pages/tenants/ViewApplicationsPage";
 
 // Placeholder for pages that might need to be created
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
@@ -74,6 +76,22 @@ export const appRoutes: AppRoute[] = [
     requiredGroups: ["tenant", "ADMIN"],
     sidebar: true,
     defaultRedirectOrder: 1,
+  },
+  {
+    id: "apply-engagement",
+    path: "/apply-engagement",
+    element: <ApplyEngagementPage />,
+    title: "Referatsbewerbungen",
+    icon: <AssignmentOutlined />,
+    requiredGroups: ["tenant", "ADMIN"],
+    sidebar: true,
+  },
+  {
+    id: "view-applications",
+    path: "/view-applications",
+    element: <ViewApplicationsPage />,
+    requiredGroups: [], // All authenticated users can view if enabled
+    sidebar: false,
   },
   ////////////////////////////////////////////////////////////
   // Department Specific Routes:

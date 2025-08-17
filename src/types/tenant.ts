@@ -24,6 +24,29 @@ export interface TenantProfile {
   new_address: string | null;
 }
 
+export interface GlobalAppSettings {
+  current_semester: string;
+  applications_open: boolean;
+  show_applications: boolean;
+  updated_at: string;
+}
+
+export interface DepartmentForSelect {
+  id: number;
+  name: string;
+  full_name: string;
+}
+
+export interface EngagementApplicationData {
+  id: number;
+  tenant: {
+    name: string;
+    surname: string;
+  };
+  department: DepartmentForSelect;
+  motivation: string;
+  image_base64: string | null;
+}
 export interface NewTenantPayload {
   name: string;
   surname: string;
