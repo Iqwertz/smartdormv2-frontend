@@ -38,3 +38,22 @@ export const fetchMyEngagementApplications = async (): Promise<MyEngagementAppli
 export const deleteEngagementApplication = async (applicationId: number): Promise<void> => {
   await apiClient.delete(`/api/tenants/engagement-application/${applicationId}/delete/`);
 };
+
+// Heimrat specific services
+export const heimratFetchApplications = async (): Promise<EngagementApplicationData[]> => {
+  const response = await apiClient.get<EngagementApplicationData[]>("/api/engagements/heimrat/applications/list/");
+  return response.data;
+};
+
+export const heimratDeleteApplication = async (applicationId: number): Promise<void> => {
+  await apiClient.delete(`/api/engagements/heimrat/applications/${applicationId}/delete/`);
+};
+
+export const heimratCreateApplication = async (formData: FormData): Promise<{ message: string }> => {
+  const response = await apiClient.post("/api/engagements/heimrat/applications/create/", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};
