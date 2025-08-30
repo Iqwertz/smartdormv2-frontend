@@ -1,5 +1,6 @@
 import { Box } from "@mui/material";
 import LogoutButton from "./LogoutButton";
+import PasswordChangeButton from "./PasswordChangeButton";
 
 const Settings: React.FC = () => {
 
@@ -8,12 +9,13 @@ const Settings: React.FC = () => {
     <Box
       sx={{
         display: 'flex',
-        flexWrap: 'wrap',
-        gap: '18px',
+        flexDirection: 'column',
+        gap: '12px',
       }}
     >
-        <LogoutButton></LogoutButton>
-</Box>
+        <PasswordChangeButton />
+        <LogoutButton />
+    </Box>
   );
 };
 

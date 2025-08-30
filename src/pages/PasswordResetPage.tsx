@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -12,12 +12,23 @@ import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import CssBaseline from "@mui/material/CssBaseline";
 import apiClient from "../services/api";
+import { useAuth } from "../context/AuthContext";
 
 const PasswordResetPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { logout, authState } = useAuth();
+
+  // Get pre-filled email from navigation state
+  useEffect(() => {
+    const preFilledEmail = location.state?.preFilledEmail;
+    if (preFilledEmail) {
+      setEmail(preFilledEmail);
+    }
+  }, [location.state]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -33,6 +44,14 @@ const PasswordResetPage: React.FC = () => {
           text: response.data.message || "Wenn die E-Mail-Adresse existiert, wurde eine Passwort-Reset-E-Mail gesendet."
         });
         setEmail("");
+        
+        // Logout the user after successful password reset
+        try {
+          await logout();
+        } catch (logoutError) {
+          console.error("Logout after password reset failed:", logoutError);
+          // Continue anyway, the password reset was successful
+        }
       } else {
         setMessage({
           type: 'error',
@@ -47,6 +66,14 @@ const PasswordResetPage: React.FC = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleBackNavigation = () => {
+    if (authState.isAuthenticated) {
+      navigate("/dashboard");
+    } else {
+      navigate("/login");
     }
   };
 
@@ -138,16 +165,19 @@ const PasswordResetPage: React.FC = () => {
                 >
                   {loading ? "Wird gesendet..." : "Passwort zurücksetzen"}
                 </Button>
-                <Box sx={{ textAlign: "center" }}>
-                  <Link
-                    component="button"
-                    variant="body2"
-                    onClick={() => navigate("/login")}
-                    sx={{ cursor: "pointer" }}
-                  >
-                    Zurück zum Login
-                  </Link>
-                </Box>
+              </Box>
+              <Box sx={{ textAlign: "center", mt: 2 }}>
+                <Link
+                  component="button"
+                  variant="body2"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleBackNavigation();
+                  }}
+                  sx={{ cursor: "pointer" }}
+                >
+                  {authState.isAuthenticated ? "Zurück" : "Zurück zum Login"}
+                </Link>
               </Box>
             </Box>
           </Container>
