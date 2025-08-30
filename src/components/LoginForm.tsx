@@ -6,6 +6,7 @@ import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import Box from "@mui/material/Box";
+import Link from "@mui/material/Link";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
@@ -113,6 +114,16 @@ const LoginForm: React.FC = () => {
           <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
             Sign In
           </Button>
+          <Box sx={{ textAlign: "center", mt: 2 }}>
+            <Link
+              component="button"
+              variant="body2"
+              onClick={() => navigate("/password-reset")}
+              sx={{ cursor: "pointer" }}
+            >
+              Passwort vergessen?
+            </Link>
+          </Box>
         </Box>
       </Box>
     </Container>
