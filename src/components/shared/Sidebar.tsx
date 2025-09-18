@@ -4,6 +4,9 @@ import "../../styles/Sidebar.scss";
 import MenuIcon from "@mui/icons-material/Menu";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import LogoutIcon from "@mui/icons-material/Logout";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import EditIcon from "@mui/icons-material/Edit";
 import { useAuth } from "../../context/AuthContext";
 import { getSidebarItems, AppRoute } from "../../routesConfig";
 
@@ -13,26 +16,42 @@ export interface AppSidebarItem {
   title: string;
   path: string;
   requiredGroups?: string[];
+  isReferat?: boolean;
 }
 
 const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [referatDropdownOpen, setReferatDropdownOpen] = useState(false);
   const { authState, logout } = useAuth();
   const location = useLocation();
   const previousPathnameRef = useRef(location.pathname);
 
-  const sidebarItems: AppSidebarItem[] = useMemo(() => {
+  const { sidebarItems, referatItems } = useMemo(() => {
     if (authState.user?.groups) {
-      return getSidebarItems(authState.user.groups).map((route: AppRoute) => ({
+      const allItems = getSidebarItems(authState.user.groups).map((route: AppRoute) => ({
         id: route.id,
         icon: route.icon,
         title: route.title!,
         path: route.path,
         requiredGroups: route.requiredGroups,
+        isReferat: route.id.includes('signatures-') || 
+                   route.id === 'signatures-tutoren' ||
+                   route.id === 'signatures-bar' ||
+                   route.id === 'signatures-werk' ||
+                   route.id === 'signatures-innen' ||
+                   route.id === 'signatures-finanzen'
       }));
+
+      const referatItems = allItems.filter(item => item.isReferat);
+      const normalItems = allItems.filter(item => !item.isReferat);
+
+      return {
+        sidebarItems: normalItems,
+        referatItems: referatItems
+      };
     }
-    return [];
+    return { sidebarItems: [], referatItems: [] };
   }, [authState.user?.groups]);
 
   const handleLogout = async () => {
@@ -41,6 +60,10 @@ const Sidebar: React.FC = () => {
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
+  };
+
+  const toggleReferatDropdown = () => {
+    setReferatDropdownOpen(!referatDropdownOpen);
   };
 
   useEffect(() => {
@@ -74,6 +97,12 @@ const Sidebar: React.FC = () => {
     previousPathnameRef.current = location.pathname;
   }, [location.pathname, isMobile, isOpen]);
 
+  useEffect(() => {
+    if (!isOpen) {
+      setReferatDropdownOpen(false);
+    }
+  }, [isOpen]);
+
   const hasAccess = (item: AppSidebarItem): boolean => {
     if (!item.requiredGroups || item.requiredGroups.length === 0) return true;
     if (!authState?.user?.groups || authState.user.groups.length === 0) return false;
@@ -106,6 +135,48 @@ const Sidebar: React.FC = () => {
     setIsOpen(true);
   };
 
+  const renderReferatDropdown = () => {
+    if (referatItems.length === 0) return null;
+
+    const hasReferatAccess = referatItems.some(item => hasAccess(item));
+    if (!hasReferatAccess) return null;
+
+    const handleReferatClick = () => {
+      if (!isOpen) {
+        setIsOpen(true);
+      } else {
+        toggleReferatDropdown();
+      }
+    };
+
+    return (
+      <li className="referat-dropdown">
+        <div className="referat-header" onClick={handleReferatClick}>
+          <EditIcon />
+          <span className="links_name">Unterschriften</span>
+          {isOpen && (referatDropdownOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />)}
+        </div>
+        <span className="tooltip">Unterschriften</span>
+        
+        {isOpen && referatDropdownOpen && (
+          <ul className="referat-submenu">
+            {referatItems.map(
+              (item) =>
+                hasAccess(item) && (
+                  <li key={item.id} className={location.pathname === item.path ? "active" : ""}>
+                    <Link to={item.path}>
+                      {item.icon}
+                      <span className="links_name">{item.title}</span>
+                    </Link>
+                  </li>
+                )
+            )}
+          </ul>
+        )}
+      </li>
+    );
+  };
+
   return (
     <>
       <div
@@ -134,6 +205,9 @@ const Sidebar: React.FC = () => {
                 </li>
               )
           )}
+          
+          {renderReferatDropdown()}
+          
           <li className="profile">
             <div className="profile-details">
               <div className="name_job">
