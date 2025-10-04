@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Card, CardContent, Typography, Paper } from "@mui/material";
+import { Box, CardContent, Typography, Paper } from "@mui/material";
 
 interface DashboardCardProps {
   title: string;

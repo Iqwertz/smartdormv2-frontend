@@ -5,7 +5,6 @@ import UserProfile from '../components/tenants/dashboard/content/UserProfile';
 import DashboardCard from '../components/tenants/dashboard/DashboardCard';
 import '../styles/tenantPage.scss'; // The order of Items on mobile can be changed here
 import Settings from '../components/tenants/dashboard/content/Settings';
-import { Box } from '@mui/material';
 
 const TenantPage: React.FC = () => {
   return (
