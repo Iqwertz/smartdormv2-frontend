@@ -17,7 +17,7 @@ import { useAuth } from "../context/AuthContext";
 const PasswordResetPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
   const { logout, authState } = useAuth();
@@ -37,32 +37,36 @@ const PasswordResetPage: React.FC = () => {
 
     try {
       const response = await apiClient.post("/api/auth/password-reset/", { email });
-      
+
       if (response.data.success) {
         setMessage({
-          type: 'success',
-          text: response.data.message || "Wenn die E-Mail-Adresse existiert, wurde eine Passwort-Reset-E-Mail gesendet."
+          type: "success",
+          text:
+            response.data.message || "Wenn die E-Mail-Adresse existiert, wurde eine Passwort-Reset-E-Mail gesendet.",
         });
         setEmail("");
-        
-        // Logout the user after successful password reset
-        try {
-          await logout();
-        } catch (logoutError) {
-          console.error("Logout after password reset failed:", logoutError);
-          // Continue anyway, the password reset was successful
+
+        // Logout the user after successful password reset, if he was logged in
+        if (authState.isAuthenticated) {
+          try {
+            await logout();
+          } catch (logoutError) {
+            console.error("Logout after password reset failed:", logoutError);
+            // Continue
+            // anyway, the password reset was successful
+          }
         }
       } else {
         setMessage({
-          type: 'error',
-          text: response.data.message || "Ein Fehler ist aufgetreten."
+          type: "error",
+          text: response.data.message || "Ein Fehler ist aufgetreten.",
         });
       }
     } catch (err: any) {
       console.error("Password reset request failed", err);
       setMessage({
-        type: 'error',
-        text: err.response?.data?.message || "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut."
+        type: "error",
+        text: err.response?.data?.message || "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
       });
     } finally {
       setLoading(false);
@@ -134,13 +138,13 @@ const PasswordResetPage: React.FC = () => {
               <Typography variant="body2" sx={{ mt: 2, textAlign: "center", color: "text.secondary" }}>
                 Geben Sie Ihre E-Mail-Adresse ein. Wir senden Ihnen ein neues Passwort zu.
               </Typography>
-              
+
               {message && (
                 <Alert severity={message.type} sx={{ width: "100%", mt: 2 }}>
                   {message.text}
                 </Alert>
               )}
-              
+
               <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
                 <TextField
                   margin="normal"
@@ -153,16 +157,10 @@ const PasswordResetPage: React.FC = () => {
                   autoFocus
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  error={message?.type === 'error'}
+                  error={message?.type === "error"}
                   disabled={loading}
                 />
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  sx={{ mt: 3, mb: 2 }}
-                  disabled={loading}
-                >
+                <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} disabled={loading}>
                   {loading ? "Wird gesendet..." : "Passwort zurücksetzen"}
                 </Button>
               </Box>
