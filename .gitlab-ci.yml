@@ -9,14 +9,12 @@ cache:
     - .npm/
     - node_modules/
 
-before_script:
-  - node --version || (sudo apt-get update -qq && sudo apt-get install -y -qq curl && curl -fsSL https://deb.nodesource.com/setup_18.x | sudo bash - && sudo apt-get install -y nodejs)
-  - npm ci --cache .npm --prefer-offline
-
 build:
   stage: build
   tags:
     - shell
+  before_script:
+    - npm ci --cache .npm --prefer-offline
   script:
     - npm run build
   artifacts:
