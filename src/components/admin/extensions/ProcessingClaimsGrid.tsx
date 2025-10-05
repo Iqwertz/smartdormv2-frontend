@@ -60,7 +60,7 @@ const ProcessingClaimsGrid: React.FC = () => {
       {claims.map((claim) => {
         const isDeciding = decisionStates[claim.id]?.isDeciding || false;
         return (
-          <Grid item xs={12} sm={6} md={4} key={claim.id}>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }} key={claim.id}>
             <Card variant="outlined">
               <CardContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 <Typography variant="h6">
