@@ -14,9 +14,10 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import { DataGrid, GridColDef, GridActionsCellItem } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridActionsCellItem, GridCheckIcon } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import UndoIcon from "@mui/icons-material/Undo";
 import TabbedDashboardCard from "../../components/shared/TabbedDashboardCard";
 import { useNotification } from "../../context/NotificationContext";
 import { AdminEngagement, DepartmentForSelect, EngagementCreatePayload } from "../../types/tenant";
@@ -29,8 +30,10 @@ import {
   updateEngagementPoints,
   deleteEngagementAdmin,
   compensateAllEngagements,
+  compensateEngagement,
 } from "../../services/engagementService";
 import { GridToolbar } from "@mui/x-data-grid/internals";
+import Tooltip from "@mui/material/Tooltip";
 
 // Helper to generate semester options
 const generateSemesterOptions = (): string[] => {
@@ -163,6 +166,15 @@ const EngagementList: React.FC<{ compensated: boolean; refreshKey: number; onDat
   const handleEditClick = (engagement: AdminEngagement) =>
     setEditState({ open: true, engagement, points: engagement.points.toString() });
   const handleDeleteClick = (engagementId: number) => setDeleteState({ open: true, engagementId });
+  const handleCompensateClick = async (engagement: AdminEngagement) => {
+    try {
+      const res = await compensateEngagement(engagement.id);
+      showNotification(res.message, "success");
+      onDataModified();
+    } catch {
+      showNotification("Entlastung fehlgeschlagen.", "error");
+    }
+  };
 
   const handleSavePoints = async () => {
     if (!editState.engagement) return;
@@ -205,9 +217,16 @@ const EngagementList: React.FC<{ compensated: boolean; refreshKey: number; onDat
       field: "actions",
       type: "actions",
       headerName: "Aktionen",
-      width: 100,
+      width: 130,
       getActions: ({ row }) => [
         <GridActionsCellItem icon={<EditIcon />} label="Punkte bearbeiten" onClick={() => handleEditClick(row)} />,
+        <Tooltip title={compensated ? "Entlastung rückgängig" : "Entlasten"}>
+          <GridActionsCellItem
+            icon={compensated ? <UndoIcon /> : <GridCheckIcon />}
+            label={compensated ? "Entlastung rückgängig" : "Entlasten"}
+            onClick={() => handleCompensateClick(row)}
+          />
+        </Tooltip>,
         <GridActionsCellItem icon={<DeleteIcon />} label="Löschen" onClick={() => handleDeleteClick(row.id)} />,
       ],
     },

@@ -175,7 +175,7 @@ const EditTenantPage: React.FC = () => {
               Persönliche Daten
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   name="name"
                   label="Vorname"
@@ -185,7 +185,7 @@ const EditTenantPage: React.FC = () => {
                   fullWidth
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   name="surname"
                   label="Nachname"
@@ -195,7 +195,7 @@ const EditTenantPage: React.FC = () => {
                   fullWidth
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   name="email"
                   label="E-Mail"
@@ -206,7 +206,7 @@ const EditTenantPage: React.FC = () => {
                   fullWidth
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth required sx={{ minWidth: 200 }}>
                   <InputLabel>Geschlecht</InputLabel>
                   <Select name="gender" value={tenant.gender || ""} label="Geschlecht" onChange={handleSelectChange}>
@@ -216,7 +216,7 @@ const EditTenantPage: React.FC = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <DatePicker
                   label="Geburtstag"
                   value={tenant.birthday ? dayjs(tenant.birthday) : null}
@@ -224,7 +224,7 @@ const EditTenantPage: React.FC = () => {
                   slotProps={{ textField: { fullWidth: true, required: true } }}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <Autocomplete
                   sx={{ minWidth: 200 }}
                   options={nationalities}
@@ -233,7 +233,7 @@ const EditTenantPage: React.FC = () => {
                   renderInput={(params) => <TextField {...params} label="Staatsangehörigkeit" required fullWidth />}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   name="tel_number"
                   label="Telefonnummer"
@@ -249,7 +249,7 @@ const EditTenantPage: React.FC = () => {
               Vertragsdetails
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={4}>
+              <Grid size={{ xs: 12, sm: 4 }}>
                 <DatePicker
                   label="Einzugsdatum"
                   value={dayjs(tenant.move_in)}
@@ -257,10 +257,10 @@ const EditTenantPage: React.FC = () => {
                   slotProps={{ textField: { fullWidth: true } }}
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid size={{ xs: 12, sm: 4 }}>
                 <TextField label="Zimmer" value={tenant.current_room || ""} disabled fullWidth />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid size={{ xs: 12, sm: 4 }}>
                 <DatePicker
                   label="Auszugsdatum"
                   value={dayjs(tenant.move_out)}
@@ -268,7 +268,7 @@ const EditTenantPage: React.FC = () => {
                   slotProps={{ textField: { fullWidth: true } }}
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid size={{ xs: 12, sm: 4 }}>
                 <TextField
                   name="deposit"
                   label="Kaution (€)"
@@ -278,7 +278,7 @@ const EditTenantPage: React.FC = () => {
                   fullWidth
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid size={{ xs: 12, sm: 4 }}>
                 <DatePicker
                   label="Probezeitende"
                   value={dayjs(tenant.probation_end)}
@@ -293,7 +293,7 @@ const EditTenantPage: React.FC = () => {
               Studiendetails & Notizen
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth required sx={{ minWidth: 300 }}>
                   <InputLabel>Hochschule</InputLabel>
                   <Select
@@ -310,7 +310,7 @@ const EditTenantPage: React.FC = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   name="study_field"
                   label="Studienfach"
@@ -324,7 +324,7 @@ const EditTenantPage: React.FC = () => {
 
             <Divider sx={{ my: 3 }} />
             <Grid container spacing={2}>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <TextField
                   name="note"
                   label="Notiz"
@@ -413,7 +413,7 @@ const EditTenantPage: React.FC = () => {
         <DashboardCard title="Umzug durchführen">
           <Box component="form" onSubmit={handleMove} noValidate sx={{ p: 2 }}>
             <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <Autocomplete
                   sx={{ minWidth: 300 }}
                   options={allRooms.filter((r) => r.label !== tenant.current_room)}
@@ -423,7 +423,7 @@ const EditTenantPage: React.FC = () => {
                   renderInput={(params) => <TextField {...params} label="Neues Zimmer" required fullWidth />}
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid size={{ xs: 12, sm: 4 }}>
                 <DatePicker
                   label="Umzugsdatum"
                   value={moveData.move_date}
@@ -431,7 +431,7 @@ const EditTenantPage: React.FC = () => {
                   slotProps={{ textField: { fullWidth: true, required: true } }}
                 />
               </Grid>
-              <Grid item xs={12} sm={2}>
+              <Grid size={{ xs: 12, sm: 2 }}>
                 <Button type="submit" variant="contained" fullWidth disabled={isMoving}>
                   {isMoving ? <CircularProgress size={24} /> : "Umziehen"}
                 </Button>

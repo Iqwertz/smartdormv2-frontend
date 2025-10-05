@@ -79,7 +79,7 @@ const ConfirmedDeparturesList: React.FC = () => {
           <Card key={dep.tenant.id} variant="outlined">
             <CardContent>
               <Grid container spacing={2}>
-                <Grid item xs={12}>
+                <Grid size={{ xs: 12 }}>
                   <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 4 }}>
                     <Box>
                       <Typography variant="h6">
@@ -117,7 +117,7 @@ const ConfirmedDeparturesList: React.FC = () => {
                     </Box>
                   </Box>
                 </Grid>
-                <Grid item xs={12}>
+                <Grid size={{ xs: 12 }}>
                   <Typography variant="subtitle1">Signaturen:</Typography>
                   <List dense sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
                     {dep.signatures?.map((sig) => (

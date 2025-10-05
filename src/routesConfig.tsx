@@ -17,7 +17,7 @@ import DepartmentPage from "./pages/DepartmentPage";
 import HSVPage from "./pages/shared/HSVPage";
 import ParcelPage from "./pages/admin/ParcelPage";
 import Error403Page from "./pages/Error403Page";
-import { Assignment, AssignmentOutlined, FilterVintageOutlined, PersonAdd } from "@mui/icons-material";
+import { AssignmentOutlined, FilterVintageOutlined, PersonAdd } from "@mui/icons-material";
 import HeimratPage from "./pages/engagements/HeimratPage";
 import NewTenantPage from "./pages/admin/NewTenantPage";
 import EditTenantPage from "./pages/admin/EditTenantPage";
@@ -33,7 +33,7 @@ import ViewApplicationsPage from "./pages/tenants/ViewApplicationsPage";
 import EngagementManagementPage from "./pages/engagements/EngagementManagementPage";
 
 // Placeholder for pages that might need to be created
-const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
+export const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
   <div>
     <h2>{title}</h2>
     <p>Not implemented, will be implemented in the future.</p>

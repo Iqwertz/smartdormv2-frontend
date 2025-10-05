@@ -14,6 +14,7 @@ import {
   Divider,
   Paper,
   Link,
+  ListItemButton,
 } from "@mui/material";
 import {
   ExpandLess,
@@ -235,8 +236,7 @@ const HSVPage: React.FC = () => {
 
                 return (
                   <React.Fragment key={group.group_id}>
-                    <ListItem
-                      button
+                    <ListItemButton
                       onClick={() => handleToggleExpand(group.group_id)}
                       sx={{ backgroundColor: "rgba(0, 0, 0, 0.03)" }}
                     >
@@ -249,7 +249,7 @@ const HSVPage: React.FC = () => {
                       <IconButton edge="end" size="small">
                         {expanded[group.group_id] ? <ExpandLess /> : <ExpandMore />}
                       </IconButton>
-                    </ListItem>
+                    </ListItemButton>
                     <Collapse in={expanded[group.group_id]} timeout="auto" unmountOnExit>
                       {/* --- Conditional Rendering based on FS --- */}
                       {isFlursprecher && groupedByFloor ? (
