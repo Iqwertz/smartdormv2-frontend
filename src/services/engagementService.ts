@@ -72,6 +72,11 @@ export const compensateAllEngagements = async (): Promise<{ message: string }> =
   return response.data;
 };
 
+export const compensateEngagement = async (engagementId: number): Promise<{ message: string }> => {
+  const response = await apiClient.put(`/api/engagements/heimrat/engagements/${engagementId}/toggle-compensate/`);
+  return response.data;
+};
+
 export const updateSemesterAndLdap = async (newSemester: string): Promise<{ message: string }> => {
   const response = await apiClient.post("/api/engagements/heimrat/update-semester-and-ldap/", {
     new_semester: newSemester,
