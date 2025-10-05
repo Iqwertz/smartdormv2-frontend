@@ -69,7 +69,7 @@ const ViewApplicationsPage: React.FC = () => {
               const altText = `${app.tenant.name} ${app.tenant.surname}`;
 
               return (
-                <Grid item xs={12} md={6} key={app.id}>
+                <Grid size={{ xs: 12, md: 6 }} key={app.id}>
                   <Paper
                     variant="outlined"
                     sx={{

@@ -121,7 +121,7 @@ const EditSubtenantPage: React.FC = () => {
       <DashboardCard title={`Untermieter bearbeiten: ${subtenant?.name} ${subtenant?.surname}`}>
         <form onSubmit={handleSubmit}>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 name="name"
                 label="Vorname"
@@ -131,7 +131,7 @@ const EditSubtenantPage: React.FC = () => {
                 fullWidth
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 name="surname"
                 label="Nachname"
@@ -141,7 +141,7 @@ const EditSubtenantPage: React.FC = () => {
                 fullWidth
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <TextField
                 name="email"
                 label="E-Mail"
@@ -152,7 +152,7 @@ const EditSubtenantPage: React.FC = () => {
                 fullWidth
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <DatePicker
                 label="Einzugsdatum"
                 value={formData.move_in ? dayjs(formData.move_in) : null}
@@ -160,7 +160,7 @@ const EditSubtenantPage: React.FC = () => {
                 slotProps={{ textField: { fullWidth: true, required: true } }}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <DatePicker
                 label="Auszugsdatum"
                 value={formData.move_out ? dayjs(formData.move_out) : null}
@@ -168,7 +168,7 @@ const EditSubtenantPage: React.FC = () => {
                 slotProps={{ textField: { fullWidth: true, required: true } }}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Autocomplete
                 sx={{ minWidth: 500 }}
                 options={tenants}
@@ -178,7 +178,7 @@ const EditSubtenantPage: React.FC = () => {
                 renderInput={(params) => <TextField {...params} label="Hauptmieter" required fullWidth />}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Autocomplete
                 sx={{ minWidth: 130 }}
                 options={rooms}
@@ -188,7 +188,7 @@ const EditSubtenantPage: React.FC = () => {
                 renderInput={(params) => <TextField {...params} label="Zimmer" required fullWidth />}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <FormControlLabel
                 control={
                   <Checkbox

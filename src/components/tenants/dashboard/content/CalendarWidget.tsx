@@ -1,4 +1,5 @@
 // src/components/tenants/dashboard/content/CalendarWidget.tsx
+/*
 import React, { useState, useEffect, useMemo } from "react";
 import {
   Box,
@@ -280,3 +281,4 @@ const CalendarWidget: React.FC = () => {
 };
 
 export default CalendarWidget;
+*/

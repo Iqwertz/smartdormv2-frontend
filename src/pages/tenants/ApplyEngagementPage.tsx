@@ -109,7 +109,7 @@ const ApplyEngagementPage: React.FC = () => {
 
       if (imageFile) {
         const options = {
-          maxSizeMB: 1,
+          maxSizeMB: 0.2,
           maxWidthOrHeight: 1024,
           useWebWorker: true,
         };
