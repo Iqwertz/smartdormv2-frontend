@@ -26,7 +26,7 @@ build_app:
   stage: deploy
   image: alpine:latest
   before_script:
-    - "command -v ssh-agent >/dev/null || ( apk add --update openssh-client rsync )"
+    - apk add --no-cache openssh-client rsync
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
