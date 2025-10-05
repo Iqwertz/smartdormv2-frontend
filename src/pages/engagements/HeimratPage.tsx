@@ -154,7 +154,11 @@ const HeimratCreateApplicationForm: React.FC = () => {
       formData.append("motivation", motivation);
 
       if (imageFile) {
-        const compressedFile = await imageCompression(imageFile, { maxSizeMB: 1, maxWidthOrHeight: 1024 });
+        const compressedFile = await imageCompression(imageFile, {
+          maxSizeMB: 0.2,
+          maxWidthOrHeight: 1024,
+          useWebWorker: true,
+        });
         formData.append("image", compressedFile, compressedFile.name);
         formData.append("image_name", compressedFile.name);
       }

@@ -4,7 +4,7 @@ import {
   Box,
   Typography,
   List,
-  ListItem,
+  ListItemButton,
   ListItemText,
   CircularProgress,
   Alert,
@@ -83,9 +83,8 @@ const MyEngagements: React.FC = () => {
 
           return (
             <React.Fragment key={engagement.id}>
-              <ListItem
+              <ListItemButton
                 // Make item clickable only if there's a note to expand/collapse
-                button={hasNote} // Add button prop for visual feedback if clickable
                 onClick={hasNote ? () => handleToggleExpand(engagement.id) : undefined}
                 // Add alignment and potentially disableGutters if needed
                 alignItems="flex-start"
@@ -139,7 +138,7 @@ const MyEngagements: React.FC = () => {
                     {isExpanded ? <ExpandLess /> : <ExpandMore />}
                   </IconButton>
                 )}
-              </ListItem>
+              </ListItemButton>
 
               {/* Collapsible Note Area (only if there's a note) */}
               {hasNote && (

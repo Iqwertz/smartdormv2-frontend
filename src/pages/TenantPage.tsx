@@ -5,7 +5,7 @@ import UserProfile from "../components/tenants/dashboard/content/UserProfile";
 import DashboardCard from "../components/shared/DashboardCard";
 import "../styles/bento-layout.scss";
 import Settings from "../components/tenants/dashboard/content/Settings";
-import CalendarWidget from "../components/tenants/dashboard/content/CalendarWidget";
+//import CalendarWidget from "../components/tenants/dashboard/content/CalendarWidget";
 import MyEngagements from "../components/tenants/dashboard/content/MyEngagements";
 import QuickLinks from "../components/tenants/dashboard/content/QuickLinks";
 import DepartureDecisionPopup from "../components/tenants/dashboard/content/DepartureDecisionPopup";
@@ -78,7 +78,8 @@ const TenantPage: React.FC = () => {
             <QuickLinks></QuickLinks>
           </DashboardCard>
           <DashboardCard title="Kalendar">
-            <CalendarWidget></CalendarWidget>
+            {/* <CalendarWidget></CalendarWidget> */}
+            Coming soon...
           </DashboardCard>
           <DashboardCard title="Settings">
             <Settings />

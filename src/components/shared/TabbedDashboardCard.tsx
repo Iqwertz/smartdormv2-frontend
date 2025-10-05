@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { Box, Paper, Typography, ButtonBase, useTheme } from "@mui/material";
+import { Box, Paper, Typography, ButtonBase, useTheme, useMediaQuery } from "@mui/material";
 
 interface Tab {
   label: string;
@@ -22,6 +22,7 @@ const TabbedDashboardCard: React.FC<TabbedDashboardCardProps> = ({
   initialTab = 0,
 }) => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [activeTab, setActiveTab] = useState(initialTab);
   const tabsContainerRef = useRef<HTMLDivElement | null>(null);
   const [showLeftFade, setShowLeftFade] = useState(false);
@@ -68,7 +69,19 @@ const TabbedDashboardCard: React.FC<TabbedDashboardCardProps> = ({
   return (
     <Box sx={{ position: "relative", mt: 4 }}>
       {/* Title & Tabs Container */}
-      <Box sx={{ display: "flex", alignItems: "center", position: "absolute", top: -16, left: 20, zIndex: 10, gap: 1 }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: isMobile ? "stretch" : "center",
+          flexDirection: isMobile ? "column" : "row",
+          position: "absolute",
+          top: isMobile ? -32 : -16,
+          left: 20,
+          zIndex: 10,
+          gap: 1,
+          width: isMobile ? "calc(100% - 40px)" : "auto",
+        }}
+      >
         {/* Main Title */}
         {title && (
           <Paper
@@ -79,6 +92,7 @@ const TabbedDashboardCard: React.FC<TabbedDashboardCardProps> = ({
               py: 0.5,
               borderRadius: 1,
               flexShrink: 0,
+              width: isMobile ? "fit-content" : "auto",
             }}
           >
             <Typography variant="h6" color="#f1f1f1">
@@ -94,8 +108,8 @@ const TabbedDashboardCard: React.FC<TabbedDashboardCardProps> = ({
           sx={{
             position: "relative",
             overflow: "hidden", // Parent hides the scrollbar area
-            flexGrow: 1,
-            maxWidth: "calc(100vw - 200px)", // Propably needs a cleaner implementation
+            flexGrow: isMobile ? 0 : 1,
+            width: isMobile ? "100%" : "auto",
           }}
         >
           <Box
@@ -186,7 +200,7 @@ const TabbedDashboardCard: React.FC<TabbedDashboardCardProps> = ({
           WebkitBackdropFilter: "blur(8px)",
           borderRadius: 2,
           overflow: "hidden",
-          pt: 4,
+          pt: isMobile ? 8 : 4,
           ...cardSx,
         }}
       >

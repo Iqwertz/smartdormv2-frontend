@@ -187,6 +187,7 @@ export interface Departure {
 }
 
 export interface DepartmentSignature {
+  id: number;
   amount: number;
   department_name: string;
   signed_on: string | null;
