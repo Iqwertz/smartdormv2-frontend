@@ -2,6 +2,7 @@
 import { Routes, Route, BrowserRouter, Navigate } from "react-router-dom";
 import { CircularProgress, Typography, Box } from "@mui/material";
 import LoginPage from "./pages/LoginPage";
+import PasswordResetPage from "./pages/PasswordResetPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./context/AuthContext";
 import AppLayout from "./layout/AppLayout";
@@ -40,6 +41,7 @@ function App() {
       {/* Routes are defined in the routesConfig file */}
       <Routes>
         <Route path={loginRoute} element={<LoginPage />} />
+        <Route path="/password-reset" element={<PasswordResetPage />} />
 
         {/* Routes that use AppLayout and require authentication */}
         <Route element={<AppLayout />}>
