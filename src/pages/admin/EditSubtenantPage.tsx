@@ -168,7 +168,7 @@ const EditSubtenantPage: React.FC = () => {
                 slotProps={{ textField: { fullWidth: true, required: true } }}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 9 }}>
               <Autocomplete
                 sx={{ minWidth: 500 }}
                 options={tenants}
@@ -178,7 +178,7 @@ const EditSubtenantPage: React.FC = () => {
                 renderInput={(params) => <TextField {...params} label="Hauptmieter" required fullWidth />}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 3 }}>
               <Autocomplete
                 sx={{ minWidth: 130 }}
                 options={rooms}
