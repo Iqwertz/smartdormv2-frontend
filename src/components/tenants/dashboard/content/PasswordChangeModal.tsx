@@ -25,7 +25,8 @@ const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({ open, onClose
   const [error, setError] = useState<string | null>(null);
   const { showNotification } = useNotification();
 
-  const isFormValid = oldPassword && newPassword && confirmPassword && newPassword === confirmPassword && newPassword.length >= 8;
+  const isFormValid =
+    oldPassword && newPassword && confirmPassword && newPassword === confirmPassword && newPassword.length >= 8;
 
   const handleSubmit = async () => {
     if (!isFormValid) return;
@@ -93,7 +94,7 @@ const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({ open, onClose
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           disabled={isSubmitting}
-          error={confirmPassword && newPassword !== confirmPassword}
+          error={Boolean(confirmPassword && newPassword !== confirmPassword)}
           helperText={confirmPassword && newPassword !== confirmPassword ? "Passwörter stimmen nicht überein" : ""}
         />
         {error && (
@@ -106,11 +107,7 @@ const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({ open, onClose
         <Button onClick={handleClose} disabled={isSubmitting}>
           Abbrechen
         </Button>
-        <Button
-          onClick={handleSubmit}
-          disabled={isSubmitting || !isFormValid}
-          variant="contained"
-        >
+        <Button onClick={handleSubmit} disabled={isSubmitting || !isFormValid} variant="contained">
           {isSubmitting ? <CircularProgress size={24} /> : "Passwort ändern"}
         </Button>
       </DialogActions>
@@ -119,4 +116,3 @@ const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({ open, onClose
 };
 
 export default PasswordChangeModal;
-
