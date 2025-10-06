@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   TextField,
@@ -22,6 +22,11 @@ import apiClient from "../../services/api";
 import dayjs, { Dayjs } from "dayjs";
 import { nationalities } from "../../utils/nationalities";
 import { universities } from "../../utils/universities";
+
+interface SelectOption {
+  id: number;
+  label: string;
+}
 
 const createNewTenant = async (data: NewTenantPayload) => {
   const payload = {
@@ -50,9 +55,14 @@ const initialState: NewTenantPayload = {
 
 const NewTenantPage: React.FC = () => {
   const [formData, setFormData] = useState<NewTenantPayload>(initialState);
+  const [rooms, setRooms] = useState<SelectOption[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { showNotification } = useNotification();
+
+  useEffect(() => {
+    apiClient.get("/api/common/room-list/").then((res) => setRooms(res.data));
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -187,13 +197,14 @@ const NewTenantPage: React.FC = () => {
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 4 }}>
-              <TextField
-                name="current_room"
-                label="Zimmer"
-                value={formData.current_room}
-                onChange={handleChange}
-                required
-                fullWidth
+              <Autocomplete
+                options={rooms}
+                getOptionLabel={(option) => option.label}
+                value={rooms.find((r) => r.label === formData.current_room) || null}
+                onChange={(_, newValue) => {
+                  setFormData({ ...formData, current_room: newValue ? newValue.label : "" });
+                }}
+                renderInput={(params) => <TextField {...params} label="Zimmer" required fullWidth />}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 4 }}>
