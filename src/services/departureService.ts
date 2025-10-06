@@ -44,3 +44,10 @@ export const decideOnDeparture = async (
   const response = await apiClient.post("/api/tenants/my-departure/decide/", payload);
   return response.data;
 };
+
+export const downloadDepartureForm = async (tenantId: number): Promise<Blob> => {
+  const response = await apiClient.get(`/api/department/departures/${tenantId}/download-pdf/`, {
+    responseType: "blob",
+  });
+  return response.data;
+};

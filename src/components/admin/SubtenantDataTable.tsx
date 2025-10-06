@@ -42,7 +42,7 @@ const SubtenantDataTable: React.FC<SubtenantDataTableProps> = ({ status }) => {
       type: "actions",
       headerName: "Aktionen",
       width: 100,
-      getActions: ({ id }) => [
+      getActions: ({ row }) => [
         <GridActionsCellItem
           icon={<EditIcon />}
           label="Bearbeiten"

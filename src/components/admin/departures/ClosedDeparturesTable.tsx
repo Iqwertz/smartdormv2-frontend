@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Box, Alert, CircularProgress } from "@mui/material";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridActionsCellItem, GridColDef, GridDownloadIcon } from "@mui/x-data-grid";
 import { Departure } from "../../../types/tenant";
-import { fetchDeparturesByStatus } from "../../../services/departureService";
+import { downloadDepartureForm, fetchDeparturesByStatus } from "../../../services/departureService";
 import dayjs from "dayjs";
 import { GridToolbar } from "@mui/x-data-grid/internals";
 
@@ -24,11 +24,35 @@ const ClosedDeparturesTable: React.FC = () => {
     }
   }, []);
 
+  const handleDownloadDepartureForm = async (tenantId: number, tenantName: string) => {
+    const pdf = await downloadDepartureForm(tenantId);
+    const url = window.URL.createObjectURL(new Blob([pdf], { type: "application/pdf" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `Laufzettel_${tenantName}.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    link.parentNode?.removeChild(link);
+  };
+
   useEffect(() => {
     loadDepartures();
   }, [loadDepartures]);
 
   const columns: GridColDef<Departure>[] = [
+    {
+      field: "actions",
+      type: "actions",
+      headerName: "Aktion",
+      width: 40,
+      getActions: ({ id, row }) => [
+        <GridActionsCellItem
+          icon={<GridDownloadIcon />}
+          label="Laufzettel herunterladen"
+          onClick={() => handleDownloadDepartureForm(id as number, `${row.tenant.surname}_${row.tenant.name}`)}
+        />,
+      ],
+    },
     { field: "tenant.surname", headerName: "Nachname", width: 150, valueGetter: (_, row) => row.tenant.surname },
     { field: "tenant.name", headerName: "Vorname", width: 150, valueGetter: (_, row) => row.tenant.name },
     {
