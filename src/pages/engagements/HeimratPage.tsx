@@ -301,7 +301,13 @@ const HeimratApplicationList: React.FC = () => {
         PDF Herunterladen
       </Button>
       {error && <Alert severity="error">{error}</Alert>}
-      <DataGrid rows={applications} columns={columns} loading={loading} autoHeight getRowId={(row) => row.id} />
+      <DataGrid
+        rows={applications}
+        columns={columns}
+        loading={loading}
+        sx={{ height: "calc(100% - 40px)" }}
+        getRowId={(row) => row.id}
+      />
       <Dialog open={deleteConfirm.open} onClose={() => setDeleteConfirm({ open: false, appId: null })}>
         <DialogTitle>Löschen bestätigen</DialogTitle>
         <DialogContent>

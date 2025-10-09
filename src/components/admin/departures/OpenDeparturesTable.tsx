@@ -92,7 +92,7 @@ const OpenDeparturesTable: React.FC = () => {
         initialState={{
           sorting: { sortModel: [{ field: "created_on", sort: "desc" }] },
         }}
-        autoHeight
+        sx={{ height: "100%" }}
         slots={{ toolbar: GridToolbar }}
         showToolbar
         slotProps={{

@@ -27,9 +27,9 @@ const ExtensionsPage: React.FC = () => {
         title="Verlängerungen verwalten"
         tabs={tabs}
         cardSx={{
-          height: "calc(100vh - 64px - 3rem - 16px)",
+          height: "calc(100vh - 100px)",
         }}
-        contentSx={{ height: "calc(100% - 40px)", padding: 2, overflowY: "auto" }}
+        contentSx={{ height: "100%", padding: 2, overflowY: "auto" }}
       />
     </Box>
   );
