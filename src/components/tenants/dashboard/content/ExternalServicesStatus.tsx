@@ -18,19 +18,19 @@ const getRoomDisplayProps = (status: RoomStatus["status"], currentBookings: numb
   let bookingsText = "-/-";
   let isClosed = false;
 
+  console.log(status);
+
   if (status === "closed") {
     isClosed = true;
     dotColor = "grey";
   } else if (status === "available") {
     bookingsText = `${maxBookings - currentBookings} / ${maxBookings}`;
-    if (currentBookings >= maxBookings) {
-      dotColor = "red"; // booked
-    } else {
-      dotColor = "green"; // available
+    dotColor = "green";
+    if (currentBookings > 0) {
+      dotColor = "orange"; //Partially booked
     }
-  } else {
-    // Fallback for other statuses
-    dotColor = "grey";
+  } else if (status === "booked") {
+    dotColor = "red";
     bookingsText = `${maxBookings - currentBookings} / ${maxBookings}`;
   }
 
@@ -226,6 +226,9 @@ const ExternalServicesStatus: React.FC = () => {
         }
         .room-status-dot.green {
           background-color: green;
+        }
+        .room-status-dot.orange {
+          background-color: orange;
         }
         .room-status-dot.grey {
           background-color: grey;

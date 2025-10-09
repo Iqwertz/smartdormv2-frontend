@@ -62,11 +62,11 @@ const TenantPage: React.FC = () => {
           <DashboardCard
             title="Services"
             contentSx={{ p: "8px 16px" }}
-            /*             cardSx={{
+            cardSx={{
               backgroundColor: "rgba(255, 255, 255, 0.55)",
               backdropFilter: "blur(8px)",
               WebkitBackdropFilter: "blur(8px)",
-            }} */
+            }}
           >
             <ExternalServicesStatus />
           </DashboardCard>
