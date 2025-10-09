@@ -12,8 +12,6 @@ import DepartureDecisionPopup from "../components/tenants/dashboard/content/Depa
 import { fetchMyDeparture } from "../services/departureService";
 import { Departure, GlobalAppSettings } from "../types/tenant";
 import { fetchGlobalSettings } from "../services/engagementService";
-import RoomsStatus from "../components/tenants/dashboard/content/RoomsStatus";
-import WashingMachineStatus from "../components/tenants/dashboard/content/WashingMachineStatus";
 import ExternalServicesStatus from "../components/tenants/dashboard/content/ExternalServicesStatus";
 
 const TenantPage: React.FC = () => {
