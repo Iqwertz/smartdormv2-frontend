@@ -238,7 +238,7 @@ const EngagementList: React.FC<{ compensated: boolean; refreshKey: number; onDat
         rows={engagements}
         columns={columns}
         loading={loading}
-        autoHeight
+        sx={{ height: "100%" }}
         slots={{ toolbar: GridToolbar }}
         showToolbar
         slotProps={{

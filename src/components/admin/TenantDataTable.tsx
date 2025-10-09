@@ -125,7 +125,7 @@ const TenantDataTable: React.FC<TenantDataTableProps> = ({ status = "current", t
   }
 
   return (
-    <Box sx={{ width: "100%" }}>
+    <Box sx={{ width: "100%", height: "100%" }}>
       {title && <h2>{title}</h2>}
       <DataGrid
         rows={rows}
@@ -137,6 +137,9 @@ const TenantDataTable: React.FC<TenantDataTableProps> = ({ status = "current", t
           toolbar: {
             showQuickFilter: true,
           },
+        }}
+        sx={{
+          height: "100%",
         }}
         initialState={{
           pagination: {

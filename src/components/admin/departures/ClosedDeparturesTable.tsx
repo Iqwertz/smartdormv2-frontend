@@ -90,7 +90,7 @@ const ClosedDeparturesTable: React.FC = () => {
         initialState={{
           sorting: { sortModel: [{ field: "tenant.move_out", sort: "desc" }] },
         }}
-        autoHeight
+        sx={{ height: "100%" }}
         slots={{ toolbar: GridToolbar }}
         showToolbar
         slotProps={{
