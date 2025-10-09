@@ -24,6 +24,62 @@ export interface TenantProfile {
   new_address: string | null;
 }
 
+export interface GlobalAppSettings {
+  current_semester: string;
+  applications_open: boolean;
+  show_applications: boolean;
+  updated_at: string;
+}
+
+export interface DepartmentForSelect {
+  id: number;
+  name: string;
+  full_name: string;
+}
+
+export interface EngagementApplicationData {
+  id: number;
+  tenant: {
+    name: string;
+    surname: string;
+  };
+  department: DepartmentForSelect;
+  motivation: string;
+  image_url: string | null;
+}
+
+export interface MyEngagementApplication {
+  id: number;
+  semester: string;
+  department: DepartmentForSelect;
+  motivation: string;
+}
+
+export interface AdminEngagement {
+  id: number;
+  semester: string;
+  points: number;
+  note: string | null;
+  compensate: boolean;
+  tenant: {
+    id: number;
+    name: string;
+    surname: string;
+    email: string;
+    current_room: string | null;
+    current_floor: string | null;
+  };
+  department: DepartmentForSelect;
+}
+
+export interface EngagementCreatePayload {
+  tenant_id: number;
+  department_id: number;
+  semester: string;
+  note: string;
+  compensate: boolean;
+}
+
 export interface NewTenantPayload {
   name: string;
   surname: string;
@@ -77,6 +133,18 @@ export interface Subtenant {
   move_out: string;
 }
 
+export interface Rental {
+  id: number;
+  move_in: string;
+  moved_out: string;
+  room_name: string;
+}
+
+export interface MovePayload {
+  room_id: number;
+  move_date: string;
+}
+
 export interface DepartmentInfo {
   name: string;
   full_name: string;
@@ -108,4 +176,34 @@ export interface HsvEngagementGroup {
   semester: string;
   tenants: HsvTenant[];
   group_id: string;
+}
+
+export interface Departure {
+  tenant: TenantProfile;
+  status: "CREATED" | "POSTPONED" | "CONFIRMED" | "CLOSED";
+  created_on: string;
+  external_id: string;
+  signatures?: DepartmentSignature[];
+}
+
+export interface DepartmentSignature {
+  id: number;
+  amount: number;
+  department_name: string;
+  signed_on: string | null;
+  departure: {
+    tenant: TenantProfile;
+    status: "CREATED" | "POSTPONED" | "CONFIRMED" | "CLOSED";
+    created_on: string;
+    external_id: string;
+  };
+}
+
+export interface Claim {
+  id: number;
+  created_on: string;
+  status: "CREATED" | "PROCESSING" | "APPROVED" | "REJECTED";
+  type: "EXTENSION";
+  tenant: TenantProfile;
+  external_id: string;
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   TextField,
@@ -15,13 +15,18 @@ import {
   Divider,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import DashboardCard from "../../components/tenants/dashboard/DashboardCard";
+import DashboardCard from "../../components/shared/DashboardCard";
 import { useNotification } from "../../context/NotificationContext";
 import { NewTenantPayload } from "../../types/tenant";
 import apiClient from "../../services/api";
 import dayjs, { Dayjs } from "dayjs";
 import { nationalities } from "../../utils/nationalities";
 import { universities } from "../../utils/universities";
+
+interface SelectOption {
+  id: number;
+  label: string;
+}
 
 const createNewTenant = async (data: NewTenantPayload) => {
   const payload = {
@@ -50,9 +55,14 @@ const initialState: NewTenantPayload = {
 
 const NewTenantPage: React.FC = () => {
   const [formData, setFormData] = useState<NewTenantPayload>(initialState);
+  const [rooms, setRooms] = useState<SelectOption[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { showNotification } = useNotification();
+
+  useEffect(() => {
+    apiClient.get("/api/common/room-list/").then((res) => setRooms(res.data));
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -104,10 +114,10 @@ const NewTenantPage: React.FC = () => {
             Persönliche Daten
           </Typography>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField name="name" label="Vorname" value={formData.name} onChange={handleChange} required fullWidth />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 name="surname"
                 label="Nachname"
@@ -117,7 +127,7 @@ const NewTenantPage: React.FC = () => {
                 fullWidth
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 name="email"
                 label="E-Mail"
@@ -128,7 +138,7 @@ const NewTenantPage: React.FC = () => {
                 fullWidth
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <FormControl fullWidth required sx={{ minWidth: 200 }}>
                 <InputLabel id="gender-label">Geschlecht</InputLabel>
                 <Select
@@ -144,7 +154,7 @@ const NewTenantPage: React.FC = () => {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <DatePicker
                 label="Geburtstag"
                 value={formData.birthday ? dayjs(formData.birthday) : null}
@@ -152,7 +162,7 @@ const NewTenantPage: React.FC = () => {
                 slotProps={{ textField: { fullWidth: true, required: true } }}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Autocomplete
                 sx={{ minWidth: 220 }}
                 options={nationalities}
@@ -161,7 +171,7 @@ const NewTenantPage: React.FC = () => {
                 renderInput={(params) => <TextField {...params} label="Staatsangehörigkeit" required fullWidth />}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 name="tel_number"
                 label="Telefonnummer"
@@ -178,7 +188,7 @@ const NewTenantPage: React.FC = () => {
             Vertragsdetails
           </Typography>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={4}>
+            <Grid size={{ xs: 12, sm: 4 }}>
               <DatePicker
                 label="Einzugsdatum"
                 value={formData.move_in ? dayjs(formData.move_in) : null}
@@ -186,17 +196,18 @@ const NewTenantPage: React.FC = () => {
                 slotProps={{ textField: { fullWidth: true, required: true } }}
               />
             </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField
-                name="current_room"
-                label="Zimmer"
-                value={formData.current_room}
-                onChange={handleChange}
-                required
-                fullWidth
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <Autocomplete
+                options={rooms}
+                getOptionLabel={(option) => option.label}
+                value={rooms.find((r) => r.label === formData.current_room) || null}
+                onChange={(_, newValue) => {
+                  setFormData({ ...formData, current_room: newValue ? newValue.label : "" });
+                }}
+                renderInput={(params) => <TextField {...params} label="Zimmer" required fullWidth />}
               />
             </Grid>
-            <Grid item xs={12} sm={4}>
+            <Grid size={{ xs: 12, sm: 4 }}>
               <TextField
                 name="deposit"
                 label="Kaution (€)"
@@ -216,7 +227,7 @@ const NewTenantPage: React.FC = () => {
             Studiendetails
           </Typography>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <FormControl fullWidth required sx={{ minWidth: 300 }}>
                 <InputLabel id="university-label">Hochschule</InputLabel>
                 <Select
@@ -234,7 +245,7 @@ const NewTenantPage: React.FC = () => {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 name="study_field"
                 label="Studienfach"
@@ -249,7 +260,7 @@ const NewTenantPage: React.FC = () => {
           <Divider sx={{ my: 3 }} />
 
           <Grid container spacing={2} sx={{ width: "100%" }}>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <TextField
                 name="note"
                 label="Notiz der Verwaltung"

@@ -6,6 +6,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { useNavigate } from "react-router-dom";
 import apiClient from "../../services/api";
 import { TenantProfile } from "../../types/tenant";
+import { GridToolbar } from "@mui/x-data-grid/internals";
 
 const TenantDataTable: React.FC = () => {
   const [rows, setRows] = useState<TenantProfile[]>([]);
@@ -120,16 +121,16 @@ const TenantDataTable: React.FC = () => {
   }
 
   return (
-    <Box sx={{ height: "85vh", width: "100%" }}>
+    <Box sx={{ width: "100%" }}>
       <DataGrid
         rows={rows}
         columns={columns}
         loading={loading}
+        slots={{ toolbar: GridToolbar }}
         showToolbar
         slotProps={{
           toolbar: {
             showQuickFilter: true,
-            quickFilterProps: { debounceMs: 500 },
           },
         }}
         initialState={{

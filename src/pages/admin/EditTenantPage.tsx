@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Box,
@@ -22,49 +22,69 @@ import {
   List,
   ListItem,
   ListItemText,
-  Paper,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import DashboardCard from "../../components/tenants/dashboard/DashboardCard";
+import DashboardCard from "../../components/shared/DashboardCard";
 import { useNotification } from "../../context/NotificationContext";
-import { TenantProfile, Subtenant } from "../../types/tenant";
+import { TenantProfile, Subtenant, Rental, MovePayload } from "../../types/tenant";
 import apiClient from "../../services/api";
 import dayjs, { Dayjs } from "dayjs";
 import { nationalities } from "../../utils/nationalities";
 import { universities } from "../../utils/universities";
 
+interface SelectOption {
+  id: number;
+  label: string;
+}
+
 const EditTenantPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { showNotification } = useNotification();
+
+  // Component State
   const [tenant, setTenant] = useState<TenantProfile | null>(null);
   const [subtenants, setSubtenants] = useState<Subtenant[]>([]);
+  const [rentals, setRentals] = useState<Rental[]>([]);
+  const [allRooms, setAllRooms] = useState<SelectOption[]>([]);
+  const [moveData, setMoveData] = useState<{ room_id: number | null; move_date: Dayjs | null }>({
+    room_id: null,
+    move_date: null,
+  });
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isMoving, setIsMoving] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const { showNotification } = useNotification();
 
-  useEffect(() => {
-    const fetchTenantData = async () => {
-      if (!id) return;
-      try {
-        setLoading(true);
-        const [tenantRes, subtenantsRes] = await Promise.all([
-          apiClient.get(`/api/department/tenant-data/${id}/`),
-          apiClient.get(`/api/department/tenant-data/${id}/subtenants/`),
-        ]);
-        setTenant(tenantRes.data);
-        setSubtenants(subtenantsRes.data);
-      } catch (err) {
-        setError("Bewohnerdaten konnten nicht geladen werden.");
-        showNotification("Bewohnerdaten konnten nicht geladen werden.", "error");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTenantData();
+  const fetchTenantData = useCallback(async () => {
+    if (!id) return;
+    try {
+      setLoading(true);
+      const [tenantRes, subtenantsRes, rentalsRes, roomsRes] = await Promise.all([
+        apiClient.get(`/api/department/tenant-data/${id}/`),
+        apiClient.get(`/api/department/tenant-data/${id}/subtenants/`),
+        apiClient.get(`/api/department/tenant-data/${id}/rentals/`),
+        apiClient.get("/api/common/room-list/"),
+      ]);
+      setTenant(tenantRes.data);
+      setSubtenants(subtenantsRes.data);
+      setRentals(rentalsRes.data);
+      setAllRooms(roomsRes.data);
+    } catch (err) {
+      setError("Bewohnerdaten konnten nicht geladen werden.");
+      showNotification("Bewohnerdaten konnten nicht geladen werden.", "error");
+    } finally {
+      setLoading(false);
+    }
   }, [id, showNotification]);
 
+  useEffect(() => {
+    fetchTenantData();
+  }, [fetchTenantData]);
+
+  // Form Handlers
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     if (!tenant) return;
     setTenant({ ...tenant, [e.target.name]: e.target.value });
@@ -82,6 +102,7 @@ const EditTenantPage: React.FC = () => {
     setTenant({ ...tenant, [name]: value || "" });
   };
 
+  // Actions
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!tenant) return;
@@ -90,7 +111,6 @@ const EditTenantPage: React.FC = () => {
     try {
       await apiClient.put(`/api/department/tenant-data/${id}/update/`, tenant);
       showNotification("Daten erfolgreich aktualisiert.", "success");
-      // Optionally, you can navigate back to the overview page
       navigate("/department/overview");
     } catch (err: any) {
       const errorMessage = err.response?.data?.error || "Update fehlgeschlagen.";
@@ -117,6 +137,30 @@ const EditTenantPage: React.FC = () => {
     }
   };
 
+  const handleMove = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!id || !moveData.room_id || !moveData.move_date) {
+      showNotification("Bitte neues Zimmer und Umzugsdatum auswählen.", "warning");
+      return;
+    }
+    setIsMoving(true);
+    const payload: MovePayload = {
+      room_id: moveData.room_id,
+      move_date: moveData.move_date.format("YYYY-MM-DD"),
+    };
+    try {
+      await apiClient.post(`/api/department/tenant-data/${id}/move/`, payload);
+      showNotification("Bewohner erfolgreich umgezogen.", "success");
+      setMoveData({ room_id: null, move_date: null }); // Reset form
+      fetchTenantData(); // Refresh all data
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.error || "Umzug fehlgeschlagen.";
+      showNotification(errorMessage, "error");
+    } finally {
+      setIsMoving(false);
+    }
+  };
+
   if (loading) return <CircularProgress />;
   if (error && !tenant) return <Alert severity="error">{error}</Alert>;
   if (!tenant) return <Alert severity="info">Kein Bewohner ausgewählt.</Alert>;
@@ -125,12 +169,13 @@ const EditTenantPage: React.FC = () => {
     <>
       <Box sx={{ maxWidth: "1200px", margin: "0 auto", display: "flex", flexDirection: "column", gap: 2 }}>
         <DashboardCard title={`Bewohner bearbeiten: ${tenant.name} ${tenant.surname}`}>
+          {/* Main Tenant Edit Form */}
           <Box component="form" onSubmit={handleUpdate} noValidate>
             <Typography variant="h6" gutterBottom>
               Persönliche Daten
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   name="name"
                   label="Vorname"
@@ -140,7 +185,7 @@ const EditTenantPage: React.FC = () => {
                   fullWidth
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   name="surname"
                   label="Nachname"
@@ -150,7 +195,7 @@ const EditTenantPage: React.FC = () => {
                   fullWidth
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   name="email"
                   label="E-Mail"
@@ -161,7 +206,7 @@ const EditTenantPage: React.FC = () => {
                   fullWidth
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth required sx={{ minWidth: 200 }}>
                   <InputLabel>Geschlecht</InputLabel>
                   <Select name="gender" value={tenant.gender || ""} label="Geschlecht" onChange={handleSelectChange}>
@@ -171,7 +216,7 @@ const EditTenantPage: React.FC = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <DatePicker
                   label="Geburtstag"
                   value={tenant.birthday ? dayjs(tenant.birthday) : null}
@@ -179,7 +224,7 @@ const EditTenantPage: React.FC = () => {
                   slotProps={{ textField: { fullWidth: true, required: true } }}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <Autocomplete
                   sx={{ minWidth: 200 }}
                   options={nationalities}
@@ -188,7 +233,7 @@ const EditTenantPage: React.FC = () => {
                   renderInput={(params) => <TextField {...params} label="Staatsangehörigkeit" required fullWidth />}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   name="tel_number"
                   label="Telefonnummer"
@@ -204,7 +249,7 @@ const EditTenantPage: React.FC = () => {
               Vertragsdetails
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={4}>
+              <Grid size={{ xs: 12, sm: 4 }}>
                 <DatePicker
                   label="Einzugsdatum"
                   value={dayjs(tenant.move_in)}
@@ -212,10 +257,10 @@ const EditTenantPage: React.FC = () => {
                   slotProps={{ textField: { fullWidth: true } }}
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid size={{ xs: 12, sm: 4 }}>
                 <TextField label="Zimmer" value={tenant.current_room || ""} disabled fullWidth />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid size={{ xs: 12, sm: 4 }}>
                 <DatePicker
                   label="Auszugsdatum"
                   value={dayjs(tenant.move_out)}
@@ -223,7 +268,7 @@ const EditTenantPage: React.FC = () => {
                   slotProps={{ textField: { fullWidth: true } }}
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid size={{ xs: 12, sm: 4 }}>
                 <TextField
                   name="deposit"
                   label="Kaution (€)"
@@ -233,7 +278,7 @@ const EditTenantPage: React.FC = () => {
                   fullWidth
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid size={{ xs: 12, sm: 4 }}>
                 <DatePicker
                   label="Probezeitende"
                   value={dayjs(tenant.probation_end)}
@@ -248,7 +293,7 @@ const EditTenantPage: React.FC = () => {
               Studiendetails & Notizen
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth required sx={{ minWidth: 300 }}>
                   <InputLabel>Hochschule</InputLabel>
                   <Select
@@ -265,7 +310,7 @@ const EditTenantPage: React.FC = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   name="study_field"
                   label="Studienfach"
@@ -279,7 +324,7 @@ const EditTenantPage: React.FC = () => {
 
             <Divider sx={{ my: 3 }} />
             <Grid container spacing={2}>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <TextField
                   name="note"
                   label="Notiz"
@@ -313,6 +358,7 @@ const EditTenantPage: React.FC = () => {
           </Box>
         </DashboardCard>
 
+        {/* Subtenants Section */}
         <DashboardCard title="Untermieter">
           {subtenants.length > 0 ? (
             <List>
@@ -340,8 +386,62 @@ const EditTenantPage: React.FC = () => {
             </Typography>
           )}
         </DashboardCard>
+
+        {/* Move History Section */}
+        <DashboardCard title="Vermietungen">
+          {rentals.length > 0 ? (
+            <List dense>
+              {rentals.map((rental) => (
+                <ListItem key={rental.id}>
+                  <ListItemText
+                    primary={`Zimmer ${rental.room_name}`}
+                    secondary={`Vom ${dayjs(rental.move_in).format("DD.MM.YYYY")} bis ${dayjs(rental.moved_out).format(
+                      "DD.MM.YYYY"
+                    )}`}
+                  />
+                </ListItem>
+              ))}
+            </List>
+          ) : (
+            <Typography sx={{ p: 2, textAlign: "center" }} color="text.secondary">
+              Keine Umzugshistorie vorhanden.
+            </Typography>
+          )}
+        </DashboardCard>
+
+        {/* Perform Move Section */}
+        <DashboardCard title="Umzug durchführen">
+          <Box component="form" onSubmit={handleMove} noValidate sx={{ p: 2 }}>
+            <Grid container spacing={2} alignItems="center">
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Autocomplete
+                  sx={{ minWidth: 300 }}
+                  options={allRooms.filter((r) => r.label !== tenant.current_room)}
+                  getOptionLabel={(option) => option.label}
+                  value={allRooms.find((r) => r.id === moveData.room_id) || null}
+                  onChange={(_, newValue) => setMoveData((prev) => ({ ...prev, room_id: newValue?.id || null }))}
+                  renderInput={(params) => <TextField {...params} label="Neues Zimmer" required fullWidth />}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 4 }}>
+                <DatePicker
+                  label="Umzugsdatum"
+                  value={moveData.move_date}
+                  onChange={(date) => setMoveData((prev) => ({ ...prev, move_date: date }))}
+                  slotProps={{ textField: { fullWidth: true, required: true } }}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 2 }}>
+                <Button type="submit" variant="contained" fullWidth disabled={isMoving}>
+                  {isMoving ? <CircularProgress size={24} /> : "Umziehen"}
+                </Button>
+              </Grid>
+            </Grid>
+          </Box>
+        </DashboardCard>
       </Box>
 
+      {/* Delete Confirmation Dialog */}
       <Dialog open={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)}>
         <DialogTitle>Löschen bestätigen</DialogTitle>
         <DialogContent>

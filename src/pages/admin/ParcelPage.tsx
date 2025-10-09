@@ -10,7 +10,7 @@ import {
   FormControlLabel,
 } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import DashboardCard from "../../components/tenants/dashboard/DashboardCard";
+import DashboardCard from "../../components/shared/DashboardCard";
 import { TenantForSelect, Parcel, CreateParcelPayload } from "../../types/parcel";
 import {
   fetchRecipientsForSelect,

@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import Box from "@mui/material/Box";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Alert from "@mui/material/Alert";
 import { useAuth } from "../context/AuthContext";
 import { getInitialRedirectPath } from "../routesConfig";
+import { useTheme } from "@mui/material";
 
 const LoginForm: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -21,6 +21,7 @@ const LoginForm: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, authState } = useAuth();
+  const theme = useTheme();
 
   const from = location.state?.from?.pathname || null;
 
@@ -55,15 +56,27 @@ const LoginForm: React.FC = () => {
     <Container component="main" maxWidth="xs">
       <Box
         sx={{
-          marginTop: 8,
+          marginTop: 2,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
         }}
       >
-        <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-          <LockOutlinedIcon />
-        </Avatar>
+        <Box
+          sx={{
+            height: 80,
+            width: 80,
+            borderRadius: "100%",
+            backgroundColor: "primary.main",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            mb: 1,
+            overflow: "hidden",
+          }}
+        >
+          <img src="/logo.svg" alt="logo" style={{ width: 80, height: 80, filter: "brightness(0) invert(1)" }} />
+        </Box>
         <Typography component="h1" variant="h5">
           Login
         </Typography>
@@ -113,6 +126,16 @@ const LoginForm: React.FC = () => {
           <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
             Sign In
           </Button>
+          <Box sx={{ textAlign: "center", mt: 2 }}>
+            <Link
+              component="button"
+              variant="body2"
+              onClick={() => navigate("/password-reset")}
+              sx={{ cursor: "pointer", marginBottom: "16px" }}
+            >
+              Passwort vergessen?
+            </Link>
+          </Box>
         </Box>
       </Box>
     </Container>

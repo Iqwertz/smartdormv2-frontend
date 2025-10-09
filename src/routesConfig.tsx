@@ -10,27 +10,12 @@ import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import DirectionsRunOutlined from "@mui/icons-material/DirectionsRunOutlined";
 import ArticleOutlined from "@mui/icons-material/ArticleOutlined";
 import BedOutlined from "@mui/icons-material/BedOutlined";
+import DrawOutlinedIcon from "@mui/icons-material/DrawOutlined";
+import { AssignmentOutlined, FilterVintageOutlined, PersonAdd } from "@mui/icons-material";
+import { ALL_FLOORS } from "./config";
 
-import TenantPage from "./pages/TenantPage";
-import DepartmentPage from "./pages/DepartmentPage";
-import HSVPage from "./pages/shared/HSVPage";
-import ParcelPage from "./pages/admin/ParcelPage";
-import Error403Page from "./pages/Error403Page";
-import { FilterVintageOutlined, PersonAdd } from "@mui/icons-material";
-import HeimratPage from "./pages/engagements/HeimratPage";
-import NewTenantPage from "./pages/admin/NewTenantPage";
-import EditTenantPage from "./pages/admin/EditTenantPage";
-import EditSubtenantPage from "./pages/admin/EditSubtenantPage";
-import NewSubtenantPage from "./pages/admin/NewSubtenantPage";
-import SubtenantPage from "./pages/admin/SubtenantPage";
-
-// Placeholder for pages that might need to be created
-const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
-  <div>
-    <h2>{title}</h2>
-    <p>Not implemented, will be implemented in the future.</p>
-  </div>
-);
+// Import all lazy page components from the dedicated pages file.
+import * as Pages from "./pages";
 
 export interface AppRoute {
   id: string;
@@ -43,6 +28,19 @@ export interface AppRoute {
   defaultRedirectOrder?: number;
 }
 
+//Generate routes for floorspeaker signatures
+const floorSignatureRoutes = ALL_FLOORS.map((floor) => ({
+  id: `signatures-${floor.toLowerCase()}`,
+  path: `/signatures/${floor.toLowerCase()}`,
+  element: <Pages.DepartmentSignaturePage departmentSlug={floor.toLowerCase()} departmentDisplayName={floor} />,
+  title: `Unterschriften ${floor}`,
+  icon: <DrawOutlinedIcon />,
+  requiredGroups: ["ADMIN", `Flursprecher-${floor}`],
+  sidebar: true,
+}));
+
+console.log("Generated floor signature routes:", floorSignatureRoutes);
+
 export const appRoutes: AppRoute[] = [
   ////////////////////////////////////////////////////////////
   // Tenant Specific Routes:
@@ -50,12 +48,28 @@ export const appRoutes: AppRoute[] = [
   {
     id: "dashboard",
     path: "/dashboard",
-    element: <TenantPage />,
+    element: <Pages.TenantPage />,
     title: "Dashboard",
     icon: <HomeIcon />,
     requiredGroups: ["tenant", "ADMIN"],
     sidebar: true,
     defaultRedirectOrder: 1,
+  },
+  {
+    id: "apply-engagement",
+    path: "/apply-engagement",
+    element: <Pages.ApplyEngagementPage />,
+    title: "Referatsbewerbungen",
+    icon: <AssignmentOutlined />,
+    requiredGroups: ["tenant", "ADMIN"],
+    sidebar: true,
+  },
+  {
+    id: "view-applications",
+    path: "/view-applications",
+    element: <Pages.ViewApplicationsPage />,
+    requiredGroups: [], // All authenticated users can view if enabled
+    sidebar: false,
   },
   ////////////////////////////////////////////////////////////
   // Department Specific Routes:
@@ -63,7 +77,7 @@ export const appRoutes: AppRoute[] = [
   {
     id: "department-overview",
     path: "/department/overview",
-    element: <DepartmentPage />,
+    element: <Pages.DepartmentPage />,
     title: "Bewohner",
     icon: <PeopleIcon />,
     requiredGroups: ["VERWALTUNG", "ADMIN"],
@@ -73,7 +87,7 @@ export const appRoutes: AppRoute[] = [
   {
     id: "new-tenant",
     path: "/department/new-tenant",
-    element: <NewTenantPage />,
+    element: <Pages.NewTenantPage />,
     title: "Neuer Bewohner",
     icon: <PersonAdd />,
     requiredGroups: ["VERWALTUNG", "ADMIN"],
@@ -82,14 +96,14 @@ export const appRoutes: AppRoute[] = [
   {
     id: "edit-tenant",
     path: "/department/edit-tenant/:id",
-    element: <EditTenantPage />,
+    element: <Pages.EditTenantPage />,
     requiredGroups: ["VERWALTUNG", "ADMIN"],
     sidebar: false,
   },
   {
     id: "departures",
     path: "/department/departures",
-    element: <PlaceholderPage title="Auszüge" />,
+    element: <Pages.DeparturesPage />,
     title: "Auszüge",
     icon: <DirectionsRunOutlined />,
     requiredGroups: ["VERWALTUNG", "ADMIN"],
@@ -98,7 +112,7 @@ export const appRoutes: AppRoute[] = [
   {
     id: "extensions",
     path: "/department/extensions",
-    element: <PlaceholderPage title="Verlängerungen" />,
+    element: <Pages.ExtensionsPage />,
     title: "Verlängerungen",
     icon: <ArticleOutlined />,
     requiredGroups: ["VERWALTUNG", "ADMIN"],
@@ -107,7 +121,7 @@ export const appRoutes: AppRoute[] = [
   {
     id: "subtenancies",
     path: "/department/subtenancies",
-    element: <SubtenantPage />,
+    element: <Pages.SubtenantPage />,
     title: "Untermiete",
     icon: <BedOutlined />,
     requiredGroups: ["VERWALTUNG", "ADMIN"],
@@ -116,21 +130,21 @@ export const appRoutes: AppRoute[] = [
   {
     id: "new-subtenant",
     path: "/department/new-subtenant",
-    element: <NewSubtenantPage />,
+    element: <Pages.NewSubtenantPage />,
     requiredGroups: ["VERWALTUNG", "ADMIN"],
     sidebar: false,
   },
   {
     id: "edit-subtenant",
     path: "/department/edit-subtenant/:id",
-    element: <EditSubtenantPage />,
+    element: <Pages.EditSubtenantPage />,
     requiredGroups: ["VERWALTUNG", "ADMIN"],
     sidebar: false,
   },
   {
     id: "parcels",
     path: "/department/parcels",
-    element: <ParcelPage />,
+    element: <Pages.ParcelPage />,
     title: "Pakete",
     icon: <Inventory2OutlinedIcon />,
     requiredGroups: ["VERWALTUNG", "ADMIN"],
@@ -142,10 +156,64 @@ export const appRoutes: AppRoute[] = [
   {
     id: "heimrat",
     path: "/heimrat",
-    element: <HeimratPage />,
+    element: <Pages.HeimratPage />,
     title: "Heimrat",
     icon: <FilterVintageOutlined />,
     requiredGroups: ["Heimrat", "ADMIN"],
+    sidebar: true,
+  },
+  {
+    id: "engagement-management",
+    path: "/referate",
+    element: <Pages.EngagementManagementPage />,
+    title: "Referate",
+    icon: <AssignmentIndOutlinedIcon />,
+    requiredGroups: ["Heimrat", "Inforeferat", "ADMIN"],
+    sidebar: true,
+  },
+  {
+    id: "signatures-tutoren",
+    path: "/signatures/tutoren",
+    element: <Pages.DepartmentSignaturePage departmentSlug="tutoren" departmentDisplayName="Tutoren" />,
+    title: "Auszüge Tutoren",
+    icon: <DrawOutlinedIcon />,
+    requiredGroups: ["Tutoren", "ADMIN"],
+    sidebar: true,
+  },
+  {
+    id: "signatures-bar",
+    path: "/signatures/bar",
+    element: <Pages.DepartmentSignaturePage departmentSlug="bar" departmentDisplayName="Barreferat" />,
+    title: "Auszüge Bar",
+    icon: <DrawOutlinedIcon />,
+    requiredGroups: ["Barreferat", "ADMIN"],
+    sidebar: true,
+  },
+  {
+    id: "signatures-werk",
+    path: "/signatures/werk",
+    element: <Pages.DepartmentSignaturePage departmentSlug="werk" departmentDisplayName="Werkreferat" />,
+    title: "Auszüge Werk",
+    icon: <DrawOutlinedIcon />,
+    requiredGroups: ["Werkreferat", "ADMIN"],
+    sidebar: true,
+  },
+  {
+    id: "signatures-innen",
+    path: "/signatures/innen",
+    element: <Pages.DepartmentSignaturePage departmentSlug="innen" departmentDisplayName="Innenreferat" />,
+    title: "Auszüge Innen",
+    icon: <DrawOutlinedIcon />,
+    requiredGroups: ["Innenreferat", "ADMIN"],
+    sidebar: true,
+  },
+  {
+    id: "signatures-finanzen",
+    path: "/signatures/finanzen",
+    element: <Pages.DepartmentSignaturePage departmentSlug="finanzen" departmentDisplayName="Finanzenreferat" />,
+    title: "Auszüge Finanzen",
+    icon: <DrawOutlinedIcon />,
+    requiredGroups: ["Finanzenreferat", "ADMIN"],
     sidebar: true,
   },
   //////////////////////////////////////////////////////////////
@@ -154,7 +222,7 @@ export const appRoutes: AppRoute[] = [
   {
     id: "hsv",
     path: "/hsv",
-    element: <HSVPage />,
+    element: <Pages.HSVPage />,
     title: "HSV",
     icon: <AssignmentIndOutlinedIcon />,
     requiredGroups: [],
@@ -164,10 +232,12 @@ export const appRoutes: AppRoute[] = [
   {
     id: "not-authorized",
     path: "/not-authorized",
-    element: <Error403Page />,
+    element: <Pages.Error403Page />,
     requiredGroups: [],
     sidebar: false,
   },
+  //Generated floor speaker routes in the end since else it looks messy for the testadmin
+  ...floorSignatureRoutes,
 ];
 
 export const loginRoute = "/login";

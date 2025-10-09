@@ -6,18 +6,17 @@ import {
   CircularProgress,
   Alert,
   Grid,
-  Typography,
   Autocomplete,
   Checkbox,
   FormControlLabel,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useNavigate } from "react-router-dom";
-import DashboardCard from "../../components/tenants/dashboard/DashboardCard";
+import DashboardCard from "../../components/shared/DashboardCard";
 import { useNotification } from "../../context/NotificationContext";
 import { NewSubtenantPayload } from "../../types/tenant";
 import apiClient from "../../services/api";
-import dayjs, { Dayjs } from "dayjs";
+import { Dayjs } from "dayjs";
 
 interface SelectOption {
   id: number;
@@ -82,30 +81,30 @@ const NewSubtenantPage: React.FC = () => {
       <DashboardCard title="Neuen Untermieter anlegen">
         <form onSubmit={handleSubmit}>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField name="name" label="Vorname" onChange={handleChange} required fullWidth />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField name="surname" label="Nachname" onChange={handleChange} required fullWidth />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <TextField name="email" label="E-Mail" type="email" onChange={handleChange} required fullWidth />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <DatePicker
                 label="Einzugsdatum"
                 onChange={(d) => handleDateChange("move_in", d)}
                 slotProps={{ textField: { fullWidth: true, required: true } }}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <DatePicker
                 label="Auszugsdatum"
                 onChange={(d) => handleDateChange("move_out", d)}
                 slotProps={{ textField: { fullWidth: true, required: true } }}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 9 }}>
               <Autocomplete
                 sx={{ minWidth: 500 }}
                 options={tenants}
@@ -114,16 +113,15 @@ const NewSubtenantPage: React.FC = () => {
                 renderInput={(params) => <TextField {...params} label="Hauptmieter" required fullWidth />}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 3 }}>
               <Autocomplete
-                sx={{ minWidth: 130 }}
                 options={rooms}
                 getOptionLabel={(o) => o.label}
                 onChange={(_, v) => handleAutocompleteChange("room_id", v)}
                 renderInput={(params) => <TextField {...params} label="Zimmer" required fullWidth />}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <FormControlLabel
                 control={
                   <Checkbox
