@@ -252,14 +252,14 @@ const ExternalServicesStatus: React.FC = () => {
             width: 32px;
             height: 32px;
             font-size: 1.1rem;
-            margin-right: 10px;
+            margin-right: 5px;
           }
           .room-name {
             font-size: 0.95rem;
-            max-width: calc(50vw - 150px);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            max-width: calc(50vw - 130px);
+            overflow: scroll;
+            //text-overflow: ellipsis;
+            text-align: center;
           }
           .room-bookings-container {
             gap: 10px;
@@ -301,7 +301,7 @@ const ExternalServicesStatus: React.FC = () => {
             width: 28px;
             height: 28px;
             font-size: 1rem;
-            margin-right: 8px;
+            margin-right: 6px;
           }
           .room-name {
           font-size: 0.8rem;
@@ -311,7 +311,7 @@ const ExternalServicesStatus: React.FC = () => {
             gap: 8px;
           }
           .room-bookings {
-            min-width: 40px;
+            min-width: 30px;
             font-size: 0.9rem;
           }
           .room-status-dot {
