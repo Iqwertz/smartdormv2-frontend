@@ -49,10 +49,6 @@ const TenantPage: React.FC = () => {
       {" "}
       <div className="grid">
         <div className="left">
-          <DashboardCard title="Services Status" contentSx={{ p: "8px 16px" }}>
-            <ExternalServicesStatus />
-          </DashboardCard>
-
           <DashboardCard title="Deine Daten">
             <UserProfile />
           </DashboardCard>
@@ -62,6 +58,17 @@ const TenantPage: React.FC = () => {
             contentSx={{ height: "100%", display: "flex", flexDirection: "column" }}
           >
             <MyEngagements />
+          </DashboardCard>
+          <DashboardCard
+            title="Services"
+            contentSx={{ p: "8px 16px" }}
+            /*             cardSx={{
+              backgroundColor: "rgba(255, 255, 255, 0.55)",
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+            }} */
+          >
+            <ExternalServicesStatus />
           </DashboardCard>
         </div>
         <div className="right">

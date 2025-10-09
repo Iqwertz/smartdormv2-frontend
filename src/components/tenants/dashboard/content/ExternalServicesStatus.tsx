@@ -1,44 +1,40 @@
 import React, { useState, useEffect } from "react";
 import {
-  Box,
-  Typography,
-  Alert,
-  Link,
-  Chip,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  Divider,
-  LinearProgress,
-} from "@mui/material";
-import {
   RoomStatus,
   fetchRoomsStatus,
   WashingMachineSummary,
   fetchWashingMachineStatus,
 } from "../../../../services/externalStatusService";
-import LocalLaundryServiceIcon from "@mui/icons-material/LocalLaundryService";
 
 /**
- * Determines the color and label for a room's status chip.
+ * Determines the dot color and bookings text for a room.
  * @param status The current status of the room.
  * @param currentBookings The number of current bookings.
  * @param maxBookings The maximum number of bookings.
- * @returns Properties for the MUI Chip component.
+ * @returns {dotColor: string, bookingsText: string, isClosed: boolean}
  */
-const getStatusChipProps = (status: RoomStatus["status"], currentBookings: number, maxBookings: number) => {
-  if (status === "available" && currentBookings >= maxBookings) {
-    return { label: "Belegt", color: "warning" as const };
+const getRoomDisplayProps = (status: RoomStatus["status"], currentBookings: number, maxBookings: number) => {
+  let dotColor = "grey";
+  let bookingsText = "-/-";
+  let isClosed = false;
+
+  if (status === "closed") {
+    isClosed = true;
+    dotColor = "grey";
+  } else if (status === "available") {
+    bookingsText = `${maxBookings - currentBookings} / ${maxBookings}`;
+    if (currentBookings >= maxBookings) {
+      dotColor = "red"; // booked
+    } else {
+      dotColor = "green"; // available
+    }
+  } else {
+    // Fallback for other statuses
+    dotColor = "grey";
+    bookingsText = `${maxBookings - currentBookings} / ${maxBookings}`;
   }
-  switch (status) {
-    case "available":
-      return { label: "Frei", color: "success" as const };
-    case "closed":
-      return { label: "Geschlossen", color: "error" as const };
-    default:
-      return { label: status.toUpperCase(), color: "default" as const };
-  }
+
+  return { dotColor, bookingsText, isClosed };
 };
 
 /**
@@ -56,45 +52,35 @@ const RoomsStatusSection: React.FC = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <LinearProgress sx={{ my: 2 }} />;
-  if (error)
-    return (
-      <Alert severity="warning" variant="outlined" sx={{ m: 1 }}>
-        {error}
-      </Alert>
-    );
+  if (loading) return <div className="loading-bar" />;
+  if (error) return <div className="error-alert">{error}</div>;
 
   return (
-    <List dense disablePadding>
-      {rooms.map((room) => (
-        <ListItem
-          key={room.id}
-          component={Link}
-          href={room.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          button // Gives visual feedback on hover
-          sx={{ color: "text.primary", textDecoration: "none", borderRadius: 1 }}
-          secondaryAction={
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-              <Chip
-                {...getStatusChipProps(room.status, room.currentBookings, room.maxBookings)}
-                size="small"
-                sx={{ minWidth: "70px", justifyContent: "center" }}
-              />
-              {room.status !== "closed" && (
-                <Typography variant="body2" color="text.secondary" sx={{ minWidth: "50px", textAlign: "right" }}>
-                  {`${room.maxBookings - room.currentBookings} / ${room.maxBookings}`}
-                </Typography>
-              )}
-            </Box>
-          }
-        >
-          <ListItemIcon sx={{ minWidth: "36px", fontSize: "1.2rem" }}>{room.emoji}</ListItemIcon>
-          <ListItemText primary={room.name} />
-        </ListItem>
-      ))}
-    </List>
+    <div className="rooms-list">
+      {rooms.map((room) => {
+        const { dotColor, bookingsText, isClosed } = getRoomDisplayProps(
+          room.status,
+          room.currentBookings,
+          room.maxBookings
+        );
+        return (
+          <a
+            key={room.id}
+            href={room.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`room-item ${isClosed ? "closed" : ""}`}
+          >
+            <div className="room-icon-container">{room.emoji}</div>
+            <div className="room-name">{room.name}</div>
+            <div className="room-bookings-container">
+              <div className="room-bookings">{bookingsText}</div>
+              <div className={`room-status-dot ${dotColor}`} />
+            </div>
+          </a>
+        );
+      })}
+    </div>
   );
 };
 
@@ -113,34 +99,33 @@ const WashingMachineStatusSection: React.FC = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <LinearProgress sx={{ my: 2 }} />;
-  if (error)
-    return (
-      <Alert severity="warning" variant="outlined" sx={{ m: 1 }}>
-        {error}
-      </Alert>
-    );
+  if (loading) return <div className="loading-bar" />;
+  if (error) return <div className="error-alert">{error}</div>;
 
   return (
-    <Box
-      sx={{ display: "flex", alignItems: "center", justifyContent: "space-around", p: 1.5, flexWrap: "wrap", gap: 2 }}
-    >
-      <LocalLaundryServiceIcon color="action" sx={{ fontSize: 32 }} />
-      {summary.map((room) => (
-        <Box key={room.roomName} sx={{ textAlign: "center" }}>
-          <Typography variant="body2" color="text.secondary">
-            {room.roomName}
-          </Typography>
-          <Typography
-            variant="h6"
-            color={room.available > 0 ? "success.main" : "text.primary"}
-            sx={{ fontWeight: "medium" }}
+    <div className="rooms-list">
+      {summary.map((room) => {
+        const dotColor = room.available > 0 ? "green" : "red";
+        return (
+          <a
+            key={room.roomName}
+            href={"http://waschmaschinen.schollheim.net/"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="room-item"
           >
-            {`${room.available} / ${room.total}`}
-          </Typography>
-        </Box>
-      ))}
-    </Box>
+            <div className="room-icon-container">🧺</div>
+            <div className="room-name">{room.roomName}</div>
+            <div className="room-bookings-container">
+              <div className="room-bookings">
+                {room.available} / {room.total}
+              </div>
+              <div className={`room-status-dot ${dotColor}`} />
+            </div>
+          </a>
+        );
+      })}
+    </div>
   );
 };
 
@@ -149,16 +134,215 @@ const WashingMachineStatusSection: React.FC = () => {
  */
 const ExternalServicesStatus: React.FC = () => {
   return (
-    <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 2 }}>
-      <Box sx={{ flex: 1 }}>
-        <RoomsStatusSection />
-      </Box>
-      <Divider orientation="vertical" flexItem sx={{ display: { xs: "none", md: "block" } }} />
-      <Divider sx={{ my: 1, display: { xs: "block", md: "none" } }} />
-      <Box sx={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <WashingMachineStatusSection />
-      </Box>
-    </Box>
+    <>
+      <style>{`
+        .external-status {
+          margin-top: 20px;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+        .horizontal-divider {
+          display: block;
+          height: 1px;
+          background-color: #e0e0e0;
+          margin: 8px 0;
+          text-align: center;
+        }
+        .loading-bar {
+          height: 4px;
+          background: linear-gradient(to right, #1976d2, #42a5f5);
+          margin: 16px 0;
+        }
+        .error-alert {
+          margin: 8px;
+          padding: 8px;
+          border: 1px solid #ff9800;
+          border-radius: 4px;
+          background-color: #fff3e0;
+          color: #ef6c00;
+        }
+        .rooms-list {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 8px;
+        }
+        .room-item {
+          display: flex;
+          align-items: center;
+          padding: 12px;
+          background-color: #ffffff;
+          border-radius: 16px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          text-decoration: none;
+          color: #000000;
+          transition: box-shadow 0.3s ease;
+        }
+        .room-item:hover {
+          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        .room-item.closed {
+          color: #9e9e9e;
+          opacity: 0.6;
+        }
+        .room-icon-container {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          background-color: #f0f0f0;
+          margin-right: 12px;
+          font-size: 1.2rem;
+        }
+        .room-item.closed .room-icon-container {
+          background-color: #e0e0e0;
+        }
+        .room-name {
+          flex: 1;
+          font-weight: bold;
+        }
+        .room-bookings-container {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        .room-bookings {
+          min-width: 50px;
+          text-align: right;
+          color: #757575;
+        }
+        .room-item.closed .room-bookings {
+          color: #9e9e9e;
+        }
+        .room-status-dot {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+        }
+        .room-status-dot.red {
+          background-color: red;
+        }
+        .room-status-dot.green {
+          background-color: green;
+        }
+        .room-status-dot.grey {
+          background-color: grey;
+        }
+        .room-booking-note {
+          margin-left: 8px;
+          font-size: 0.75rem;
+          color: #757575;
+        }
+
+        /* Media query for tablets and smaller */
+        @media (max-width: 768px) {
+          .rooms-list {
+            gap: 6px;
+          }
+          .room-item {
+            padding: 10px;
+            border-radius: 12px;
+          }
+          .room-icon-container {
+            width: 32px;
+            height: 32px;
+            font-size: 1.1rem;
+            margin-right: 10px;
+          }
+          .room-name {
+            font-size: 0.95rem;
+            max-width: calc(50vw - 150px);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+          .room-bookings-container {
+            gap: 10px;
+          }
+          .room-bookings {
+            min-width: 45px;
+            font-size: 0.95rem;
+          }
+          .room-status-dot {
+            width: 11px;
+            height: 11px;
+          }
+          .external-status {
+            margin-top: 16px;
+            gap: 12px;
+          }
+          .horizontal-divider {
+            margin: 6px 0;
+          }
+          .error-alert {
+            margin: 6px;
+            padding: 6px;
+          }
+          .loading-bar {
+            margin: 12px 0;
+          }
+        }
+
+        /* Media query for mobile phones */
+        @media (max-width: 480px) {
+          .rooms-list {
+            gap: 4px;
+          }
+          .room-item {
+            padding: 8px;
+            border-radius: 8px;
+          }
+          .room-icon-container {
+            width: 28px;
+            height: 28px;
+            font-size: 1rem;
+            margin-right: 8px;
+          }
+          .room-name {
+          font-size: 0.8rem;
+            overflow: hidden;
+          }
+          .room-bookings-container {
+            gap: 8px;
+          }
+          .room-bookings {
+            min-width: 40px;
+            font-size: 0.9rem;
+          }
+          .room-status-dot {
+            width: 10px;
+            height: 10px;
+          }
+          .external-status {
+            margin-top: 12px;
+            gap: 8px;
+          }
+          .horizontal-divider {
+            margin: 4px 0;
+          }
+          .error-alert {
+            margin: 4px;
+            padding: 4px;
+            font-size: 0.9rem;
+          }
+          .loading-bar {
+            margin: 8px 0;
+            height: 3px;
+          }
+        }
+      `}</style>
+      <div className="external-status">
+        <div style={{ flex: 1 }}>
+          <RoomsStatusSection />
+        </div>
+        <div className="horizontal-divider"></div>
+        <div style={{ flex: 1 }}>
+          <WashingMachineStatusSection />
+        </div>
+      </div>
+    </>
   );
 };
 

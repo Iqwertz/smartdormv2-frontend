@@ -195,7 +195,7 @@ const TabbedDashboardCard: React.FC<TabbedDashboardCardProps> = ({
         sx={{
           position: "relative",
           zIndex: 2,
-          backgroundColor: "rgba(255, 255, 255, 0.85)",
+          backgroundColor: "rgba(255, 255, 255, 1)",
           backdropFilter: "blur(8px)",
           WebkitBackdropFilter: "blur(8px)",
           borderRadius: 2,
