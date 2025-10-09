@@ -19,6 +19,9 @@ const AppLayout: React.FC = () => {
             height: "100vh",
             position: "relative",
             zIndex: 1,
+            "@media (max-width: 1100px)": {
+              paddingTop: "60px",
+            },
           }}
         >
           <Outlet />

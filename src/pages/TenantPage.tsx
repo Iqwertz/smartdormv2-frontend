@@ -12,6 +12,9 @@ import DepartureDecisionPopup from "../components/tenants/dashboard/content/Depa
 import { fetchMyDeparture } from "../services/departureService";
 import { Departure, GlobalAppSettings } from "../types/tenant";
 import { fetchGlobalSettings } from "../services/engagementService";
+import RoomsStatus from "../components/tenants/dashboard/content/RoomsStatus";
+import WashingMachineStatus from "../components/tenants/dashboard/content/WashingMachineStatus";
+import ExternalServicesStatus from "../components/tenants/dashboard/content/ExternalServicesStatus";
 
 const TenantPage: React.FC = () => {
   const [departure, setDeparture] = useState<Departure | null>(null);
@@ -56,8 +59,26 @@ const TenantPage: React.FC = () => {
           >
             <MyEngagements />
           </DashboardCard>
+          <DashboardCard
+            title="Services"
+            contentSx={{ p: "8px 16px" }}
+            cardSx={{
+              backgroundColor: "rgba(255, 255, 255, 0.55)",
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+            }}
+          >
+            <ExternalServicesStatus />
+          </DashboardCard>
         </div>
         <div className="right">
+          <DashboardCard title="Quick Links">
+            <QuickLinks></QuickLinks>
+          </DashboardCard>
+          <DashboardCard title="Kalendar">
+            {/* <CalendarWidget></CalendarWidget> */}
+            Coming soon...
+          </DashboardCard>
           {settings?.applications_open && (
             <DashboardCard title="Referatsbewerbung">
               <Typography sx={{ mb: 2 }}>Die Bewerbungsphase für das nächste Semester ist jetzt geöffnet.</Typography>
@@ -74,13 +95,6 @@ const TenantPage: React.FC = () => {
               </Button>
             </DashboardCard>
           )}
-          <DashboardCard title="Quick Links">
-            <QuickLinks></QuickLinks>
-          </DashboardCard>
-          <DashboardCard title="Kalendar">
-            {/* <CalendarWidget></CalendarWidget> */}
-            Coming soon...
-          </DashboardCard>
           <DashboardCard title="Settings">
             <Settings />
           </DashboardCard>

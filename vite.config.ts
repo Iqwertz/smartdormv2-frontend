@@ -11,4 +11,7 @@ export default defineConfig({
       open: true, // Automatically open it in the browser after build
     }),
   ],
+  server: {
+    allowedHosts: true,
+  },
 });
