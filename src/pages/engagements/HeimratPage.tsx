@@ -305,7 +305,7 @@ const HeimratApplicationList: React.FC = () => {
         rows={applications}
         columns={columns}
         loading={loading}
-        sx={{ height: "calc(100% - 40px)" }}
+        sx={{ height: "calc(100% - 60px)" }}
         getRowId={(row) => row.id}
       />
       <Dialog open={deleteConfirm.open} onClose={() => setDeleteConfirm({ open: false, appId: null })}>
@@ -425,8 +425,8 @@ const HeimratPage: React.FC = () => {
       <TabbedDashboardCard
         title="Heimrat Verwaltung"
         tabs={tabs}
-        cardSx={{ height: "calc(100vh - 64px - 3rem - 16px)" }}
-        contentSx={{ height: "calc(100% - 40px)", overflowY: "auto" }}
+        cardSx={{ height: "calc(100dvh - 100px)" }}
+        contentSx={{ height: "calc(100%)", overflowY: "auto" }}
       />
     </Box>
   );

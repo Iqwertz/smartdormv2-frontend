@@ -45,13 +45,12 @@ const OpenDeparturesTable: React.FC = () => {
       field: "actions",
       type: "actions",
       headerName: "Aktion",
-      width: 120,
+      width: 80,
       getActions: ({ row }) => [
         <GridActionsCellItem
           icon={<EmailIcon />}
           label="Erinnerung senden"
           onClick={() => handleSendReminder(row.tenant.id)}
-          showInMenu
         />,
       ],
     },

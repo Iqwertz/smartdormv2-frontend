@@ -26,7 +26,7 @@ const SubtenantPage: React.FC = () => {
         title="Untermieter"
         tabs={tabs}
         cardSx={{
-          height: "calc(100vh - 64px - 3rem - 16px)",
+          height: "calc(100dvh - 100px)",
         }}
         contentSx={{ height: "calc(100% - 40px)", padding: 2 }}
       />

@@ -328,7 +328,7 @@ const EngagementManagementPage: React.FC = () => {
       <TabbedDashboardCard
         title="Referate verwalten"
         tabs={tabs}
-        cardSx={{ height: "calc(100vh - 64px - 3rem - 16px)" }}
+        cardSx={{ height: "calc(100dvh - 64px - 3rem - 16px)" }}
         contentSx={{ height: "calc(100% - 40px)", overflowY: "auto" }}
       />
     </Box>

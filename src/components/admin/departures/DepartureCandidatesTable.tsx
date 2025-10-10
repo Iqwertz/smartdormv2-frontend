@@ -46,7 +46,7 @@ const DepartureCandidatesTable: React.FC = () => {
       field: "actions",
       type: "actions",
       headerName: "Aktion",
-      width: 120,
+      width: 80,
       getActions: ({ id }) => [
         <GridActionsCellItem
           icon={<AddCircleOutlineIcon />}

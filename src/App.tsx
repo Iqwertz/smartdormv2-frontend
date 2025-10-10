@@ -20,7 +20,7 @@ const InitialLoadingScreen: React.FC = () => (
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        minHeight: "100vh",
+        minHeight: "100dvh",
         width: "100%",
       }}
     >
@@ -40,7 +40,7 @@ const SuspenseFallback: React.FC = () => (
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        minHeight: "100vh",
+        minHeight: "100dvh",
         width: "100%",
       }}
     >

@@ -7,7 +7,7 @@ import "../styles/global.scss";
 const AppLayout: React.FC = () => {
   return (
     <div className="background">
-      <Box sx={{ display: "flex", minHeight: "100vh" }}>
+      <Box sx={{ display: "flex", minHeight: "100dvh" }}>
         <AppSidebar />
         <Box
           component="main"
@@ -16,7 +16,7 @@ const AppLayout: React.FC = () => {
             p: { xs: 1, sm: 2, md: 3 },
             overflowX: "hidden",
             overflowY: "auto",
-            height: "100vh",
+            height: "100dvh",
             position: "relative",
             zIndex: 1,
             "@media (max-width: 1100px)": {
