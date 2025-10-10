@@ -24,14 +24,14 @@ const getRoomDisplayProps = (status: RoomStatus["status"], currentBookings: numb
     isClosed = true;
     dotColor = "grey";
   } else if (status === "available") {
-    bookingsText = `${maxBookings - currentBookings} / ${maxBookings}`;
+    bookingsText = `${currentBookings} / ${maxBookings}`;
     dotColor = "green";
     if (currentBookings > 0) {
       dotColor = "orange"; //Partially booked
     }
   } else if (status === "booked") {
     dotColor = "red";
-    bookingsText = `${maxBookings - currentBookings} / ${maxBookings}`;
+    bookingsText = `${currentBookings} / ${maxBookings}`;
   }
 
   return { dotColor, bookingsText, isClosed };
@@ -118,7 +118,7 @@ const WashingMachineStatusSection: React.FC = () => {
             <div className="room-name">{room.roomName}</div>
             <div className="room-bookings-container">
               <div className="room-bookings">
-                {room.available} / {room.total}
+                {room.total - room.available} / {room.total}
               </div>
               <div className={`room-status-dot ${dotColor}`} />
             </div>
@@ -305,7 +305,7 @@ const ExternalServicesStatus: React.FC = () => {
           }
           .room-name {
           font-size: 0.8rem;
-            overflow: hidden;
+            overflow: auto;
           }
           .room-bookings-container {
             gap: 8px;
