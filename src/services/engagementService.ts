@@ -55,10 +55,14 @@ export const createEngagementAdmin = async (payload: EngagementCreatePayload): P
   return response.data;
 };
 
-export const updateEngagementPoints = async (engagementId: number, points: number): Promise<AdminEngagement> => {
+export const updateEngagement = async (
+  engagementId: number,
+  points: number,
+  note: string
+): Promise<AdminEngagement> => {
   const response = await apiClient.put<AdminEngagement>(
-    `/api/engagements/heimrat/engagements/${engagementId}/update-points/`,
-    { points }
+    `/api/engagements/heimrat/engagements/${engagementId}/update/`,
+    { points, note }
   );
   return response.data;
 };

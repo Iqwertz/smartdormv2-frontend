@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   CircularProgress,
-  Alert,
   Autocomplete,
   TextField,
   Checkbox,
@@ -27,10 +26,10 @@ import {
   fetchDepartmentsForSelect,
   fetchEngagementsAdmin,
   createEngagementAdmin,
-  updateEngagementPoints,
   deleteEngagementAdmin,
   compensateAllEngagements,
   compensateEngagement,
+  updateEngagement,
 } from "../../services/engagementService";
 import { GridToolbar } from "@mui/x-data-grid/internals";
 import Tooltip from "@mui/material/Tooltip";
@@ -137,10 +136,16 @@ const EngagementList: React.FC<{ compensated: boolean; refreshKey: number; onDat
   const { showNotification } = useNotification();
   const [engagements, setEngagements] = useState<AdminEngagement[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editState, setEditState] = useState<{ open: boolean; engagement: AdminEngagement | null; points: string }>({
+  const [editState, setEditState] = useState<{
+    open: boolean;
+    engagement: AdminEngagement | null;
+    points: string;
+    note: string;
+  }>({
     open: false,
     engagement: null,
     points: "",
+    note: "",
   });
   const [deleteState, setDeleteState] = useState<{ open: boolean; engagementId: number | null }>({
     open: false,
@@ -164,7 +169,7 @@ const EngagementList: React.FC<{ compensated: boolean; refreshKey: number; onDat
   }, [loadEngagements, refreshKey]);
 
   const handleEditClick = (engagement: AdminEngagement) =>
-    setEditState({ open: true, engagement, points: engagement.points.toString() });
+    setEditState({ open: true, engagement, points: engagement.points.toString(), note: engagement.note || "" });
   const handleDeleteClick = (engagementId: number) => setDeleteState({ open: true, engagementId });
   const handleCompensateClick = async (engagement: AdminEngagement) => {
     try {
@@ -179,9 +184,9 @@ const EngagementList: React.FC<{ compensated: boolean; refreshKey: number; onDat
   const handleSavePoints = async () => {
     if (!editState.engagement) return;
     try {
-      await updateEngagementPoints(editState.engagement.id, parseFloat(editState.points));
-      showNotification("Punkte aktualisiert.", "success");
-      setEditState({ open: false, engagement: null, points: "" });
+      await updateEngagement(editState.engagement.id, parseFloat(editState.points), editState.note);
+      showNotification("Referat aktualisiert.", "success");
+      setEditState({ open: false, engagement: null, points: "", note: "" });
       onDataModified();
     } catch {
       showNotification("Update fehlgeschlagen.", "error");
@@ -249,10 +254,10 @@ const EngagementList: React.FC<{ compensated: boolean; refreshKey: number; onDat
       />
 
       <Dialog open={editState.open} onClose={() => setEditState({ ...editState, open: false })}>
-        <DialogTitle>Punkte bearbeiten</DialogTitle>
+        <DialogTitle>Referat bearbeiten</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Punkte für {editState.engagement?.tenant.name} {editState.engagement?.tenant.surname} im Amt{" "}
+            Referatseintrag für {editState.engagement?.tenant.name} {editState.engagement?.tenant.surname} im Amt{" "}
             {editState.engagement?.department.name} bearbeiten.
           </DialogContentText>
           <TextField
@@ -264,6 +269,16 @@ const EngagementList: React.FC<{ compensated: boolean; refreshKey: number; onDat
             variant="standard"
             value={editState.points}
             onChange={(e) => setEditState((p) => ({ ...p, points: e.target.value }))}
+          />
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Notiz"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={editState.note}
+            onChange={(e) => setEditState((p) => ({ ...p, note: e.target.value }))}
           />
         </DialogContent>
         <DialogActions>
