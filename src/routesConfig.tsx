@@ -11,7 +11,7 @@ import DirectionsRunOutlined from "@mui/icons-material/DirectionsRunOutlined";
 import ArticleOutlined from "@mui/icons-material/ArticleOutlined";
 import BedOutlined from "@mui/icons-material/BedOutlined";
 import DrawOutlinedIcon from "@mui/icons-material/DrawOutlined";
-import { AssignmentOutlined, FilterVintageOutlined, PersonAdd } from "@mui/icons-material";
+import { AssignmentOutlined, FilterVintageOutlined, Groups, PersonAdd } from "@mui/icons-material";
 import { ALL_FLOORS } from "./config";
 
 // Import all lazy page components from the dedicated pages file.
@@ -153,6 +153,15 @@ export const appRoutes: AppRoute[] = [
   ////////////////////////////////////////////////////////////
   // Engagement Specific Routes:
   ////////////////////////////////////////////////////////////
+  {
+    id: "tenant-overview",
+    path: "/tenant-overview",
+    element: <Pages.TenantOverviewPage />,
+    title: "Bewohnerübersicht",
+    icon: <Groups />,
+    requiredGroups: ["Heimrat", "ADMIN"],
+    sidebar: true,
+  },
   {
     id: "heimrat",
     path: "/heimrat",

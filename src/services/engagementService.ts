@@ -6,6 +6,8 @@ import {
   MyEngagementApplication,
   AdminEngagement,
   EngagementCreatePayload,
+  TenantWithEngagements,
+  DepartmentEngagementGroup,
 } from "../types/tenant";
 
 export const fetchGlobalSettings = async (): Promise<GlobalAppSettings> => {
@@ -69,6 +71,16 @@ export const updateEngagement = async (
 
 export const deleteEngagementAdmin = async (engagementId: number): Promise<void> => {
   await apiClient.delete(`/api/engagements/heimrat/engagements/${engagementId}/delete/`);
+};
+
+export const fetchTenantOverviewData = async (): Promise<TenantWithEngagements[]> => {
+  const response = await apiClient.get<TenantWithEngagements[]>("/api/engagements/misc/tenant-overview-data/");
+  return response.data;
+};
+
+export const fetchEngagementOverviewData = async (): Promise<DepartmentEngagementGroup[]> => {
+  const response = await apiClient.get<DepartmentEngagementGroup[]>("/api/engagements/misc/engagement-overview-data/");
+  return response.data;
 };
 
 export const compensateAllEngagements = async (): Promise<{ message: string }> => {
