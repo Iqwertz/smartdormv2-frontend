@@ -293,7 +293,7 @@ const HeimratApplicationList: React.FC = () => {
     <Box sx={{ height: "100%", p: 1 }}>
       <Button
         component="a"
-        href={`${API_BASE_URL}/api/engagements/heimrat/applications/`}
+        href={`${API_BASE_URL}/api/tenants/engagement-applications/pdf/`}
         target="_blank"
         variant="contained"
         startIcon={<DownloadIcon />}
