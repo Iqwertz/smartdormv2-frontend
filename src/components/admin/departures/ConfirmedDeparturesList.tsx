@@ -80,7 +80,15 @@ const ConfirmedDeparturesList: React.FC = () => {
             <CardContent>
               <Grid container spacing={2}>
                 <Grid size={{ xs: 12 }}>
-                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 4 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      gap: 4,
+                      "@media (max-width:420px)": { flexDirection: "column" },
+                    }}
+                  >
                     <Box>
                       <Typography variant="h6">
                         {dep.tenant.name} {dep.tenant.surname}
@@ -124,7 +132,13 @@ const ConfirmedDeparturesList: React.FC = () => {
                       <Paper
                         key={sig.id}
                         elevation={3}
-                        sx={{ display: "inline-flex", alignItems: "center", p: 1, minWidth: 180 }}
+                        sx={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          p: 1,
+                          minWidth: 180,
+                          "@media (max-width:420px)": { minWidth: "100%" },
+                        }}
                       >
                         <ListItem disablePadding>
                           <ListItemIcon sx={{ minWidth: 32 }}>
@@ -137,7 +151,17 @@ const ConfirmedDeparturesList: React.FC = () => {
                           <ListItemText
                             primary={sig.department_name}
                             secondary={`Betrag: ${sig.amount} €`}
-                            sx={{ color: sig.amount > 0 ? "error.main" : "inherit" }}
+                            sx={{
+                              color: sig.amount > 0 ? "error.main" : "inherit",
+                              "@media (max-width:420px)": {
+                                display: "flex",
+                                gap: 1,
+                                alignItems: "center",
+                                width: "100%",
+                                "& .MuiListItemText-primary": { marginBottom: 0 },
+                                "& .MuiListItemText-secondary": { marginLeft: "auto" },
+                              },
+                            }}
                           />
                         </ListItem>
                       </Paper>

@@ -207,3 +207,14 @@ export interface Claim {
   tenant: TenantProfile;
   external_id: string;
 }
+
+export interface TenantOverview extends TenantProfile {
+  engagements: Engagement[];
+}
+
+export interface EngagementOverviewGroup {
+  department_id: number;
+  department_name: string;
+  department_full_name: string;
+  engagements: AdminEngagement[];
+}

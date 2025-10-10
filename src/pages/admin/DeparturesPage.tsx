@@ -32,7 +32,7 @@ const DeparturesPage: React.FC = () => {
         title="Auszüge verwalten"
         tabs={tabs}
         cardSx={{
-          height: "calc(100vh - 100px)",
+          height: "calc(100dvh - 100px)",
         }}
         contentSx={{ height: "100%", padding: 2, overflowY: "auto" }}
       />

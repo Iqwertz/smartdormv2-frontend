@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Box,
   TextField,
@@ -16,6 +16,10 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import DashboardCard from "../../components/shared/DashboardCard";
@@ -30,6 +34,9 @@ import {
 } from "../../services/engagementService";
 import imageCompression from "browser-image-compression";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { API_BASE_URL } from "../../config";
+import { GridDownloadIcon } from "@mui/x-data-grid";
+import { getPreviousSemester } from "../../services/helperService";
 
 const ApplyEngagementPage: React.FC = () => {
   const navigate = useNavigate();
@@ -50,6 +57,21 @@ const ApplyEngagementPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedSemester, setSelectedSemester] = useState<string>("");
+
+  const availableSemesters = useMemo(() => {
+    if (!settings) return [];
+
+    const defaultSemester = settings.current_semester;
+
+    const semesters = [
+      defaultSemester,
+      getPreviousSemester(defaultSemester),
+      getPreviousSemester(getPreviousSemester(defaultSemester)),
+    ];
+
+    return semesters;
+  }, [settings]);
 
   const loadMyApplications = useCallback(async () => {
     setLoadingApps(true);
@@ -73,6 +95,8 @@ const ApplyEngagementPage: React.FC = () => {
           setDepartments(deptsData);
           loadMyApplications(); // Load user's apps
         }
+
+        setSelectedSemester(settingsData.current_semester);
       } catch (err) {
         setError("Daten konnten nicht geladen werden.");
       } finally {
@@ -233,6 +257,36 @@ const ApplyEngagementPage: React.FC = () => {
             Du hast dich noch für kein Referat beworben.
           </Typography>
         )}
+      </DashboardCard>
+
+      <DashboardCard title="Alte Bewerbungen">
+        <Box sx={{ display: "flex", gap: 2, alignItems: "center", width: "100%", p: 1 }}>
+          <FormControl size="small" sx={{ minWidth: 150 }}>
+            <InputLabel>Semester</InputLabel>
+            <Select value={selectedSemester} onChange={(e) => setSelectedSemester(e.target.value)} label="Semester">
+              {availableSemesters.map((semester) => (
+                <MenuItem key={semester} value={semester}>
+                  {semester}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Button
+            component="a"
+            href={`${API_BASE_URL}/api/tenants/engagement-applications/pdf/?semester=${selectedSemester}`}
+            target="_blank"
+            variant="contained"
+            startIcon={<GridDownloadIcon />}
+            sx={{
+              "@media (max-width: 420px)": {
+                fontSize: "0.65rem",
+                whiteSpace: "nowrap",
+              },
+            }}
+          >
+            PDF Herunterladen
+          </Button>
+        </Box>
       </DashboardCard>
 
       <Dialog open={deleteConfirm.open} onClose={() => setDeleteConfirm({ open: false, appId: null })}>
