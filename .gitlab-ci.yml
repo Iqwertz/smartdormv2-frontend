@@ -67,4 +67,4 @@ deploy_to_production:
   needs: [build_production]
   when: manual
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main" && $CI_MERGE_REQUEST_STATE == "merged"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
