@@ -99,7 +99,7 @@ const OpenClaimsTable: React.FC = () => {
         columns={columns}
         loading={loading}
         getRowId={(row) => row.id}
-        autoHeight
+        sx={{ height: "100%" }}
         slots={{ toolbar: GridToolbar }}
         showToolbar
         slotProps={{

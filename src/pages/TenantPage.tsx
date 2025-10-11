@@ -51,7 +51,7 @@ const TenantPage: React.FC = () => {
             <UserProfile />
           </DashboardCard>
           <DashboardCard
-            title="Meine Referate"
+            title="Deine Referate"
             cardSx={{ maxHeight: "calc(35vh + 40px)", overflowY: "auto" }}
             contentSx={{ height: "100%", display: "flex", flexDirection: "column" }}
           >

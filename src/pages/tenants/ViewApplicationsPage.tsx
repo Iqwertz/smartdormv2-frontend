@@ -1,21 +1,61 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Box, Typography, CircularProgress, Alert, Paper, Grid } from "@mui/material";
+import {
+  Box,
+  Typography,
+  CircularProgress,
+  Alert,
+  Paper,
+  Grid,
+  Button,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+} from "@mui/material";
 import DashboardCard from "../../components/shared/DashboardCard";
 import { GlobalAppSettings, EngagementApplicationData } from "../../types/tenant";
 import { fetchGlobalSettings, fetchEngagementApplications } from "../../services/engagementService";
 import LazyImage from "../../components/shared/LazyImage"; // Import the new component
+import { GridDownloadIcon } from "@mui/x-data-grid";
+import { API_BASE_URL } from "../../config";
+import { getNextSemester, getPreviousSemester } from "../../services/helperService";
+import { textAlign } from "@mui/system";
 
 const ViewApplicationsPage: React.FC = () => {
   const [settings, setSettings] = useState<GlobalAppSettings | null>(null);
   const [applications, setApplications] = useState<EngagementApplicationData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedSemester, setSelectedSemester] = useState<string>("");
+
+  const availableSemesters = useMemo(() => {
+    if (!settings) return [];
+
+    const defaultSemester = settings.show_applications
+      ? getNextSemester(settings.current_semester)
+      : settings.current_semester;
+
+    const semesters = [
+      defaultSemester,
+      getPreviousSemester(defaultSemester),
+      getPreviousSemester(getPreviousSemester(defaultSemester)),
+    ];
+
+    return semesters;
+  }, [settings]);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         const settingsData = await fetchGlobalSettings();
         setSettings(settingsData);
+
+        // Set default semester
+        const defaultSemester = settingsData.show_applications
+          ? getNextSemester(settingsData.current_semester)
+          : settingsData.current_semester;
+        setSelectedSemester(defaultSemester);
+
         if (settingsData.show_applications) {
           const appsData = await fetchEngagementApplications();
           setApplications(appsData);
@@ -61,6 +101,60 @@ const ViewApplicationsPage: React.FC = () => {
 
   return (
     <Box sx={{ maxWidth: "1200px", margin: "0 auto", display: "flex", flexDirection: "column", gap: 3 }}>
+      <Paper
+        variant="outlined"
+        sx={{
+          p: 2,
+          display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
+          justifyContent: "space-between",
+          alignItems: { xs: "stretch", sm: "center" },
+          gap: 2,
+        }}
+      >
+        <Typography
+          variant="h5"
+          sx={{
+            mb: { xs: 1, sm: 0 },
+            "@media (max-width: 420px)": {
+              textAlign: "center",
+            },
+          }}
+        >
+          Referatsbewerbungen
+        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            gap: 2,
+            alignItems: { xs: "stretch", sm: "center" },
+          }}
+        >
+          <FormControl size="small" sx={{ minWidth: { xs: "100%", sm: 150 } }}>
+            <InputLabel>Semester</InputLabel>
+            <Select value={selectedSemester} onChange={(e) => setSelectedSemester(e.target.value)} label="Semester">
+              {availableSemesters.map((semester) => (
+                <MenuItem key={semester} value={semester}>
+                  {semester}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Button
+            component="a"
+            href={`${API_BASE_URL}/api/tenants/engagement-applications/pdf/?semester=${selectedSemester}`}
+            target="_blank"
+            variant="contained"
+            startIcon={<GridDownloadIcon />}
+            fullWidth
+            sx={{ width: { xs: "100%", sm: "auto" } }}
+          >
+            PDF Herunterladen
+          </Button>
+        </Box>
+      </Paper>
+
       {Object.entries(groupedApplications).map(([deptName, apps]) => (
         <DashboardCard key={deptName} title={deptName}>
           <Grid container spacing={2}>
@@ -69,7 +163,7 @@ const ViewApplicationsPage: React.FC = () => {
               const altText = `${app.tenant.name} ${app.tenant.surname}`;
 
               return (
-                <Grid size={{ xs: 12, md: 6 }} key={app.id}>
+                <Grid size={{ xs: 12, md: 12 }} key={app.id}>
                   <Paper
                     variant="outlined"
                     sx={{

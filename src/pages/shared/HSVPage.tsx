@@ -123,7 +123,7 @@ const HSVPage: React.FC = () => {
             component="span"
             sx={{ display: "flex", flexDirection: "column", fontSize: "0.8rem", color: "text.secondary", mt: 0.5 }}
           >
-            <Box component="span" sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
+            {/*             <Box component="span" sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
               <EmailOutlined fontSize="inherit" sx={{ mr: 0.5, flexShrink: 0 }} />
               {tenant.email ? (
                 <Link href={`mailto:${tenant.email}`} color="inherit" underline="hover">
@@ -132,8 +132,8 @@ const HSVPage: React.FC = () => {
               ) : (
                 "N/A"
               )}
-            </Box>
-            <Box component="span" sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
+            </Box> */}
+            {/*             <Box component="span" sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
               <PhoneOutlined fontSize="inherit" sx={{ mr: 0.5, flexShrink: 0 }} />
               {tenant.tel_number ? (
                 <Link href={`tel:${tenant.tel_number.replace(/\s+/g, "")}`} color="inherit" underline="hover">
@@ -142,7 +142,7 @@ const HSVPage: React.FC = () => {
               ) : (
                 "N/A"
               )}
-            </Box>
+            </Box> */}
             <Box component="span" sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
               <MeetingRoomOutlined fontSize="inherit" sx={{ mr: 0.5, flexShrink: 0 }} />
               Zimmer: {tenant.current_room || "N/A"}
@@ -190,10 +190,10 @@ const HSVPage: React.FC = () => {
       component="main"
       sx={{
         flexGrow: 1,
-        p: 3,
+        p: 1,
         maxWidth: "900px",
         margin: "0 auto",
-        height: "100vh",
+        height: "100dvh",
       }}
     >
       <DashboardCard title="Suche">

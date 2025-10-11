@@ -89,7 +89,7 @@ const PasswordResetPage: React.FC = () => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          minHeight: "100vh",
+          minHeight: "100dvh",
           position: "relative",
           backgroundImage: "url(./img/Wohnheim.jpg)",
           backgroundSize: "cover",

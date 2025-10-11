@@ -178,7 +178,7 @@ const ParcelPage: React.FC = () => {
         display: "flex",
         flexDirection: "column",
         gap: 2,
-        height: "calc(100vh - 32px)",
+        height: "calc(100dvh - 32px)",
         maxWidth: "1200px",
         margin: "0 auto",
       }}

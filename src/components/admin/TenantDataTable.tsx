@@ -7,8 +7,12 @@ import { useNavigate } from "react-router-dom";
 import apiClient from "../../services/api";
 import { TenantProfile } from "../../types/tenant";
 import { GridToolbar } from "@mui/x-data-grid/internals";
+interface TenantDataTableProps {
+  status?: string;
+  title?: string; // Optional title for different contexts
+}
 
-const TenantDataTable: React.FC = () => {
+const TenantDataTable: React.FC<TenantDataTableProps> = ({ status = "current", title }) => {
   const [rows, setRows] = useState<TenantProfile[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -20,7 +24,7 @@ const TenantDataTable: React.FC = () => {
     apiClient
       .get<TenantProfile[]>("/api/department/tenant-data", {
         params: {
-          status: "current",
+          status: status, // Use the prop value
         },
       })
       .then((response) => {
@@ -33,7 +37,7 @@ const TenantDataTable: React.FC = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [status]); // Add status to dependency array
 
   const handleEditClick = (id: number) => {
     navigate(`/department/edit-tenant/${id}`);
@@ -121,7 +125,8 @@ const TenantDataTable: React.FC = () => {
   }
 
   return (
-    <Box sx={{ width: "100%" }}>
+    <Box sx={{ width: "100%", height: "100%" }}>
+      {title && <h2>{title}</h2>}
       <DataGrid
         rows={rows}
         columns={columns}
@@ -132,6 +137,9 @@ const TenantDataTable: React.FC = () => {
           toolbar: {
             showQuickFilter: true,
           },
+        }}
+        sx={{
+          height: "100%",
         }}
         initialState={{
           pagination: {

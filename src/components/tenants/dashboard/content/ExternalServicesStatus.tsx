@@ -24,14 +24,14 @@ const getRoomDisplayProps = (status: RoomStatus["status"], currentBookings: numb
     isClosed = true;
     dotColor = "grey";
   } else if (status === "available") {
-    bookingsText = `${maxBookings - currentBookings} / ${maxBookings}`;
+    bookingsText = `${currentBookings} / ${maxBookings}`;
     dotColor = "green";
     if (currentBookings > 0) {
       dotColor = "orange"; //Partially booked
     }
   } else if (status === "booked") {
     dotColor = "red";
-    bookingsText = `${maxBookings - currentBookings} / ${maxBookings}`;
+    bookingsText = `${currentBookings} / ${maxBookings}`;
   }
 
   return { dotColor, bookingsText, isClosed };
@@ -118,7 +118,7 @@ const WashingMachineStatusSection: React.FC = () => {
             <div className="room-name">{room.roomName}</div>
             <div className="room-bookings-container">
               <div className="room-bookings">
-                {room.available} / {room.total}
+                {room.total - room.available} / {room.total}
               </div>
               <div className={`room-status-dot ${dotColor}`} />
             </div>
@@ -252,14 +252,14 @@ const ExternalServicesStatus: React.FC = () => {
             width: 32px;
             height: 32px;
             font-size: 1.1rem;
-            margin-right: 10px;
+            margin-right: 5px;
           }
           .room-name {
             font-size: 0.95rem;
-            max-width: calc(50vw - 150px);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            max-width: calc(50vw - 130px);
+            overflow: scroll;
+            //text-overflow: ellipsis;
+            text-align: center;
           }
           .room-bookings-container {
             gap: 10px;
@@ -301,17 +301,17 @@ const ExternalServicesStatus: React.FC = () => {
             width: 28px;
             height: 28px;
             font-size: 1rem;
-            margin-right: 8px;
+            margin-right: 6px;
           }
           .room-name {
           font-size: 0.8rem;
-            overflow: hidden;
+            overflow: auto;
           }
           .room-bookings-container {
             gap: 8px;
           }
           .room-bookings {
-            min-width: 40px;
+            min-width: 30px;
             font-size: 0.9rem;
           }
           .room-status-dot {

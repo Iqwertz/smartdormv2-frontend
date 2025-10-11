@@ -6,6 +6,8 @@ import {
   MyEngagementApplication,
   AdminEngagement,
   EngagementCreatePayload,
+  TenantOverview,
+  EngagementOverviewGroup,
 } from "../types/tenant";
 
 export const fetchGlobalSettings = async (): Promise<GlobalAppSettings> => {
@@ -55,16 +57,30 @@ export const createEngagementAdmin = async (payload: EngagementCreatePayload): P
   return response.data;
 };
 
-export const updateEngagementPoints = async (engagementId: number, points: number): Promise<AdminEngagement> => {
+export const updateEngagement = async (
+  engagementId: number,
+  points: number,
+  note: string
+): Promise<AdminEngagement> => {
   const response = await apiClient.put<AdminEngagement>(
-    `/api/engagements/heimrat/engagements/${engagementId}/update-points/`,
-    { points }
+    `/api/engagements/heimrat/engagements/${engagementId}/update/`,
+    { points, note }
   );
   return response.data;
 };
 
 export const deleteEngagementAdmin = async (engagementId: number): Promise<void> => {
   await apiClient.delete(`/api/engagements/heimrat/engagements/${engagementId}/delete/`);
+};
+
+export const fetchTenantOverviewData = async (): Promise<TenantOverview[]> => {
+  const response = await apiClient.get<TenantOverview[]>("/api/engagements/misc/tenant-overview-data/");
+  return response.data;
+};
+
+export const fetchEngagementOverviewData = async (): Promise<EngagementOverviewGroup[]> => {
+  const response = await apiClient.get<EngagementOverviewGroup[]>("/api/engagements/misc/engagement-overview-data/");
+  return response.data;
 };
 
 export const compensateAllEngagements = async (): Promise<{ message: string }> => {

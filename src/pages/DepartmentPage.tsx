@@ -1,9 +1,29 @@
 import React from "react";
 import { Box } from "@mui/material";
-import DashboardCard from "../components/shared/DashboardCard";
 import TenantDataTable from "../components/admin/TenantDataTable";
+import TabbedDashboardCard from "../components/shared/TabbedDashboardCard";
+import { height } from "@mui/system";
 
 const DepartmentPage: React.FC = () => {
+  const tabs = [
+    {
+      label: "Aktuell",
+      content: <TenantDataTable status="current" />,
+    },
+    {
+      label: "Ehemalig",
+      content: <TenantDataTable status="past" />,
+    },
+    {
+      label: "Zukünftig",
+      content: <TenantDataTable status="future" />,
+    },
+    {
+      label: "Alle",
+      content: <TenantDataTable status="all" />,
+    },
+  ];
+
   return (
     <Box
       sx={{
@@ -11,15 +31,14 @@ const DepartmentPage: React.FC = () => {
         margin: "0 auto",
       }}
     >
-      <DashboardCard
+      <TabbedDashboardCard
         title="Bewohner Übersicht"
+        tabs={tabs}
         cardSx={{
-          flexGrow: 1,
+          height: "calc(100dvh - 100px)",
         }}
-        contentSx={{ height: "calc(100% - 40px)" }}
-      >
-        <TenantDataTable />
-      </DashboardCard>
+        contentSx={{ height: "100%", padding: 2 }}
+      ></TabbedDashboardCard>
     </Box>
   );
 };

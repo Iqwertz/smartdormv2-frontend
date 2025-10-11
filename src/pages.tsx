@@ -20,6 +20,7 @@ export const ExtensionsPage = React.lazy(() => import("./pages/admin/ExtensionsP
 export const ApplyEngagementPage = React.lazy(() => import("./pages/tenants/ApplyEngagementPage"));
 export const ViewApplicationsPage = React.lazy(() => import("./pages/tenants/ViewApplicationsPage"));
 export const EngagementManagementPage = React.lazy(() => import("./pages/engagements/EngagementManagementPage"));
+export const TenantOverviewPage = React.lazy(() => import("./pages/engagements/TenantOverviewPage"));
 
 // Also move any other component definitions here for consistency.
 export const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (

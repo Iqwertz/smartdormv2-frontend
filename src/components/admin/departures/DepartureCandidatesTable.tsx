@@ -46,7 +46,7 @@ const DepartureCandidatesTable: React.FC = () => {
       field: "actions",
       type: "actions",
       headerName: "Aktion",
-      width: 120,
+      width: 80,
       getActions: ({ id }) => [
         <GridActionsCellItem
           icon={<AddCircleOutlineIcon />}
@@ -81,7 +81,7 @@ const DepartureCandidatesTable: React.FC = () => {
         initialState={{
           sorting: { sortModel: [{ field: "move_out", sort: "asc" }] },
         }}
-        autoHeight
+        sx={{ height: "100%" }}
         slots={{ toolbar: GridToolbar }}
         showToolbar
         slotProps={{

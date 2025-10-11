@@ -28,6 +28,7 @@ const TabbedDashboardCard: React.FC<TabbedDashboardCardProps> = ({
   const [showLeftFade, setShowLeftFade] = useState(false);
   const [showRightFade, setShowRightFade] = useState(false);
 
+  // Fixed: Include state setters in dependencies (or use functional updates if needed)
   const checkFades = useCallback(() => {
     const el = tabsContainerRef.current;
     if (!el) return;
@@ -40,12 +41,12 @@ const TabbedDashboardCard: React.FC<TabbedDashboardCardProps> = ({
       return;
     }
 
-    const isAtStart = el.scrollLeft < 5; // A small tolerance
+    const isAtStart = el.scrollLeft < 5;
     const isAtEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 5;
 
     setShowLeftFade(!isAtStart);
     setShowRightFade(!isAtEnd);
-  }, []);
+  }, [setShowLeftFade, setShowRightFade]); // ← Added dependencies
 
   // Check for fades on mount, resize, and when tabs change.
   useEffect(() => {
@@ -61,6 +62,12 @@ const TabbedDashboardCard: React.FC<TabbedDashboardCardProps> = ({
       observer.disconnect();
     };
   }, [tabs, checkFades]);
+
+  // Fixed: Add a separate useEffect to handle initial check and tab changes
+  useEffect(() => {
+    // Use setTimeout to ensure DOM is updated
+    setTimeout(checkFades, 0);
+  }, [activeTab, tabs, checkFades]);
 
   if (!tabs || tabs.length === 0) {
     return null;
@@ -103,16 +110,17 @@ const TabbedDashboardCard: React.FC<TabbedDashboardCardProps> = ({
 
         {/* Scrollable Tabs Wrapper */}
         <Box
-          ref={tabsContainerRef}
-          onScroll={checkFades}
           sx={{
             position: "relative",
-            overflow: "hidden", // Parent hides the scrollbar area
+            overflow: "hidden",
             flexGrow: isMobile ? 0 : 1,
             width: isMobile ? "100%" : "auto",
           }}
         >
+          {/* Fixed: Move the scroll handler to the actual scrollable element */}
           <Box
+            ref={tabsContainerRef}
+            onScroll={checkFades}
             sx={{
               overflowX: "auto",
               display: "flex",
@@ -120,8 +128,8 @@ const TabbedDashboardCard: React.FC<TabbedDashboardCardProps> = ({
               py: 1,
               // Hide scrollbar style
               "&::-webkit-scrollbar": { display: "none" },
-              scrollbarWidth: "none", // Firefox
-              "-ms-overflow-style": "none", // IE
+              scrollbarWidth: "none",
+              "-ms-overflow-style": "none",
             }}
           >
             {/* Tab Buttons */}
