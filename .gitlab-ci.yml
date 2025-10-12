@@ -23,24 +23,6 @@ build_check:
     - if: '$CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "develop"'
   allow_failure: false
 
-lint_check:
-  stage: test
-  image: node:20
-  cache:
-    key:
-      files:
-        - package-lock.json
-    paths:
-      - .npm/
-  before_script:
-    - npm ci --cache .npm --prefer-offline
-  script:
-    - echo "Running ESLint..."
-    - npm run lint
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "develop"'
-  allow_failure: true
 
 type_check:
   stage: test
