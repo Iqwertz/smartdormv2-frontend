@@ -109,7 +109,7 @@ const WashingMachineStatusSection: React.FC = () => {
         return (
           <a
             key={room.roomName}
-            href={"http://waschmaschinen.schollheim.net/"}
+            href={"https://waschmaschinen.schollheim.net/"}
             target="_blank"
             rel="noopener noreferrer"
             className="room-item"
