@@ -1,6 +1,65 @@
 stages:
+  - test
   - build
   - deploy
+
+# Run on every commit
+build_check:
+  stage: test
+  image: node:18
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - .npm/
+  before_script:
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Running build check..."
+    - npm run build
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "develop"'
+  allow_failure: false
+
+lint_check:
+  stage: test
+  image: node:18
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - .npm/
+  before_script:
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Running ESLint..."
+    - npm run lint
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "develop"'
+  allow_failure: false
+
+type_check:
+  stage: test
+  image: node:18
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - .npm/
+  before_script:
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Running TypeScript type check..."
+    - npx tsc --noEmit
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "develop"'
+  allow_failure: false
 
 .build_template: &build_definition
   stage: build
