@@ -8,7 +8,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import EditIcon from "@mui/icons-material/Edit";
 import { useAuth } from "../../context/AuthContext";
-import { getSidebarItems, AppRoute } from "../../routesConfig";
+import { getSidebarItems, AppRouteItem } from "../../routesConfig";
 
 export interface AppSidebarItem {
   id: string;
@@ -29,22 +29,24 @@ const Sidebar: React.FC = () => {
 
   const { sidebarItems, referatItems } = useMemo(() => {
     if (authState.user?.groups) {
-      const allItems = getSidebarItems(authState.user.groups).map((route: AppRoute) => ({
+      const items = getSidebarItems(authState.user.groups);
+      
+      const normalItems = items.filter(item => !('routes' in item)).map((route) => ({
         id: route.id,
         icon: route.icon,
         title: route.title!,
         path: route.path,
         requiredGroups: route.requiredGroups,
-        isReferat: route.id.includes('signatures-') || 
-                   route.id === 'signatures-tutoren' ||
-                   route.id === 'signatures-bar' ||
-                   route.id === 'signatures-werk' ||
-                   route.id === 'signatures-innen' ||
-                   route.id === 'signatures-finanzen'
       }));
 
-      const referatItems = allItems.filter(item => item.isReferat);
-      const normalItems = allItems.filter(item => !item.isReferat);
+      const referatGroups = items.filter(item => 'routes' in item);
+      const referatItems = referatGroups.length > 0 ? referatGroups[0].routes.map(route => ({
+        id: route.id,
+        icon: route.icon,
+        title: route.title!,
+        path: route.path,
+        requiredGroups: route.requiredGroups,
+      })) : [];
 
       return {
         sidebarItems: normalItems,

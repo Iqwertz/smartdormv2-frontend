@@ -28,6 +28,13 @@ export interface AppRoute {
   defaultRedirectOrder?: number;
 }
 
+export interface AppRouteGroup {
+  name: string;
+  routes: AppRoute[];
+}
+
+export type AppRouteItem = AppRoute | AppRouteGroup;
+
 //Generate routes for floorspeaker signatures
 const floorSignatureRoutes = ALL_FLOORS.map((floor) => ({
   id: `signatures-${floor.toLowerCase()}`,
@@ -41,7 +48,7 @@ const floorSignatureRoutes = ALL_FLOORS.map((floor) => ({
 
 console.log("Generated floor signature routes:", floorSignatureRoutes);
 
-export const appRoutes: AppRoute[] = [
+export const appRoutes: AppRouteItem[] = [
   ////////////////////////////////////////////////////////////
   // Tenant Specific Routes:
   ////////////////////////////////////////////////////////////
@@ -180,51 +187,6 @@ export const appRoutes: AppRoute[] = [
     requiredGroups: ["Heimrat", "Inforeferat", "ADMIN"],
     sidebar: true,
   },
-  {
-    id: "signatures-tutoren",
-    path: "/signatures/tutoren",
-    element: <Pages.DepartmentSignaturePage departmentSlug="tutoren" departmentDisplayName="Tutoren" />,
-    title: "Auszüge Tutoren",
-    icon: <DrawOutlinedIcon />,
-    requiredGroups: ["Tutoren", "ADMIN"],
-    sidebar: true,
-  },
-  {
-    id: "signatures-bar",
-    path: "/signatures/bar",
-    element: <Pages.DepartmentSignaturePage departmentSlug="bar" departmentDisplayName="Barreferat" />,
-    title: "Auszüge Bar",
-    icon: <DrawOutlinedIcon />,
-    requiredGroups: ["Barreferat", "ADMIN"],
-    sidebar: true,
-  },
-  {
-    id: "signatures-werk",
-    path: "/signatures/werk",
-    element: <Pages.DepartmentSignaturePage departmentSlug="werk" departmentDisplayName="Werkreferat" />,
-    title: "Auszüge Werk",
-    icon: <DrawOutlinedIcon />,
-    requiredGroups: ["Werkreferat", "ADMIN"],
-    sidebar: true,
-  },
-  {
-    id: "signatures-innen",
-    path: "/signatures/innen",
-    element: <Pages.DepartmentSignaturePage departmentSlug="innen" departmentDisplayName="Innenreferat" />,
-    title: "Auszüge Innen",
-    icon: <DrawOutlinedIcon />,
-    requiredGroups: ["Innenreferat", "ADMIN"],
-    sidebar: true,
-  },
-  {
-    id: "signatures-finanzen",
-    path: "/signatures/finanzen",
-    element: <Pages.DepartmentSignaturePage departmentSlug="finanzen" departmentDisplayName="Finanzenreferat" />,
-    title: "Auszüge Finanzen",
-    icon: <DrawOutlinedIcon />,
-    requiredGroups: ["Finanzenreferat", "ADMIN"],
-    sidebar: true,
-  },
   //////////////////////////////////////////////////////////////
   // General Routes:
   //////////////////////////////////////////////////////////////
@@ -245,24 +207,87 @@ export const appRoutes: AppRoute[] = [
     requiredGroups: [],
     sidebar: false,
   },
-  //Generated floor speaker routes in the end since else it looks messy for the testadmin
-  ...floorSignatureRoutes,
+  {
+    name: "Unterschriften",
+    routes: [
+      {
+        id: "signatures-tutoren",
+        path: "/signatures/tutoren",
+        element: <Pages.DepartmentSignaturePage departmentSlug="tutoren" departmentDisplayName="Tutoren" />,
+        title: "Auszüge Tutoren",
+        icon: <DrawOutlinedIcon />,
+        requiredGroups: ["Tutoren", "ADMIN"],
+        sidebar: true,
+      },
+      {
+        id: "signatures-bar",
+        path: "/signatures/bar",
+        element: <Pages.DepartmentSignaturePage departmentSlug="bar" departmentDisplayName="Barreferat" />,
+        title: "Auszüge Bar",
+        icon: <DrawOutlinedIcon />,
+        requiredGroups: ["Barreferat", "ADMIN"],
+        sidebar: true,
+      },
+      {
+        id: "signatures-werk",
+        path: "/signatures/werk",
+        element: <Pages.DepartmentSignaturePage departmentSlug="werk" departmentDisplayName="Werkreferat" />,
+        title: "Auszüge Werk",
+        icon: <DrawOutlinedIcon />,
+        requiredGroups: ["Werkreferat", "ADMIN"],
+        sidebar: true,
+      },
+      {
+        id: "signatures-innen",
+        path: "/signatures/innen",
+        element: <Pages.DepartmentSignaturePage departmentSlug="innen" departmentDisplayName="Innenreferat" />,
+        title: "Auszüge Innen",
+        icon: <DrawOutlinedIcon />,
+        requiredGroups: ["Innenreferat", "ADMIN"],
+        sidebar: true,
+      },
+      {
+        id: "signatures-finanzen",
+        path: "/signatures/finanzen",
+        element: <Pages.DepartmentSignaturePage departmentSlug="finanzen" departmentDisplayName="Finanzenreferat" />,
+        title: "Auszüge Finanzen",
+        icon: <DrawOutlinedIcon />,
+        requiredGroups: ["Finanzenreferat", "ADMIN"],
+        sidebar: true,
+      },
+      ...floorSignatureRoutes,
+    ]
+  },
 ];
 
 export const loginRoute = "/login";
 export const defaultAuthenticatedRoute = "/dashboard"; // Fallback if no specific route is found
 
-// Helper function to get sidebar items based on user's groups
-export const getSidebarItems = (userGroups: string[]): AppRoute[] => {
-  return appRoutes.filter(
-    (route) =>
-      route.sidebar &&
-      route.title &&
-      route.icon &&
-      (!route.requiredGroups ||
-        route.requiredGroups.length === 0 ||
-        route.requiredGroups.some((group) => userGroups.includes(group)))
-  );
+export const getSidebarItems = (userGroups: string[]): AppRouteItem[] => {
+  return appRoutes.filter((item) => {
+    if (!('routes' in item)) {
+      return item.sidebar && 
+             item.title && 
+             item.icon && 
+             (!item.requiredGroups || 
+              item.requiredGroups.length === 0 || 
+              item.requiredGroups.some(group => userGroups.includes(group)));
+    }
+    
+    const visibleRoutes = item.routes.filter(route => 
+      route.sidebar && 
+      route.title && 
+      route.icon && 
+      (!route.requiredGroups || 
+       route.requiredGroups.length === 0 || 
+       route.requiredGroups.some(group => userGroups.includes(group)))
+    );
+    
+    if (visibleRoutes.length === 0) return false;
+    
+    item.routes = visibleRoutes;
+    return true;
+  });
 };
 
 // Helper function to determine initial redirect path after login (Needed to redirect tenants and departments to their respective dashboards)

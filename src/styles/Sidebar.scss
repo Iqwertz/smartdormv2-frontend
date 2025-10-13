@@ -94,6 +94,18 @@
 
   .nav-list {
     margin-top: 20px;
+    max-height: calc(100vh - 140px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 20px;
+
+    // Scrollbar komplett ausblenden
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    // Für Firefox
+    scrollbar-width: none;
 
     li {
       position: relative;
@@ -242,54 +254,43 @@
         }
 
         .referat-submenu {
-          position: absolute !important;
-          left: 100% !important; 
-          top: 0 !important;
-          width: 200px !important; 
-          height: calc(100vh - 750px) !important; 
-          max-height: calc(100vh - 750px) !important;
-          overflow-y: auto !important; 
-          background: #ffffff !important; 
-          box-shadow: variables.$box-shadow !important;
-          border-radius: 12px !important;
-          padding: 8px !important;
-          z-index: 1000 !important; 
-          margin-left: 20px !important; 
+          position: static !important;
+          width: 100% !important;
+          max-height: 300px !important;
+          overflow-y: auto !important;
+          overflow-x: hidden !important;
+          background: transparent !important;
+          box-shadow: none !important;
+          border-radius: 0 !important;
+          padding: 8px 0 0 0 !important;
+          z-index: auto !important;
+          margin-left: 0 !important;
+          margin-top: 8px !important;
 
-          // Scrollbar Styling
+          // Scrollbar komplett ausblenden
           &::-webkit-scrollbar {
-            width: 6px;
+            display: none;
           }
 
-          &::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 3px;
-          }
-
-          &::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 3px;
-          }
-
-          &::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 0, 0, 0.5);
-          }
+          // Für Firefox
+          scrollbar-width: none;
 
           li {
-            margin: 4px 0;
+            margin: 2px 0;
             list-style: none;
 
             a {
               display: flex;
               align-items: center;
-              padding: 12px;
+              padding: 8px 12px;
               border-radius: 8px;
               text-decoration: none;
               transition: all 0.3s ease;
               font-size: 14px;
+              margin-left: 20px;
 
               &:hover {
-                background: #fff;
+                background: rgba(255, 255, 255, 0.2);
               }
 
               svg {
@@ -308,7 +309,7 @@
                 font-size: 14px;
                 font-weight: 400;
                 white-space: nowrap;
-                opacity: 1; 
+                opacity: 1;
                 pointer-events: auto;
                 transition: 0.3s;
 
@@ -476,7 +477,6 @@
 }
 
 .sidebar .nav-list li.referat-dropdown .referat-submenu {
-  height: calc(100vh - 750px) !important;
-  max-height: calc(100vh - 750px) !important;
+  max-height: 300px !important;
   overflow-y: auto !important;
 }
