@@ -122,8 +122,9 @@ const TabbedDashboardCard: React.FC<TabbedDashboardCardProps> = ({
             ref={tabsContainerRef}
             onScroll={checkFades}
             sx={{
-              overflowX: "auto",
+              overflowX: isMobile ? "visible" : "auto",
               display: "flex",
+              flexDirection: isMobile ? "column" : "row",
               gap: 1,
               py: 1,
               // Hide scrollbar style
@@ -140,10 +141,11 @@ const TabbedDashboardCard: React.FC<TabbedDashboardCardProps> = ({
                 sx={{
                   px: 2,
                   py: 0.5,
-                  mx: 0.2,
+                  mx: isMobile ? 0 : 0.2,
                   borderRadius: 1,
                   transition: "all 0.2s ease-in-out",
                   whiteSpace: "nowrap",
+                  width: isMobile ? "100%" : "auto",
                   ...(activeTab === index
                     ? {
                         backgroundColor: "primary.main",
@@ -208,7 +210,7 @@ const TabbedDashboardCard: React.FC<TabbedDashboardCardProps> = ({
           WebkitBackdropFilter: "blur(8px)",
           borderRadius: 2,
           overflow: "hidden",
-          pt: isMobile ? 8 : 4,
+          pt: isMobile ? Math.max(8, tabs.length * 4 + 8) : 4,
           ...cardSx,
         }}
       >
