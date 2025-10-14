@@ -61,7 +61,7 @@ export interface WashingMachineSummary {
  * @returns A promise that resolves to an array of WashingMachineSummary objects.
  */
 export const fetchWashingMachineStatus = async (): Promise<WashingMachineSummary[]> => {
-  const response = await axios.get<WashingMachineStatus[]>("http://waschmaschinen.schollheim.net/api/GetWMStatus");
+  const response = await axios.get<WashingMachineStatus[]>("https://waschmaschinen.schollheim.net/api/GetWMStatus");
   const machines = response.data;
 
   // Process the raw data into a summary grouped by room name
