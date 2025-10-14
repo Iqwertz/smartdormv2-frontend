@@ -256,7 +256,7 @@ export const appRoutes: AppRouteItem[] = [
         sidebar: true,
       },
       ...floorSignatureRoutes,
-    ]
+    ],
   },
 ];
 
@@ -265,26 +265,29 @@ export const defaultAuthenticatedRoute = "/dashboard"; // Fallback if no specifi
 
 export const getSidebarItems = (userGroups: string[]): AppRouteItem[] => {
   return appRoutes.filter((item) => {
-    if (!('routes' in item)) {
-      return item.sidebar && 
-             item.title && 
-             item.icon && 
-             (!item.requiredGroups || 
-              item.requiredGroups.length === 0 || 
-              item.requiredGroups.some(group => userGroups.includes(group)));
+    if (!("routes" in item)) {
+      return (
+        item.sidebar &&
+        item.title &&
+        item.icon &&
+        (!item.requiredGroups ||
+          item.requiredGroups.length === 0 ||
+          item.requiredGroups.some((group) => userGroups.includes(group)))
+      );
     }
-    
-    const visibleRoutes = item.routes.filter(route => 
-      route.sidebar && 
-      route.title && 
-      route.icon && 
-      (!route.requiredGroups || 
-       route.requiredGroups.length === 0 || 
-       route.requiredGroups.some(group => userGroups.includes(group)))
+
+    const visibleRoutes = item.routes.filter(
+      (route) =>
+        route.sidebar &&
+        route.title &&
+        route.icon &&
+        (!route.requiredGroups ||
+          route.requiredGroups.length === 0 ||
+          route.requiredGroups.some((group) => userGroups.includes(group)))
     );
-    
+
     if (visibleRoutes.length === 0) return false;
-    
+
     item.routes = visibleRoutes;
     return true;
   });
@@ -293,6 +296,7 @@ export const getSidebarItems = (userGroups: string[]): AppRouteItem[] => {
 // Helper function to determine initial redirect path after login (Needed to redirect tenants and departments to their respective dashboards)
 export const getInitialRedirectPath = (userGroups: string[]): string => {
   const accessibleRoutes = appRoutes
+    .filter((item): item is AppRoute => !("routes" in item))
     .filter(
       (route) =>
         (route.requiredGroups && route.requiredGroups.length === 0) ||

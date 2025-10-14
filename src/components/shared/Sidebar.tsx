@@ -8,7 +8,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import EditIcon from "@mui/icons-material/Edit";
 import { useAuth } from "../../context/AuthContext";
-import { getSidebarItems, AppRouteItem } from "../../routesConfig";
+import { getSidebarItems } from "../../routesConfig";
 
 export interface AppSidebarItem {
   id: string;
@@ -30,27 +30,36 @@ const Sidebar: React.FC = () => {
   const { sidebarItems, referatItems } = useMemo(() => {
     if (authState.user?.groups) {
       const items = getSidebarItems(authState.user.groups);
-      
-      const normalItems = items.filter(item => !('routes' in item)).map((route) => ({
-        id: route.id,
-        icon: route.icon,
-        title: route.title!,
-        path: route.path,
-        requiredGroups: route.requiredGroups,
-      }));
 
-      const referatGroups = items.filter(item => 'routes' in item);
-      const referatItems = referatGroups.length > 0 ? referatGroups[0].routes.map(route => ({
-        id: route.id,
-        icon: route.icon,
-        title: route.title!,
-        path: route.path,
-        requiredGroups: route.requiredGroups,
-      })) : [];
+      const normalItems = items
+        .filter((item) => !("routes" in item))
+        .map((route) => {
+          if ("routes" in route) return null;
+          return {
+            id: route.id,
+            icon: route.icon,
+            title: route.title!,
+            path: route.path,
+            requiredGroups: route.requiredGroups,
+          };
+        })
+        .filter(Boolean) as AppSidebarItem[];
+
+      const referatGroups = items.filter((item) => "routes" in item);
+      const referatItems =
+        referatGroups.length > 0
+          ? referatGroups[0].routes.map((route) => ({
+              id: route.id,
+              icon: route.icon,
+              title: route.title!,
+              path: route.path,
+              requiredGroups: route.requiredGroups,
+            }))
+          : [];
 
       return {
         sidebarItems: normalItems,
-        referatItems: referatItems
+        referatItems: referatItems,
       };
     }
     return { sidebarItems: [], referatItems: [] };
@@ -140,7 +149,7 @@ const Sidebar: React.FC = () => {
   const renderReferatDropdown = () => {
     if (referatItems.length === 0) return null;
 
-    const hasReferatAccess = referatItems.some(item => hasAccess(item));
+    const hasReferatAccess = referatItems.some((item) => hasAccess(item));
     if (!hasReferatAccess) return null;
 
     const handleReferatClick = () => {
@@ -159,7 +168,7 @@ const Sidebar: React.FC = () => {
           {isOpen && (referatDropdownOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />)}
         </div>
         <span className="tooltip">Unterschriften</span>
-        
+
         {isOpen && referatDropdownOpen && (
           <ul className="referat-submenu">
             {referatItems.map(
@@ -207,9 +216,9 @@ const Sidebar: React.FC = () => {
                 </li>
               )
           )}
-          
+
           {renderReferatDropdown()}
-          
+
           <li className="profile">
             <div className="profile-details">
               <div className="name_job">

@@ -5,7 +5,7 @@ import { CircularProgress, Typography, Box } from "@mui/material";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./context/AuthContext";
 import AppLayout from "./layout/AppLayout";
-import { appRoutes, loginRoute, getInitialRedirectPath } from "./routesConfig";
+import { appRoutes, loginRoute, getInitialRedirectPath, AppRouteGroup, AppRoute } from "./routesConfig";
 
 // Lazy load pages that are not in the main appRoutes array
 const LoginPage = React.lazy(() => import("./pages/LoginPage"));
@@ -67,11 +67,25 @@ function App() {
 
           {/* Routes that use AppLayout and require authentication */}
           <Route element={<AppLayout />}>
-            {appRoutes.map((route) => (
-              <Route key={route.id} element={<ProtectedRoute requiredGroups={route.requiredGroups} />}>
-                <Route path={route.path} element={route.element} />
-              </Route>
-            ))}
+            {appRoutes.map((item) => {
+              // Check if item is a route group
+              if ("routes" in item) {
+                // It's an AppRouteGroup
+                return (item as AppRouteGroup).routes.map((route) => (
+                  <Route key={route.id} element={<ProtectedRoute requiredGroups={route.requiredGroups} />}>
+                    <Route path={route.path} element={route.element} />
+                  </Route>
+                ));
+              } else {
+                // It's a single AppRoute
+                const route = item as AppRoute;
+                return (
+                  <Route key={route.id} element={<ProtectedRoute requiredGroups={route.requiredGroups} />}>
+                    <Route path={route.path} element={route.element} />
+                  </Route>
+                );
+              }
+            })}
             {authState.isAuthenticated && <Route path="*" element={<Error404Page />} />}
           </Route>
 
