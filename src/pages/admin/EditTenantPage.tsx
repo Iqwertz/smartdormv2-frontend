@@ -51,11 +51,13 @@ const EditTenantPage: React.FC = () => {
     room_id: null,
     move_date: null,
   });
+  const [terminationDate, setTerminationDate] = useState<Dayjs | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isMoving, setIsMoving] = useState(false);
+  const [isTerminating, setIsTerminating] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   const fetchTenantData = useCallback(async () => {
@@ -158,6 +160,29 @@ const EditTenantPage: React.FC = () => {
       showNotification(errorMessage, "error");
     } finally {
       setIsMoving(false);
+    }
+  };
+
+  const handleTerminate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!id || !terminationDate) {
+      showNotification("Bitte Auszugsdatum auswählen.", "warning");
+      return;
+    }
+    setIsTerminating(true);
+    const payload = {
+      move_out_date: terminationDate.format("YYYY-MM-DD"),
+    };
+    try {
+      await apiClient.post(`/api/department/tenant-data/${id}/terminate/`, payload);
+      showNotification("Bewohner erfolgreich gekündigt.", "success");
+      setTerminationDate(null); // Reset form
+      fetchTenantData(); // Refresh all data
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.error || "Kündigung fehlgeschlagen.";
+      showNotification(errorMessage, "error");
+    } finally {
+      setIsTerminating(false);
     }
   };
 
@@ -434,6 +459,27 @@ const EditTenantPage: React.FC = () => {
               <Grid size={{ xs: 12, sm: 2 }}>
                 <Button type="submit" variant="contained" fullWidth disabled={isMoving}>
                   {isMoving ? <CircularProgress size={24} /> : "Umziehen"}
+                </Button>
+              </Grid>
+            </Grid>
+          </Box>
+        </DashboardCard>
+
+        {/* Termination Section */}
+        <DashboardCard title="Kündigen">
+          <Box component="form" onSubmit={handleTerminate} noValidate sx={{ p: 2 }}>
+            <Grid container spacing={2} alignItems="center">
+              <Grid size={{ xs: 12, sm: 10 }}>
+                <DatePicker
+                  label="Auszugsdatum"
+                  value={terminationDate}
+                  onChange={(date) => setTerminationDate(date)}
+                  slotProps={{ textField: { fullWidth: true, required: true } }}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 2 }}>
+                <Button type="submit" variant="contained" fullWidth disabled={isTerminating}>
+                  {isTerminating ? <CircularProgress size={24} /> : "Kündigen"}
                 </Button>
               </Grid>
             </Grid>
