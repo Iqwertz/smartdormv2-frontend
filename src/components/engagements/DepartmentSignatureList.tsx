@@ -13,6 +13,7 @@ import {
 import apiClient from "../../services/api";
 import { DepartmentSignature } from "../../types/tenant";
 import { useNotification } from "../../context/NotificationContext";
+import { fontSize } from "@mui/system";
 
 interface DepartmentSignatureListProps {
   departmentSlug: string;
@@ -124,7 +125,12 @@ const DepartmentSignatureList: React.FC<DepartmentSignatureListProps> = ({ depar
                 variant="contained"
                 onClick={() => handleSubmit(sig.id)}
                 disabled={submittingId === sig.id || isClosed}
-                sx={{ minWidth: "180px" }}
+                sx={{
+                  minWidth: "180px",
+                  "@media (max-width: 420px)": {
+                    fontSize: "0.7rem",
+                  },
+                }}
               >
                 {submittingId === sig.id ? (
                   <CircularProgress size={24} />

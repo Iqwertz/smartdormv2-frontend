@@ -13,17 +13,9 @@ import {
   Alert,
   Divider,
   Paper,
-  Link,
   ListItemButton,
 } from "@mui/material";
-import {
-  ExpandLess,
-  ExpandMore,
-  EmailOutlined,
-  PhoneOutlined,
-  MeetingRoomOutlined,
-  LocationCityOutlined,
-} from "@mui/icons-material";
+import { ExpandLess, ExpandMore, MeetingRoomOutlined, LocationCityOutlined } from "@mui/icons-material";
 import { HsvEngagementGroup, HsvTenant } from "../../types/tenant";
 import apiClient from "../../services/api";
 import DashboardCard from "../../components/shared/DashboardCard";
@@ -190,7 +182,6 @@ const HSVPage: React.FC = () => {
       component="main"
       sx={{
         flexGrow: 1,
-        p: 1,
         maxWidth: "900px",
         margin: "0 auto",
         height: "100dvh",
