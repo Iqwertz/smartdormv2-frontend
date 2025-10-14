@@ -16,6 +16,7 @@ import {
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { fetchEngagementOverviewData } from "../../services/engagementService";
 import { AdminEngagement, EngagementOverviewGroup } from "../../types/tenant";
+import { isHigherSemester } from "../../services/helperService";
 
 const GroupedTenantsBySemester: React.FC<{ engagements: AdminEngagement[] }> = ({ engagements }) => {
   const groupedBySemester = useMemo(() => {
@@ -25,7 +26,10 @@ const GroupedTenantsBySemester: React.FC<{ engagements: AdminEngagement[] }> = (
     }, {} as Record<string, AdminEngagement[]>);
   }, [engagements]);
 
-  const sortedSemesters = useMemo(() => Object.keys(groupedBySemester).sort().reverse(), [groupedBySemester]);
+  const sortedSemesters = useMemo(
+    () => Object.keys(groupedBySemester).sort((a, b) => (isHigherSemester(b, a) ? 1 : -1)),
+    [groupedBySemester]
+  );
 
   return (
     <Box sx={{ pl: 4 }}>

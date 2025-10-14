@@ -46,3 +46,19 @@ export function getNextSemester(currentSemester: string): string {
 export function isValidSemesterFormat(semester: string): boolean {
   return /^(SS\d{2}|WS\d{2}\/\d{2})$/.test(semester);
 }
+
+export function isHigherSemester(semA: string, semB: string): boolean {
+  const semesterOrder = (sem: string): number => {
+    const ssMatch = sem.match(/^SS(\d{2})$/);
+    if (ssMatch) {
+      return parseInt(ssMatch[1], 10) * 2; // Summer semester is even
+    }
+    const wsMatch = sem.match(/^WS(\d{2})\/(\d{2})$/);
+    if (wsMatch) {
+      return parseInt(wsMatch[1], 10) * 2 + 1; // Winter semester is odd
+    }
+    return -1; // Invalid format
+  };
+
+  return semesterOrder(semA) > semesterOrder(semB);
+}
