@@ -54,7 +54,7 @@ const Tooltip: React.FC<TooltipProps> = ({ children, text, disabled = false }) =
     ref: triggerRef,
     onMouseEnter: handleMouseEnter,
     onMouseLeave: handleMouseLeave,
-  });
+  } as React.HTMLAttributes<HTMLElement>);
 
   return (
     <>
