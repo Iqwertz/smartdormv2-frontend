@@ -9,6 +9,7 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import EditIcon from "@mui/icons-material/Edit";
 import { useAuth } from "../../context/AuthContext";
 import { getSidebarItems } from "../../routesConfig";
+import Tooltip from "./Tooltip";
 
 export interface AppSidebarItem {
   id: string;
@@ -167,7 +168,6 @@ const Sidebar: React.FC = () => {
           <span className="links_name">Unterschriften</span>
           {isOpen && (referatDropdownOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />)}
         </div>
-        <span className="tooltip">Unterschriften</span>
 
         {isOpen && referatDropdownOpen && (
           <ul className="referat-submenu">
@@ -208,11 +208,12 @@ const Sidebar: React.FC = () => {
             (item) =>
               hasAccess(item) && (
                 <li key={item.id} className={location.pathname === item.path ? "active" : ""}>
-                  <Link to={item.path}>
-                    {item.icon}
-                    <span className="links_name">{item.title}</span>
-                  </Link>
-                  <span className="tooltip">{item.title}</span>
+                  <Tooltip text={item.title} disabled={isOpen || isMobile}>
+                    <Link to={item.path}>
+                      {item.icon}
+                      <span className="links_name">{item.title}</span>
+                    </Link>
+                  </Tooltip>
                 </li>
               )
           )}
