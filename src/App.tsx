@@ -6,6 +6,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./context/AuthContext";
 import AppLayout from "./layout/AppLayout";
 import { appRoutes, loginRoute, getInitialRedirectPath, AppRouteGroup, AppRoute } from "./routesConfig";
+import { useTracking } from "./hooks/useTracking";
 
 // Lazy load pages that are not in the main appRoutes array
 const LoginPage = React.lazy(() => import("./pages/LoginPage"));
@@ -51,6 +52,7 @@ const SuspenseFallback: React.FC = () => (
 
 function App() {
   const { authState } = useAuth();
+  useTracking();
 
   if (authState.loading) {
     return <InitialLoadingScreen />;

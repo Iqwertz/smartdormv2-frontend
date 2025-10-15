@@ -174,7 +174,6 @@ const ParcelPage: React.FC = () => {
   return (
     <Box
       sx={{
-        p: 2,
         display: "flex",
         flexDirection: "column",
         gap: 2,
@@ -182,6 +181,7 @@ const ParcelPage: React.FC = () => {
         maxWidth: "1200px",
         margin: "0 auto",
       }}
+      className="page-root"
     >
       <DashboardCard title="Paket hinzufügen">
         <Box component="form" onSubmit={handleCreateParcel} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>

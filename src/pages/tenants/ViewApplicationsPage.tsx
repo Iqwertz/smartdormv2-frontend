@@ -100,7 +100,10 @@ const ViewApplicationsPage: React.FC = () => {
   if (error) return <Alert severity="error">{error}</Alert>;
 
   return (
-    <Box sx={{ maxWidth: "1200px", margin: "0 auto", display: "flex", flexDirection: "column", gap: 3 }}>
+    <Box
+      sx={{ maxWidth: "1200px", margin: "0 auto", display: "flex", flexDirection: "column", gap: 3 }}
+      className="page-root"
+    >
       <Paper
         variant="outlined"
         sx={{

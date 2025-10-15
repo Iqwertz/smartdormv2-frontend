@@ -192,7 +192,10 @@ const EditTenantPage: React.FC = () => {
 
   return (
     <>
-      <Box sx={{ maxWidth: "1200px", margin: "0 auto", display: "flex", flexDirection: "column", gap: 2 }}>
+      <Box
+        sx={{ maxWidth: "1200px", margin: "0 auto", display: "flex", flexDirection: "column", gap: 2 }}
+        className="page-root"
+      >
         <DashboardCard title={`Bewohner bearbeiten: ${tenant.name} ${tenant.surname}`}>
           {/* Main Tenant Edit Form */}
           <Box component="form" onSubmit={handleUpdate} noValidate>

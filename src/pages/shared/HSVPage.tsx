@@ -186,6 +186,7 @@ const HSVPage: React.FC = () => {
         margin: "0 auto",
         height: "100dvh",
       }}
+      className="page-root"
     >
       <DashboardCard title="Suche">
         <TextField

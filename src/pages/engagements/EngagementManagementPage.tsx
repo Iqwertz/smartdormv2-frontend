@@ -349,7 +349,7 @@ const EngagementManagementPage: React.FC = () => {
   ];
 
   return (
-    <Box sx={{ maxWidth: "1600px", margin: "0 auto" }}>
+    <Box sx={{ maxWidth: "1600px", margin: "0 auto" }} className="page-root">
       <TabbedDashboardCard
         title="Referate verwalten"
         tabs={tabs}

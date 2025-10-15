@@ -21,7 +21,7 @@ const DepartmentSignaturePage: React.FC<DepartmentSignaturePageProps> = ({ depar
   ];
 
   return (
-    <Box sx={{ maxWidth: "1000px", margin: "0 auto" }}>
+    <Box sx={{ maxWidth: "1000px", margin: "0 auto" }} className="page-root">
       <TabbedDashboardCard
         title={`${departmentDisplayName} Signaturen`}
         tabs={tabs}

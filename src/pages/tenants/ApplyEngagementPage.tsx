@@ -190,7 +190,10 @@ const ApplyEngagementPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ maxWidth: "800px", margin: "0 auto", display: "flex", flexDirection: "column", gap: 3 }}>
+    <Box
+      sx={{ maxWidth: "800px", margin: "0 auto", display: "flex", flexDirection: "column", gap: 3 }}
+      className="page-root"
+    >
       <DashboardCard title="Für ein Referat bewerben">
         <form onSubmit={handleSubmit}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3, p: 1 }}>

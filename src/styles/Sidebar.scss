@@ -20,6 +20,7 @@
   padding: 6px 14px;
   z-index: 99;
   transition: all 0.5s ease;
+  overflow-x: visible;
 
   //border-radius: 0px 10px 10px 0px;
 
@@ -79,7 +80,6 @@
 
   &.open {
     .logo-details {
-
       .icon,
       .logo_name {
         opacity: 1;
@@ -96,7 +96,7 @@
     margin-top: 20px;
     max-height: calc(100vh - 140px);
     overflow-y: auto;
-    overflow-x: hidden;
+    overflow-x: visible;
     padding-bottom: 20px;
 
     // Scrollbar komplett ausblenden
@@ -111,32 +111,6 @@
       position: relative;
       margin: 8px 0;
       list-style: none;
-
-      .tooltip {
-        position: absolute;
-        top: -20px;
-        left: calc(100% + 18px);
-        z-index: 3;
-        background: variables.$paper-color;
-        backdrop-filter: blur(variables.$paper-blur);
-        box-shadow: variables.$box-shadow;
-        padding: 10px 12px;
-        border-radius: 4px;
-        font-size: 15px;
-        font-weight: 400;
-        opacity: 0;
-        white-space: nowrap;
-        pointer-events: none;
-        transition: 0s;
-      }
-
-      &:hover .tooltip {
-        opacity: 1;
-        pointer-events: auto;
-        transition: all 0.4s ease;
-        top: 50%;
-        transform: translateY(-50%);
-      }
 
       .search-icon {
         position: absolute;
@@ -258,7 +232,7 @@
           width: 100% !important;
           max-height: 300px !important;
           overflow-y: auto !important;
-          overflow-x: hidden !important;
+          overflow-x: visible !important;
           background: transparent !important;
           box-shadow: none !important;
           border-radius: 0 !important;
@@ -378,10 +352,6 @@
   &.open {
     .nav-list {
       li {
-        .tooltip {
-          display: none;
-        }
-
         input {
           padding: 0 20px 0 50px;
           width: 100%;
@@ -412,7 +382,7 @@
   }
 }
 
-.sidebar.open~.home-section {
+.sidebar.open ~ .home-section {
   left: 250px;
   width: calc(100% - 250px);
 }
@@ -463,20 +433,38 @@
     width: 100%;
   }
 
-  .sidebar.open~.home-section {
+  .sidebar.open ~ .home-section {
     left: 0;
     width: 100%;
     margin-top: 60px;
   }
 }
 
-@media (max-width: 420px) {
-  .sidebar li .tooltip {
-    display: none;
-  }
-}
-
 .sidebar .nav-list li.referat-dropdown .referat-submenu {
   max-height: 300px !important;
   overflow-y: auto !important;
+}
+
+.portal-tooltip {
+  position: fixed;
+  z-index: 1000;
+  pointer-events: none;
+
+  background: variables.$paper-color;
+  backdrop-filter: blur(variables.$paper-blur);
+  box-shadow: variables.$box-shadow;
+  padding: 10px 12px;
+  border-radius: 4px;
+  font-size: 15px;
+  font-weight: 400;
+  white-space: nowrap;
+
+  opacity: 0;
+  transform: translateY(-50%) translateX(0);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(-50%) translateX(5px);
+  }
 }
