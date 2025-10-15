@@ -20,6 +20,7 @@
   padding: 6px 14px;
   z-index: 99;
   transition: all 0.5s ease;
+  overflow-x: visible;
 
   //border-radius: 0px 10px 10px 0px;
 
@@ -79,7 +80,6 @@
 
   &.open {
     .logo-details {
-
       .icon,
       .logo_name {
         opacity: 1;
@@ -96,7 +96,7 @@
     margin-top: 20px;
     max-height: calc(100vh - 140px);
     overflow-y: auto;
-    overflow-x: hidden;
+    overflow-x: visible;
     padding-bottom: 20px;
 
     // Scrollbar komplett ausblenden
@@ -124,7 +124,7 @@
         border-radius: 4px;
         font-size: 15px;
         font-weight: 400;
-        opacity: 0;
+        opacity: 1;
         white-space: nowrap;
         pointer-events: none;
         transition: 0s;
@@ -258,7 +258,7 @@
           width: 100% !important;
           max-height: 300px !important;
           overflow-y: auto !important;
-          overflow-x: hidden !important;
+          overflow-x: visible !important;
           background: transparent !important;
           box-shadow: none !important;
           border-radius: 0 !important;
@@ -412,7 +412,7 @@
   }
 }
 
-.sidebar.open~.home-section {
+.sidebar.open ~ .home-section {
   left: 250px;
   width: calc(100% - 250px);
 }
@@ -463,7 +463,7 @@
     width: 100%;
   }
 
-  .sidebar.open~.home-section {
+  .sidebar.open ~ .home-section {
     left: 0;
     width: 100%;
     margin-top: 60px;

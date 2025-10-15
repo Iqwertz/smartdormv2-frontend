@@ -117,7 +117,7 @@ const EditSubtenantPage: React.FC = () => {
   if (error) return <Alert severity="error">{error}</Alert>;
 
   return (
-    <Box sx={{ maxWidth: "800px", margin: "0 auto" }}>
+    <Box sx={{ maxWidth: "800px", margin: "0 auto" }} className="page-root">
       <DashboardCard title={`Untermieter bearbeiten: ${subtenant?.name} ${subtenant?.surname}`}>
         <form onSubmit={handleSubmit}>
           <Grid container spacing={2}>

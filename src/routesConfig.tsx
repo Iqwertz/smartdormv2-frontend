@@ -166,7 +166,17 @@ export const appRoutes: AppRouteItem[] = [
     element: <Pages.TenantOverviewPage />,
     title: "Bewohnerübersicht",
     icon: <Groups />,
-    requiredGroups: ["Heimrat", "ADMIN"],
+    requiredGroups: [
+      "Heimrat",
+      "Inforeferat",
+      "Tutoren",
+      "HSV-Vertreter",
+      "Zimmerreferat",
+      "Finanzenreferat",
+      "Schlichtungsreferat",
+      "Aufnahmereferat-Nachruecker",
+      "ADMIN",
+    ],
     sidebar: true,
   },
   {

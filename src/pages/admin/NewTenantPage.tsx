@@ -107,7 +107,7 @@ const NewTenantPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: "1200px", margin: "0 auto" }}>
+    <Box sx={{ maxWidth: "1200px", margin: "0 auto" }} className="page-root">
       <DashboardCard title="Neuen Bewohner anlegen">
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
           <Typography variant="h6" gutterBottom>

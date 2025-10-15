@@ -43,7 +43,7 @@ const TenantPage: React.FC = () => {
   }, []);
 
   return (
-    <Box sx={{ px: 1, py: 1 }}>
+    <Box sx={{ px: 1, py: 1 }} className="page-root">
       {" "}
       <div className="grid">
         <div className="left">
