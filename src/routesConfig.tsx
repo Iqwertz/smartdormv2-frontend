@@ -11,7 +11,7 @@ import DirectionsRunOutlined from "@mui/icons-material/DirectionsRunOutlined";
 import ArticleOutlined from "@mui/icons-material/ArticleOutlined";
 import BedOutlined from "@mui/icons-material/BedOutlined";
 import DrawOutlinedIcon from "@mui/icons-material/DrawOutlined";
-import { AssignmentOutlined, FilterVintageOutlined, Groups, PersonAdd } from "@mui/icons-material";
+import { AssignmentOutlined, FilterVintageOutlined, Groups, GroupWorkOutlined, PersonAdd } from "@mui/icons-material";
 import { ALL_FLOORS } from "./config";
 
 // Import all lazy page components from the dedicated pages file.
@@ -183,7 +183,7 @@ export const appRoutes: AppRouteItem[] = [
     path: "/referate",
     element: <Pages.EngagementManagementPage />,
     title: "Referate",
-    icon: <AssignmentIndOutlinedIcon />,
+    icon: <GroupWorkOutlined />,
     requiredGroups: ["Heimrat", "Inforeferat", "ADMIN"],
     sidebar: true,
   },
