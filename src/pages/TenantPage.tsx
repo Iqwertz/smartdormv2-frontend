@@ -73,7 +73,7 @@ const TenantPage: React.FC = () => {
           <DashboardCard title="Quick Links">
             <QuickLinks></QuickLinks>
           </DashboardCard>
-          <DashboardCard title="Kalendar">
+          <DashboardCard title="Kalender">
             {/* <CalendarWidget></CalendarWidget> */}
             Coming soon...
           </DashboardCard>

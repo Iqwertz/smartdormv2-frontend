@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Box, Alert, CircularProgress } from "@mui/material";
+import { Box, Alert, CircularProgress, Tooltip } from "@mui/material";
 import { DataGrid, GridColDef, GridActionsCellItem } from "@mui/x-data-grid";
 import { Claim } from "../../../types/tenant";
 import { fetchClaimsByStatus, sendClaimReminder, updateClaimStatus } from "../../../services/claimService";
@@ -56,20 +56,22 @@ const OpenClaimsTable: React.FC = () => {
       field: "actions",
       type: "actions",
       headerName: "Aktionen",
-      width: 150,
+      width: 100,
       getActions: ({ row }) => [
-        <GridActionsCellItem
-          icon={<EmailIcon />}
-          label="Erinnerung senden"
-          onClick={() => handleSendReminder(row.id)}
-          showInMenu
-        />,
-        <GridActionsCellItem
-          icon={<CheckCircleOutlineIcon />}
-          label="Bewertung eingereicht"
-          onClick={() => handleMarkAsProcessing(row.id)}
-          showInMenu
-        />,
+        <Tooltip title="Erinnerung senden" key="email-tooltip">
+          <GridActionsCellItem
+            icon={<EmailIcon />}
+            label="Erinnerung senden"
+            onClick={() => handleSendReminder(row.id)}
+          />
+        </Tooltip>,
+        <Tooltip title="Bewerbung eingereicht" key="check-tooltip">
+          <GridActionsCellItem
+            icon={<CheckCircleOutlineIcon />}
+            label="Bewerbung eingereicht"
+            onClick={() => handleMarkAsProcessing(row.id)}
+          />
+        </Tooltip>,
       ],
     },
     { field: "tenant.surname", headerName: "Nachname", width: 150, valueGetter: (_, row) => row.tenant.surname },
@@ -84,6 +86,13 @@ const OpenClaimsTable: React.FC = () => {
       field: "created_on",
       headerName: "Antrag vom",
       width: 120,
+      type: "date",
+      valueGetter: (value) => dayjs(value).toDate(),
+    },
+    {
+      field: "move_out",
+      headerName: "Auszugsdatum",
+      width: 160,
       type: "date",
       valueGetter: (value) => dayjs(value).toDate(),
     },
@@ -105,6 +114,11 @@ const OpenClaimsTable: React.FC = () => {
         slotProps={{
           toolbar: {
             showQuickFilter: true,
+          },
+        }}
+        initialState={{
+          sorting: {
+            sortModel: [{ field: "move_out", sort: "asc" }],
           },
         }}
       />
