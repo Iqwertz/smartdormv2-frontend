@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Box,
   Typography,
-  CircularProgress,
   Alert,
   Badge,
   Button,
@@ -55,26 +54,26 @@ interface CalendarEvent {
 }
 
 // --- Custom Day component to show a badge for events ---
-interface CustomPickerDayProps extends PickersDayProps<Dayjs> {
+// --- Custom Day component to show a badge for events ---
+interface CustomPickerDayProps extends PickersDayProps {
   hasEvents?: boolean;
 }
 
 const CustomDay = React.memo((props: CustomPickerDayProps) => {
-  const { day, outsideCurrentMonth, hasEvents, ...other } = props;
+  const { hasEvents, ...other } = props;
 
   return (
     <Badge
-      key={day.toString()}
+      key={props.day.toString()}
       overlap="circular"
       variant="dot"
       color="primary"
-      invisible={!hasEvents || outsideCurrentMonth}
+      invisible={!hasEvents || props.outsideCurrentMonth}
     >
-      <PickersDay {...other} outsideCurrentMonth={outsideCurrentMonth} day={day} />
+      <PickersDay {...other} />
     </Badge>
   );
 });
-
 // --- Main Calendar Widget Component ---
 const CalendarWidget: React.FC = () => {
   const [viewDate, setViewDate] = useState<Dayjs>(dayjs());
@@ -147,7 +146,9 @@ const CalendarWidget: React.FC = () => {
   }, [events]);
 
   const handleDayClick = useCallback(
-    (day: Dayjs) => {
+    (day: Dayjs | null) => {
+      if (!day) return;
+
       const eventsOnDay = events.filter((event) => {
         const targetDayStart = day.startOf("day");
         const targetDayEnd = day.endOf("day");
@@ -166,7 +167,6 @@ const CalendarWidget: React.FC = () => {
     },
     [events]
   );
-
   const handleCloseDialog = () => setIsDialogOpen(false);
 
   const formatEventTime = (event: CalendarEvent): string => {
