@@ -5,7 +5,6 @@ import UserProfile from "../components/tenants/dashboard/content/UserProfile";
 import DashboardCard from "../components/shared/DashboardCard";
 import "../styles/bento-layout.scss";
 import Settings from "../components/tenants/dashboard/content/Settings";
-//import CalendarWidget from "../components/tenants/dashboard/content/CalendarWidget";
 import MyEngagements from "../components/tenants/dashboard/content/MyEngagements";
 import QuickLinks from "../components/tenants/dashboard/content/QuickLinks";
 import DepartureDecisionPopup from "../components/tenants/dashboard/content/DepartureDecisionPopup";
@@ -13,6 +12,7 @@ import { fetchMyDeparture } from "../services/departureService";
 import { Departure, GlobalAppSettings } from "../types/tenant";
 import { fetchGlobalSettings } from "../services/engagementService";
 import ExternalServicesStatus from "../components/tenants/dashboard/content/ExternalServicesStatus";
+import CalendarWidget from "../components/tenants/dashboard/content/CalendarWidget";
 
 const TenantPage: React.FC = () => {
   const [departure, setDeparture] = useState<Departure | null>(null);
@@ -73,9 +73,8 @@ const TenantPage: React.FC = () => {
           <DashboardCard title="Quick Links">
             <QuickLinks></QuickLinks>
           </DashboardCard>
-          <DashboardCard title="Kalender">
-            {/* <CalendarWidget></CalendarWidget> */}
-            Coming soon...
+          <DashboardCard title="Kalender" contentSx={{ p: 0 }}>
+            <CalendarWidget></CalendarWidget>
           </DashboardCard>
           {settings?.applications_open && (
             <DashboardCard title="Referatsbewerbung">

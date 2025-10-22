@@ -26,8 +26,6 @@
     "browser-image-compression": "^2.0.2",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
-    "ical": "^0.8.0",
-    "ical.js": "^2.1.0",
     "lucide-react": "^0.507.0",
     "react": "^19.0.0",
     "react-big-calendar": "^1.18.0",
