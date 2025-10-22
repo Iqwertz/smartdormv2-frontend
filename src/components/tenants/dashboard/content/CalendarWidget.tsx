@@ -93,7 +93,7 @@ const CalendarWidget: React.FC = () => {
 
     // This proxy endpoint on your backend should call the external API
     apiClient
-      .get<ApiCalendarEntry[]>("https://rooms.schollheim.net/api/getCalendar", {
+      .get<ApiCalendarEntry[]>("https://api-rooms.schollheim.net/api/getCalendar", {
         params: {
           year: viewDate.year(),
           month: viewDate.month(), // dayjs month is 0-indexed
