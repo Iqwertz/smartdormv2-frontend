@@ -5,10 +5,9 @@ import apiClient from "../../../../services/api";
 import { useAuth } from "../../../../context/AuthContext";
 import { TenantProfile } from "../../../../types/tenant";
 
-// Define approximate widths based on expected content length
 const fieldWidths = {
   name: "130px",
-  surname: "130px",
+  surname: "130px", 
   email: "170px",
   birthday: "100px",
   gender: "100px",
@@ -91,7 +90,9 @@ const UserProfile: React.FC = () => {
         variant="standard"
         size="small"
         sx={{
-          width: fieldWidths.name,
+          minWidth: fieldWidths.name,
+          flex: "1 1 auto",
+          maxWidth: "100%",
           "& .MuiInputLabel-root": { fontSize: "0.9rem" },
           "& .MuiInputBase-input": { fontSize: "0.9rem" },
         }}
@@ -103,7 +104,9 @@ const UserProfile: React.FC = () => {
         variant="standard"
         size="small"
         sx={{
-          width: fieldWidths.surname,
+          minWidth: fieldWidths.surname,
+          flex: "1 1 auto",
+          maxWidth: "100%",
           "& .MuiInputLabel-root": { fontSize: "0.9rem" },
           "& .MuiInputBase-input": { fontSize: "0.9rem" },
         }}
@@ -115,7 +118,9 @@ const UserProfile: React.FC = () => {
         variant="standard"
         size="small"
         sx={{
-          width: fieldWidths.email,
+          minWidth: fieldWidths.email,
+          flex: "1 1 auto",
+          maxWidth: "100%",
           "& .MuiInputLabel-root": { fontSize: "0.9rem" },
           "& .MuiInputBase-input": { fontSize: "0.9rem" },
         }}
@@ -128,7 +133,9 @@ const UserProfile: React.FC = () => {
         variant="standard"
         size="small"
         sx={{
-          width: fieldWidths.birthday,
+          minWidth: fieldWidths.birthday,
+          flex: "1 1 auto",
+          maxWidth: "100%",
           "& .MuiInputLabel-root": { fontSize: "0.9rem" },
           "& .MuiInputBase-input": { fontSize: "0.9rem" },
         }}
@@ -140,7 +147,9 @@ const UserProfile: React.FC = () => {
         variant="standard"
         size="small"
         sx={{
-          width: fieldWidths.gender,
+          minWidth: fieldWidths.gender,
+          flex: "1 1 auto",
+          maxWidth: "100%",
           "& .MuiInputLabel-root": { fontSize: "0.9rem" },
           "& .MuiInputBase-input": { fontSize: "0.9rem" },
         }}
@@ -152,7 +161,9 @@ const UserProfile: React.FC = () => {
         variant="standard"
         size="small"
         sx={{
-          width: fieldWidths.nationality,
+          minWidth: fieldWidths.nationality,
+          flex: "1 1 auto",
+          maxWidth: "100%",
           "& .MuiInputLabel-root": { fontSize: "0.9rem" },
           "& .MuiInputBase-input": { fontSize: "0.9rem" },
         }}
@@ -164,7 +175,9 @@ const UserProfile: React.FC = () => {
         variant="standard"
         size="small"
         sx={{
-          width: fieldWidths.tel_number,
+          minWidth: fieldWidths.tel_number,
+          flex: "1 1 auto",
+          maxWidth: "100%",
           "& .MuiInputLabel-root": { fontSize: "0.9rem" },
           "& .MuiInputBase-input": { fontSize: "0.9rem" },
         }}
@@ -176,7 +189,9 @@ const UserProfile: React.FC = () => {
         variant="standard"
         size="small"
         sx={{
-          width: fieldWidths.university,
+          minWidth: fieldWidths.university,
+          flex: "1 1 auto",
+          maxWidth: "100%",
           "& .MuiInputLabel-root": { fontSize: "0.9rem" },
           "& .MuiInputBase-input": { fontSize: "0.9rem" },
         }}
@@ -188,7 +203,9 @@ const UserProfile: React.FC = () => {
         variant="standard"
         size="small"
         sx={{
-          width: fieldWidths.study_field,
+          minWidth: fieldWidths.study_field,
+          flex: "1 1 auto",
+          maxWidth: "100%",
           "& .MuiInputLabel-root": { fontSize: "0.9rem" },
           "& .MuiInputBase-input": { fontSize: "0.9rem" },
         }}
@@ -201,7 +218,9 @@ const UserProfile: React.FC = () => {
         variant="standard"
         size="small"
         sx={{
-          width: fieldWidths.current_room,
+          minWidth: fieldWidths.current_room,
+          flex: "1 1 auto",
+          maxWidth: "100%",
           "& .MuiInputLabel-root": { fontSize: "0.9rem" },
           "& .MuiInputBase-input": { fontSize: "0.9rem" },
         }}
@@ -213,7 +232,9 @@ const UserProfile: React.FC = () => {
         variant="standard"
         size="small"
         sx={{
-          width: fieldWidths.current_floor,
+          minWidth: fieldWidths.current_floor,
+          flex: "1 1 auto",
+          maxWidth: "100%",
           "& .MuiInputLabel-root": { fontSize: "0.9rem" },
           "& .MuiInputBase-input": { fontSize: "0.9rem" },
         }}
@@ -226,7 +247,9 @@ const UserProfile: React.FC = () => {
         variant="standard"
         size="small"
         sx={{
-          width: fieldWidths.move_in,
+          minWidth: fieldWidths.move_in,
+          flex: "1 1 auto",
+          maxWidth: "100%",
           "& .MuiInputLabel-root": { fontSize: "0.9rem" },
           "& .MuiInputBase-input": { fontSize: "0.9rem" },
         }}
@@ -239,7 +262,9 @@ const UserProfile: React.FC = () => {
         variant="standard"
         size="small"
         sx={{
-          width: fieldWidths.move_out,
+          minWidth: fieldWidths.move_out,
+          flex: "1 1 auto",
+          maxWidth: "100%",
           "& .MuiInputLabel-root": { fontSize: "0.9rem" },
           "& .MuiInputBase-input": { fontSize: "0.9rem" },
         }}
@@ -251,7 +276,9 @@ const UserProfile: React.FC = () => {
         variant="standard"
         size="small"
         sx={{
-          width: fieldWidths.deposit,
+          minWidth: fieldWidths.current_points,
+          flex: "1 1 auto",
+          maxWidth: "100%",
           "& .MuiInputLabel-root": { fontSize: "0.9rem" },
           "& .MuiInputBase-input": { fontSize: "0.9rem" },
         }}
@@ -264,7 +291,9 @@ const UserProfile: React.FC = () => {
         variant="standard"
         size="small"
         sx={{
-          width: fieldWidths.current_points,
+          minWidth: fieldWidths.current_points,
+          flex: "1 1 auto",
+          maxWidth: "100%",
           "& .MuiInputLabel-root": { fontSize: "0.9rem" },
           "& .MuiInputBase-input": { fontSize: "0.9rem" },
         }}
@@ -277,7 +306,9 @@ const UserProfile: React.FC = () => {
         variant="standard"
         size="small"
         sx={{
-          width: fieldWidths.extension,
+          minWidth: fieldWidths.extension,
+          flex: "1 1 auto",
+          maxWidth: "100%",
           "& .MuiInputLabel-root": { fontSize: "0.9rem" },
           "& .MuiInputBase-input": { fontSize: "0.9rem" },
         }}
@@ -290,7 +321,9 @@ const UserProfile: React.FC = () => {
         variant="standard"
         size="small"
         sx={{
-          width: fieldWidths.sublet,
+          minWidth: fieldWidths.sublet,
+          flex: "1 1 auto",
+          maxWidth: "100%",
           "& .MuiInputLabel-root": { fontSize: "0.9rem" },
           "& .MuiInputBase-input": { fontSize: "0.9rem" },
         }}

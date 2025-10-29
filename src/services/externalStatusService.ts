@@ -38,12 +38,13 @@ export const fetchRoomsStatus = async (): Promise<RoomStatus[]> => {
 /**
  * Defines the structure of a single washing machine's status.
  */
+export type WMStateType = "running" | "available" | "defective";
 export interface WashingMachineStatus {
   roomId: number;
   roomName: string;
   wmId: number;
   wmName: string;
-  status: boolean; // true = in use, false = free
+  status: WMStateType;
   lastUpdate: string;
 }
 
@@ -71,9 +72,14 @@ export const fetchWashingMachineStatus = async (): Promise<WashingMachineSummary
     if (!summaryMap[machine.roomName]) {
       summaryMap[machine.roomName] = { available: 0, total: 0 };
     }
+
+    // Skip defective machines from the total count
+    if (machine.status === "defective") {
+      return;
+    }
+
     summaryMap[machine.roomName].total++;
-    if (!machine.status) {
-      // status: false means the machine is free
+    if (machine.status === "available") {
       summaryMap[machine.roomName].available++;
     }
   });

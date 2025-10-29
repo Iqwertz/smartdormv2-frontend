@@ -3,7 +3,7 @@ import {
   Box,
   Typography,
   Alert,
-  Badge,
+  // Badge is no longer needed for the CustomDay component
   Button,
   Dialog,
   DialogTitle,
@@ -12,7 +12,7 @@ import {
   List,
   ListItemText,
   IconButton,
-  ListItemButton, // Added for clickable list items
+  ListItemButton,
 } from "@mui/material";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { PickersDay, PickersDayProps } from "@mui/x-date-pickers/PickersDay";
@@ -20,6 +20,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import apiClient from "../../../../services/api";
 import dayjs, { Dayjs } from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat";
+import { useAuth } from "../../../../context/AuthContext";
 dayjs.extend(localizedFormat);
 
 // --- Interfaces for the new API response ---
@@ -42,7 +43,8 @@ interface ApiCalendarEntry extends ApiReservation {
   emoji: string;
 }
 
-// --- Component's internal event structure ---
+// --- Component's internal event structure (MODIFIED) ---
+// We now store calendarId and color to use them later.
 interface CalendarEvent {
   uid: string;
   summary: string;
@@ -51,60 +53,90 @@ interface CalendarEvent {
   location?: string;
   description?: string;
   isAllDay: boolean;
+  calendarId: string; // Added
+  color?: string; // Added
 }
 
-// --- Custom Day component to show a badge for events ---
-// --- Custom Day component to show a badge for events ---
+// --- Information about a calendar to be rendered as a dot ---
+interface CalendarDotInfo {
+  id: string;
+  color: string;
+}
+
+// --- Custom Day component props (MODIFIED) ---
 interface CustomPickerDayProps extends PickersDayProps {
-  hasEvents?: boolean;
+  // Instead of a boolean, we now pass an array of calendar info objects
+  calendars?: CalendarDotInfo[];
 }
 
+// --- Custom Day component to show multiple colored dots (MODIFIED) ---
 const CustomDay = React.memo((props: CustomPickerDayProps) => {
-  const { hasEvents, ...other } = props;
+  const { calendars, ...other } = props;
 
+  // We wrap the PickersDay in a Box with relative positioning
+  // to absolutely position the dots container at the bottom.
   return (
-    <Badge
-      key={props.day.toString()}
-      overlap="circular"
-      variant="dot"
-      color="primary"
-      invisible={!hasEvents || props.outsideCurrentMonth}
-    >
+    <Box sx={{ position: "relative" }}>
       <PickersDay {...other} />
-    </Badge>
+      {calendars && calendars.length > 0 && !props.outsideCurrentMonth && (
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: 4,
+            left: 0,
+            right: 0,
+            display: "flex",
+            justifyContent: "center",
+            gap: "3px", // Space between dots
+          }}
+        >
+          {calendars.map((cal) => (
+            <Box
+              key={cal.id}
+              sx={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                backgroundColor: cal.color || "grey", // Fallback color
+              }}
+            />
+          ))}
+        </Box>
+      )}
+    </Box>
   );
 });
+
 // --- Main Calendar Widget Component ---
 const CalendarWidget: React.FC = () => {
   const [viewDate, setViewDate] = useState<Dayjs>(dayjs());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const { authState } = useAuth();
 
   // Dialog State
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
   const [selectedDayEvents, setSelectedDayEvents] = useState<CalendarEvent[]>([]);
 
-  // Fetch events from the new API endpoint when the view month/year changes
   useEffect(() => {
     setLoading(true);
     setError(null);
 
-    // This proxy endpoint on your backend should call the external API
     apiClient
       .get<ApiCalendarEntry[]>("https://api-rooms.schollheim.net/api/getCalendar", {
         params: {
           year: viewDate.year(),
-          month: viewDate.month(), // dayjs month is 0-indexed
+          month: viewDate.month(),
+          roles: authState.user?.groups || [],
         },
       })
       .then((response) => {
+        // MODIFIED: Capture calendarId and color during parsing
         const parsedEvents: CalendarEvent[] = response.data.map((entry) => {
           const start = dayjs(entry.time[0]);
           const end = dayjs(entry.time[1]);
-
-          // Simple all-day check: event is 24 hours long and starts at midnight.
           const isAllDay =
             start.hour() === 0 && start.minute() === 0 && start.second() === 0 && end.diff(start, "hour") >= 24;
 
@@ -116,6 +148,8 @@ const CalendarWidget: React.FC = () => {
             location: entry.location || entry.roomNumber,
             description: entry.description,
             isAllDay,
+            calendarId: entry.calendarId, // <-- ADDED
+            color: entry.color, // <-- ADDED
           };
         });
         setEvents(parsedEvents);
@@ -127,22 +161,38 @@ const CalendarWidget: React.FC = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, [viewDate]);
+  }, [viewDate, authState.user?.groups]);
 
-  // Memoize the set of days that have events to optimize rendering
-  const eventDays = useMemo(() => {
-    const days = new Set<string>();
+  // MODIFIED: Memoize a map of days to their unique calendar info
+  // The key is the date string 'YYYY-MM-DD', and the value is an array of CalendarDotInfo objects.
+  const eventsByDay = useMemo(() => {
+    const dayMap = new Map<string, CalendarDotInfo[]>();
+
     events.forEach((event) => {
       let current = event.start.startOf("day");
-      // Adjust end date for multi-day events
       const iterationEndDate = event.isAllDay ? event.end.subtract(1, "day").endOf("day") : event.end;
 
       while (current.isBefore(iterationEndDate) || current.isSame(iterationEndDate, "day")) {
-        days.add(current.format("YYYY-MM-DD"));
+        const dayKey = current.format("YYYY-MM-DD");
+
+        // Get or initialize the array for this day
+        if (!dayMap.has(dayKey)) {
+          dayMap.set(dayKey, []);
+        }
+        const calendarsForDay = dayMap.get(dayKey)!;
+
+        // Add the calendar info for this event ONLY if it's not already there for this day
+        const calendarExists = calendarsForDay.some((c) => c.id === event.calendarId);
+        if (!calendarExists && event.color) {
+          // Only add if it has a color
+          calendarsForDay.push({ id: event.calendarId, color: event.color });
+        }
+
         current = current.add(1, "day");
       }
     });
-    return days;
+
+    return dayMap;
   }, [events]);
 
   const handleDayClick = useCallback(
@@ -152,8 +202,6 @@ const CalendarWidget: React.FC = () => {
       const eventsOnDay = events.filter((event) => {
         const targetDayStart = day.startOf("day");
         const targetDayEnd = day.endOf("day");
-        // For all-day events, the end time might be midnight of the next day.
-        // We subtract a millisecond to ensure it's counted for the correct day.
         const effectiveEventEnd =
           event.isAllDay && event.end.isSame(event.end.startOf("day")) && !event.end.isSame(event.start, "day")
             ? event.end.subtract(1, "millisecond")
@@ -175,7 +223,6 @@ const CalendarWidget: React.FC = () => {
     const start = event.start;
     const end = event.end;
 
-    // Handle events that are a single point in time
     if (end.isSame(start)) {
       return start.format("HH:mm");
     }
@@ -204,7 +251,11 @@ const CalendarWidget: React.FC = () => {
         onChange={handleDayClick}
         loading={loading}
         slots={{
-          day: (dayProps) => <CustomDay {...dayProps} hasEvents={eventDays.has(dayProps.day.format("YYYY-MM-DD"))} />,
+          // MODIFIED: Pass the array of unique calendars for the day to CustomDay
+          day: (dayProps) => {
+            const dayKey = dayProps.day.format("YYYY-MM-DD");
+            return <CustomDay {...dayProps} calendars={eventsByDay.get(dayKey)} />;
+          },
         }}
         slotProps={{
           calendarHeader: {
