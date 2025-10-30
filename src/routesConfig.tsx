@@ -274,6 +274,7 @@ export const loginRoute = "/login";
 export const defaultAuthenticatedRoute = "/dashboard"; // Fallback if no specific route is found
 
 export const getSidebarItems = (userGroups: string[]): AppRouteItem[] => {
+  console.log("Determining sidebar items for user groups:", userGroups);
   return appRoutes.filter((item) => {
     if (!("routes" in item)) {
       return (

@@ -4,12 +4,17 @@ import { Box } from "@mui/material";
 import TabbedDashboardCard from "../../components/shared/TabbedDashboardCard";
 import TenantEngagementTable from "../../components/engagements/TenantEngagementTable";
 import EngagementTenantTable from "../../components/engagements/EngagementTenantTable";
+import TenantExport from "../../components/engagements/TenantExport";
 
 const TenantOverviewPage: React.FC = () => {
   const tabs = [
     {
       label: "Bewohner Übersicht",
       content: <TenantEngagementTable />,
+    },
+    {
+      label: "Download",
+      content: <TenantExport />,
     },
     {
       label: "Referate Übersicht",
