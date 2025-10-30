@@ -308,7 +308,10 @@ const CalendarWidget: React.FC = () => {
             </Typography>
           )}
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ justifyContent: "space-between" }}>
+          <Button href="https://rooms.schollheim.net/#/calendar" target="_blank" rel="noopener noreferrer">
+            Termin eintragen
+          </Button>
           <Button onClick={handleCloseDialog}>Schließen</Button>
         </DialogActions>
       </Dialog>
