@@ -422,16 +422,25 @@ const EditTenantPage: React.FC = () => {
         <DashboardCard title="Vermietungen">
           {rentals.length > 0 ? (
             <List dense>
-              {rentals.map((rental) => (
-                <ListItem key={rental.id}>
-                  <ListItemText
-                    primary={`Zimmer ${rental.room_name}`}
-                    secondary={`Vom ${dayjs(rental.move_in).format("DD.MM.YYYY")} bis ${dayjs(rental.moved_out).format(
-                      "DD.MM.YYYY"
-                    )}`}
-                  />
-                </ListItem>
-              ))}
+              {rentals
+                .sort((a, b) => dayjs(b.move_in).valueOf() - dayjs(a.move_in).valueOf())
+                .map((rental, index) => {
+                  const isCurrentRoom = index === 0;
+                  return (
+                    <ListItem key={rental.id}>
+                      <ListItemText
+                        primary={`Zimmer ${rental.room_name}${isCurrentRoom ? " (Aktuell)" : ""}`}
+                        secondary={
+                          isCurrentRoom
+                            ? `Eingezogen am ${dayjs(rental.move_in).format("DD.MM.YYYY")}`
+                            : `Vom ${dayjs(rental.move_in).format("DD.MM.YYYY")} bis ${dayjs(rental.moved_out).format(
+                                "DD.MM.YYYY"
+                              )}`
+                        }
+                      />
+                    </ListItem>
+                  );
+                })}
             </List>
           ) : (
             <Typography sx={{ p: 2, textAlign: "center" }} color="text.secondary">
