@@ -270,6 +270,9 @@ const EditTenantPage: React.FC = () => {
                   fullWidth
                 />
               </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField name="points" label="Punkte" value={tenant.current_points || ""} disabled fullWidth />
+              </Grid>
             </Grid>
 
             <Divider sx={{ my: 3 }} />
