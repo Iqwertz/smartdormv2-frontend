@@ -148,8 +148,8 @@ const CalendarWidget: React.FC = () => {
             location: entry.location || entry.roomNumber,
             description: entry.description,
             isAllDay,
-            calendarId: entry.calendarId, // <-- ADDED
-            color: entry.color, // <-- ADDED
+            calendarId: entry.calendarId,
+            color: entry.color,
           };
         });
         setEvents(parsedEvents);
@@ -162,9 +162,6 @@ const CalendarWidget: React.FC = () => {
         setLoading(false);
       });
   }, [viewDate, authState.user?.groups]);
-
-  // MODIFIED: Memoize a map of days to their unique calendar info
-  // The key is the date string 'YYYY-MM-DD', and the value is an array of CalendarDotInfo objects.
   const eventsByDay = useMemo(() => {
     const dayMap = new Map<string, CalendarDotInfo[]>();
 

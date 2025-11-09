@@ -1,9 +1,11 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { Box, Paper, Typography, ButtonBase, useTheme, useMediaQuery } from "@mui/material";
+import { useAuth } from "../../context/AuthContext";
 
 interface Tab {
   label: string;
   content: React.ReactNode;
+  authGroups?: string[]; // Optional: restrict tab visibility based on auth groups
 }
 
 interface TabbedDashboardCardProps {
@@ -27,14 +29,31 @@ const TabbedDashboardCard: React.FC<TabbedDashboardCardProps> = ({
   const tabsContainerRef = useRef<HTMLDivElement | null>(null);
   const [showLeftFade, setShowLeftFade] = useState(false);
   const [showRightFade, setShowRightFade] = useState(false);
+  const { authState } = useAuth();
 
-  // Fixed: Include state setters in dependencies (or use functional updates if needed)
+  // Filter tabs based on auth groups
+  const visibleTabs = useMemo(() => {
+    return tabs.filter((tab) => {
+      if (!tab.authGroups || tab.authGroups.length === 0) {
+        return true; // No restriction, show tab
+      }
+      const userGroups = authState.user?.groups || [];
+      return tab.authGroups.some((group) => userGroups.includes(group));
+    });
+  }, [tabs, authState.user?.groups]);
+
+  // Ensure activeTab is valid after filtering
+  useEffect(() => {
+    if (activeTab >= visibleTabs.length) {
+      setActiveTab(Math.max(0, visibleTabs.length - 1));
+    }
+  }, [visibleTabs.length, activeTab]);
+
   const checkFades = useCallback(() => {
     const el = tabsContainerRef.current;
     if (!el) return;
 
     const isScrollable = el.scrollWidth > el.clientWidth;
-    // Hide fades if not scrollable
     if (!isScrollable) {
       setShowLeftFade(false);
       setShowRightFade(false);
@@ -46,9 +65,8 @@ const TabbedDashboardCard: React.FC<TabbedDashboardCardProps> = ({
 
     setShowLeftFade(!isAtStart);
     setShowRightFade(!isAtEnd);
-  }, [setShowLeftFade, setShowRightFade]); // ← Added dependencies
+  }, [setShowLeftFade, setShowRightFade]);
 
-  // Check for fades on mount, resize, and when tabs change.
   useEffect(() => {
     const el = tabsContainerRef.current;
     if (!el) return;
@@ -61,21 +79,18 @@ const TabbedDashboardCard: React.FC<TabbedDashboardCardProps> = ({
     return () => {
       observer.disconnect();
     };
-  }, [tabs, checkFades]);
+  }, [visibleTabs, checkFades]);
 
-  // Fixed: Add a separate useEffect to handle initial check and tab changes
   useEffect(() => {
-    // Use setTimeout to ensure DOM is updated
     setTimeout(checkFades, 0);
-  }, [activeTab, tabs, checkFades]);
+  }, [activeTab, visibleTabs, checkFades]);
 
-  if (!tabs || tabs.length === 0) {
+  if (!visibleTabs || visibleTabs.length === 0) {
     return null;
   }
 
   return (
     <Box sx={{ position: "relative", mt: 4 }}>
-      {/* Title & Tabs Container */}
       <Box
         sx={{
           display: "flex",
@@ -89,7 +104,6 @@ const TabbedDashboardCard: React.FC<TabbedDashboardCardProps> = ({
           width: isMobile ? "calc(100% - 40px)" : "auto",
         }}
       >
-        {/* Main Title */}
         {title && (
           <Paper
             elevation={3}
@@ -108,7 +122,6 @@ const TabbedDashboardCard: React.FC<TabbedDashboardCardProps> = ({
           </Paper>
         )}
 
-        {/* Scrollable Tabs Wrapper */}
         <Box
           sx={{
             position: "relative",
@@ -117,7 +130,6 @@ const TabbedDashboardCard: React.FC<TabbedDashboardCardProps> = ({
             width: isMobile ? "100%" : "auto",
           }}
         >
-          {/* Fixed: Move the scroll handler to the actual scrollable element */}
           <Box
             ref={tabsContainerRef}
             onScroll={checkFades}
@@ -126,14 +138,12 @@ const TabbedDashboardCard: React.FC<TabbedDashboardCardProps> = ({
               display: "flex",
               gap: 1,
               py: 1,
-              // Hide scrollbar style
               "&::-webkit-scrollbar": { display: "none" },
               scrollbarWidth: "none",
               "-ms-overflow-style": "none",
             }}
           >
-            {/* Tab Buttons */}
-            {tabs.map((tab, index) => (
+            {visibleTabs.map((tab, index) => (
               <ButtonBase
                 key={index}
                 onClick={() => setActiveTab(index)}
@@ -167,7 +177,6 @@ const TabbedDashboardCard: React.FC<TabbedDashboardCardProps> = ({
               </ButtonBase>
             ))}
           </Box>
-          {/* Fade Effects */}
           <Box
             sx={{
               position: "absolute",
@@ -197,7 +206,6 @@ const TabbedDashboardCard: React.FC<TabbedDashboardCardProps> = ({
         </Box>
       </Box>
 
-      {/* Main Card */}
       <Paper
         elevation={6}
         sx={{
@@ -212,7 +220,7 @@ const TabbedDashboardCard: React.FC<TabbedDashboardCardProps> = ({
           ...cardSx,
         }}
       >
-        <Box sx={{ ...contentSx }}>{tabs[activeTab].content}</Box>
+        <Box sx={{ ...contentSx }}>{visibleTabs[activeTab].content}</Box>
       </Paper>
     </Box>
   );

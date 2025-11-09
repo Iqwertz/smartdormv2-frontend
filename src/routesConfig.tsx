@@ -11,7 +11,14 @@ import DirectionsRunOutlined from "@mui/icons-material/DirectionsRunOutlined";
 import ArticleOutlined from "@mui/icons-material/ArticleOutlined";
 import BedOutlined from "@mui/icons-material/BedOutlined";
 import DrawOutlinedIcon from "@mui/icons-material/DrawOutlined";
-import { AssignmentOutlined, FilterVintageOutlined, Groups, GroupWorkOutlined, PersonAdd } from "@mui/icons-material";
+import {
+  AssignmentOutlined,
+  FilterVintageOutlined,
+  Groups,
+  GroupWorkOutlined,
+  LanOutlined,
+  PersonAdd,
+} from "@mui/icons-material";
 import { ALL_FLOORS } from "./config";
 
 // Import all lazy page components from the dedicated pages file.
@@ -195,6 +202,15 @@ export const appRoutes: AppRouteItem[] = [
     title: "Referate",
     icon: <GroupWorkOutlined />,
     requiredGroups: ["Heimrat", "Inforeferat", "ADMIN"],
+    sidebar: true,
+  },
+  {
+    id: "network",
+    path: "/networkdepartment",
+    element: <Pages.NetworkDepartmentPage />,
+    title: "Netzwerkreferat",
+    icon: <LanOutlined />,
+    requiredGroups: ["Netzwerkreferat", "ADMIN"],
     sidebar: true,
   },
   //////////////////////////////////////////////////////////////
