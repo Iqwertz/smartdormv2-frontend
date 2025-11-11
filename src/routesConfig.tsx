@@ -177,7 +177,7 @@ export const appRoutes: AppRouteItem[] = [
       "Heimrat",
       "Inforeferat",
       //"Tutoren",
-      //"HSV-Vertreter",
+      "HSV-Vertreter",
       "Zimmerreferat",
       "Finanzenreferat",
       "Schlichtungsreferat",
