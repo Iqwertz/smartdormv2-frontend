@@ -34,6 +34,9 @@ import { TenantForSelect } from "../../types/parcel";
 import imageCompression from "browser-image-compression";
 import { API_BASE_URL } from "../../config";
 import { updateSemesterAndLdap } from "../../services/engagementService";
+import BudgetRequestTable from "../../components/budget/BudgetRequestTable";
+import { fetchBudgetRequests, voteBudgetRequest } from "../../services/budgetService";
+import { BudgetRequest } from "../../types/budget";
 
 // --- Helper ---
 const generateSemesterOptions = (): string[] => {
@@ -410,11 +413,63 @@ const UpdateSemesterComponent: React.FC = () => {
   );
 };
 
+const HeimratBudgetList: React.FC = () => {
+  const { showNotification } = useNotification();
+  const [requests, setRequests] = useState<BudgetRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadRequests = useCallback(async () => {
+    setLoading(true);
+    try {
+      // Heimrat sees OPEN requests.
+      // Backend permission logic handles ensuring only authorized users access this endpoint.
+      const data = await fetchBudgetRequests("OPEN");
+
+      // Optional: Client-side filter if Heimrat should ONLY see type='BUDGET'
+      // and not 'REIMBURSEMENT' (since they only vote on budgets).
+      // Based on requirements: "Budget Requests: All must vote" vs "Reimbursements: Only Finanzer".
+      // Usually Heimrat wants to see everything happening, but can only vote on BUDGET.
+      setRequests(data);
+    } catch (err) {
+      showNotification("Anträge konnten nicht geladen werden.", "error");
+    } finally {
+      setLoading(false);
+    }
+  }, [showNotification]);
+
+  useEffect(() => {
+    loadRequests();
+  }, [loadRequests]);
+
+  const handleVote = async (id: number, vote: "APPROVE" | "REJECT") => {
+    try {
+      await voteBudgetRequest(id, vote);
+      showNotification("Stimme erfolgreich abgegeben.", "success");
+      loadRequests(); // Refresh to see updated status or vote count
+    } catch (err: any) {
+      const msg = err.response?.data?.error || "Abstimmung fehlgeschlagen.";
+      showNotification(msg, "error");
+    }
+  };
+
+  return (
+    <Box sx={{ height: "100%", p: 1 }}>
+      {requests.length === 0 && !loading && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          Keine offenen Budgetanträge vorhanden.
+        </Alert>
+      )}
+      <BudgetRequestTable requests={requests} loading={loading} userRole="HEIMRAT" onVote={handleVote} />
+    </Box>
+  );
+};
+
 // --- Main Page Component ---
 const HeimratPage: React.FC = () => {
   const tabs = [
     { label: "Bewerbungen", content: <HeimratApplicationList /> },
     { label: "Bewerbung erstellen", content: <HeimratCreateApplicationForm /> },
+    { label: "Budgetanträge", content: <HeimratBudgetList /> },
     { label: "Einstellungen", content: <HeimratSettings /> },
     { label: "System", content: <UpdateSemesterComponent /> },
   ];

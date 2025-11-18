@@ -13,10 +13,12 @@ import BedOutlined from "@mui/icons-material/BedOutlined";
 import DrawOutlinedIcon from "@mui/icons-material/DrawOutlined";
 import {
   AssignmentOutlined,
+  EuroOutlined,
   FilterVintageOutlined,
   Groups,
   GroupWorkOutlined,
   LanOutlined,
+  PaymentsOutlined,
   PersonAdd,
 } from "@mui/icons-material";
 import { ALL_FLOORS } from "./config";
@@ -168,6 +170,15 @@ export const appRoutes: AppRouteItem[] = [
   // Engagement Specific Routes:
   ////////////////////////////////////////////////////////////
   {
+    id: "my-budget",
+    path: "/budget",
+    element: <Pages.TenantBudgetPage />,
+    title: "Finanzen",
+    icon: <EuroOutlined />,
+    requiredGroups: ["tenant", "ADMIN"],
+    sidebar: true,
+  },
+  {
     id: "tenant-overview",
     path: "/tenant-overview",
     element: <Pages.TenantOverviewPage />,
@@ -202,6 +213,15 @@ export const appRoutes: AppRouteItem[] = [
     title: "Referate",
     icon: <GroupWorkOutlined />,
     requiredGroups: ["Heimrat", "Inforeferat", "ADMIN"],
+    sidebar: true,
+  },
+  {
+    id: "finance-management",
+    path: "/finance",
+    element: <Pages.FinanceManagementPage />,
+    title: "Finanzverwaltung",
+    icon: <PaymentsOutlined />,
+    requiredGroups: ["Finanzenreferat", "ADMIN"],
     sidebar: true,
   },
   {
