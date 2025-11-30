@@ -63,6 +63,10 @@ const TenantDataTable: React.FC<TenantDataTableProps> = ({ status = "current", t
     },
     { field: "surname", headerName: "Nachname", width: 140 },
     { field: "name", headerName: "Vorname", width: 140 },
+    { field: "current_room", headerName: "Zimmer", width: 100 },
+    { field: "current_floor", headerName: "Flur", width: 80 },
+    { field: "extension", headerName: "Verlängerungen", type: "number", width: 120 },
+    { field: "sublet", headerName: "Untermiete (Monate)", type: "number", width: 150 },
     { field: "username", headerName: "Benutzername", width: 130 },
     { field: "email", headerName: "E-Mail", width: 200 },
     {
@@ -77,8 +81,6 @@ const TenantDataTable: React.FC<TenantDataTableProps> = ({ status = "current", t
     { field: "tel_number", headerName: "Telefon", width: 150, sortable: false },
     { field: "university", headerName: "Universität", width: 120 },
     { field: "study_field", headerName: "Studienfach", width: 160 },
-    { field: "current_room", headerName: "Zimmer", width: 100 },
-    { field: "current_floor", headerName: "Flur", width: 80 },
     {
       field: "move_in",
       headerName: "Einzug",
@@ -112,8 +114,6 @@ const TenantDataTable: React.FC<TenantDataTableProps> = ({ status = "current", t
       type: "number",
       width: 90,
     },
-    { field: "extension", headerName: "Verlängerungen", type: "number", width: 120 },
-    { field: "sublet", headerName: "Untermiete (Monate)", type: "number", width: 150 },
     { field: "note", headerName: "Notiz", width: 200, sortable: false, hideable: true },
     { field: "new_address", headerName: "Neue Adresse", width: 220, sortable: false, hideable: true },
     { field: "id", headerName: "ID", width: 80, type: "number", hideable: true },
