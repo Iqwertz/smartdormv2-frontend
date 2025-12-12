@@ -1,3 +1,5 @@
+// src/pages/admin/EditTenantPage.tsx
+
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -22,11 +24,25 @@ import {
   List,
   ListItem,
   ListItemText,
+  IconButton,
+  Chip,
+  Stack
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import DashboardCard from "../../components/shared/DashboardCard";
 import { useNotification } from "../../context/NotificationContext";
-import { TenantProfile, Subtenant, Rental, MovePayload } from "../../types/tenant";
+import { 
+  TenantProfile, 
+  Subtenant, 
+  Rental, 
+  MovePayload, 
+  Termination, 
+  DepartmentExtension 
+} from "../../types/tenant";
 import apiClient from "../../services/api";
 import dayjs, { Dayjs } from "dayjs";
 import { nationalities } from "../../utils/nationalities";
@@ -47,33 +63,70 @@ const EditTenantPage: React.FC = () => {
   const [subtenants, setSubtenants] = useState<Subtenant[]>([]);
   const [rentals, setRentals] = useState<Rental[]>([]);
   const [allRooms, setAllRooms] = useState<SelectOption[]>([]);
+  
+  // New State for Termination and Extensions
+  const [termination, setTermination] = useState<Termination | null>(null);
+  const [departmentExtensions, setDepartmentExtensions] = useState<DepartmentExtension[]>([]);
+
+  // Move Form State
   const [moveData, setMoveData] = useState<{ room_id: number | null; move_date: Dayjs | null }>({
     room_id: null,
     move_date: null,
   });
-  const [terminationDate, setTerminationDate] = useState<Dayjs | null>(null);
+
+  // Termination Form State
+  const [terminationForm, setTerminationForm] = useState<{ date: Dayjs | null; note: string }>({
+    date: null,
+    note: "",
+  });
+
+  // Department Extension Form State
+  const [extensionForm, setExtensionForm] = useState<{ months: string; note: string }>({
+    months: "",
+    note: "",
+  });
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isMoving, setIsMoving] = useState(false);
+  
   const [isTerminating, setIsTerminating] = useState(false);
+  const [isExtending, setIsExtending] = useState(false);
+
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   const fetchTenantData = useCallback(async () => {
     if (!id) return;
     try {
       setLoading(true);
-      const [tenantRes, subtenantsRes, rentalsRes, roomsRes] = await Promise.all([
+      // Fetch base data
+      const [tenantRes, subtenantsRes, rentalsRes, roomsRes, extensionsRes] = await Promise.all([
         apiClient.get(`/api/department/tenant-data/${id}/`),
         apiClient.get(`/api/department/tenant-data/${id}/subtenants/`),
         apiClient.get(`/api/department/tenant-data/${id}/rentals/`),
         apiClient.get("/api/common/room-list/"),
+        apiClient.get(`/api/department/tenant-data/${id}/department-extensions/`),
       ]);
+
       setTenant(tenantRes.data);
       setSubtenants(subtenantsRes.data);
       setRentals(rentalsRes.data);
       setAllRooms(roomsRes.data);
+      setDepartmentExtensions(extensionsRes.data);
+
+      // Fetch termination separately
+      try {
+        const termRes = await apiClient.get(`/api/department/tenant-data/${id}/termination/`);
+        setTermination(termRes.data);
+      } catch (err: any) {
+        if (err.response && err.response.status === 404) {
+          setTermination(null);
+        } else {
+          console.error("Error fetching termination status", err);
+        }
+      }
+
     } catch (err) {
       setError("Bewohnerdaten konnten nicht geladen werden.");
       showNotification("Bewohnerdaten konnten nicht geladen werden.", "error");
@@ -104,7 +157,8 @@ const EditTenantPage: React.FC = () => {
     setTenant({ ...tenant, [name]: value || "" });
   };
 
-  // Actions
+  // --- ACTIONS ---
+
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!tenant) return;
@@ -113,7 +167,7 @@ const EditTenantPage: React.FC = () => {
     try {
       await apiClient.put(`/api/department/tenant-data/${id}/update/`, tenant);
       showNotification("Daten erfolgreich aktualisiert.", "success");
-      navigate("/department/overview");
+      fetchTenantData();
     } catch (err: any) {
       const errorMessage = err.response?.data?.error || "Update fehlgeschlagen.";
       setError(errorMessage);
@@ -153,8 +207,8 @@ const EditTenantPage: React.FC = () => {
     try {
       await apiClient.post(`/api/department/tenant-data/${id}/move/`, payload);
       showNotification("Bewohner erfolgreich umgezogen.", "success");
-      setMoveData({ room_id: null, move_date: null }); // Reset form
-      fetchTenantData(); // Refresh all data
+      setMoveData({ room_id: null, move_date: null });
+      fetchTenantData();
     } catch (err: any) {
       const errorMessage = err.response?.data?.error || "Umzug fehlgeschlagen.";
       showNotification(errorMessage, "error");
@@ -163,26 +217,85 @@ const EditTenantPage: React.FC = () => {
     }
   };
 
-  const handleTerminate = async (e: React.FormEvent) => {
+  // --- Termination Logic ---
+
+  const handleCreateTermination = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!id || !terminationDate) {
+    if (!id || !terminationForm.date) {
       showNotification("Bitte Auszugsdatum auswählen.", "warning");
       return;
     }
     setIsTerminating(true);
     const payload = {
-      move_out_date: terminationDate.format("YYYY-MM-DD"),
+      move_out_date: terminationForm.date.format("YYYY-MM-DD"),
+      note: terminationForm.note,
     };
     try {
       await apiClient.post(`/api/department/tenant-data/${id}/terminate/`, payload);
       showNotification("Bewohner erfolgreich gekündigt.", "success");
-      setTerminationDate(null); // Reset form
-      fetchTenantData(); // Refresh all data
+      setTerminationForm({ date: null, note: "" });
+      fetchTenantData();
     } catch (err: any) {
       const errorMessage = err.response?.data?.error || "Kündigung fehlgeschlagen.";
       showNotification(errorMessage, "error");
     } finally {
       setIsTerminating(false);
+    }
+  };
+
+  const handleRevokeTermination = async () => {
+    if (!id) return;
+    setIsTerminating(true);
+    try {
+      await apiClient.delete(`/api/department/tenant-data/${id}/termination/`);
+      showNotification("Kündigung erfolgreich aufgehoben.", "success");
+      setTermination(null);
+      fetchTenantData();
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.error || "Aufheben fehlgeschlagen.";
+      showNotification(errorMessage, "error");
+    } finally {
+      setIsTerminating(false);
+    }
+  };
+
+  // --- Department Extension Logic ---
+
+  const handleCreateExtension = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!id || !extensionForm.months) {
+      showNotification("Bitte Monate angeben.", "warning");
+      return;
+    }
+    setIsExtending(true);
+    try {
+      const payload = {
+        tenant_id: parseInt(id),
+        months: parseInt(extensionForm.months),
+        note: extensionForm.note,
+      };
+      await apiClient.post(`/api/department/department-extensions/create/`, payload);
+      showNotification("Verlängerung erfolgreich erstellt.", "success");
+      setExtensionForm({ months: "", note: "" });
+      fetchTenantData();
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.error || "Erstellen fehlgeschlagen.";
+      showNotification(errorMessage, "error");
+    } finally {
+      setIsExtending(false);
+    }
+  };
+
+  const handleDeleteExtension = async (extId: number) => {
+    setIsExtending(true);
+    try {
+      await apiClient.delete(`/api/department/department-extensions/${extId}/`);
+      showNotification("Verlängerung gelöscht.", "success");
+      fetchTenantData();
+    } catch (err: any) {
+      showNotification("Löschen fehlgeschlagen.", "error");
+    } finally {
+      setIsExtending(false);
     }
   };
 
@@ -197,7 +310,6 @@ const EditTenantPage: React.FC = () => {
         className="page-root"
       >
         <DashboardCard title={`Bewohner bearbeiten: ${tenant.name} ${tenant.surname}`}>
-          {/* Main Tenant Edit Form */}
           <Box component="form" onSubmit={handleUpdate} noValidate>
             <Typography variant="h6" gutterBottom>
               Persönliche Daten
@@ -293,10 +405,16 @@ const EditTenantPage: React.FC = () => {
               </Grid>
               <Grid size={{ xs: 12, sm: 4 }}>
                 <DatePicker
-                  label="Auszugsdatum"
+                  label="Auszugsdatum (Berechnet)"
                   value={dayjs(tenant.move_out)}
                   onChange={(d) => handleDateChange("move_out", d)}
-                  slotProps={{ textField: { fullWidth: true } }}
+                  slotProps={{ 
+                    textField: { 
+                      fullWidth: true, 
+                      helperText: "Wird automatisch berechnet. Für Änderungen nutzen Sie Verlängerungen oder Kündigung." 
+                    } 
+                  }}
+                  disabled
                 />
               </Grid>
               <Grid size={{ xs: 12, sm: 4 }}>
@@ -315,6 +433,16 @@ const EditTenantPage: React.FC = () => {
                   value={dayjs(tenant.probation_end)}
                   onChange={(d) => handleDateChange("probation_end", d)}
                   slotProps={{ textField: { fullWidth: true } }}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 4 }}>
+                 {/* Added Extension Count Field */}
+                 <TextField
+                  label="Verlängerungen"
+                  type="number"
+                  value={tenant.extension ?? 0}
+                  disabled
+                  fullWidth
                 />
               </Grid>
             </Grid>
@@ -389,6 +517,85 @@ const EditTenantPage: React.FC = () => {
           </Box>
         </DashboardCard>
 
+        {/* --- Department Extensions Section --- */}
+        <DashboardCard title="Verwaltungs Verlängerungen">
+          <Box sx={{ p: 2 }}>
+             {/* List existing extensions */}
+             {departmentExtensions.length > 0 ? (
+                <List dense>
+                  {departmentExtensions.map((ext) => (
+                    <ListItem
+                      key={ext.id}
+                      secondaryAction={
+                        <IconButton 
+                          edge="end" 
+                          aria-label="delete" 
+                          onClick={() => handleDeleteExtension(ext.id)}
+                          disabled={isExtending}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      }
+                      sx={{ borderBottom: '1px solid #eee' }}
+                    >
+                      <ListItemText
+                        primary={
+                          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                            <Chip 
+                              label={`${ext.months > 0 ? '+' : ''}${ext.months} Monat(e)`} 
+                              color={ext.months > 0 ? "success" : "warning"}
+                              size="small"
+                              variant="outlined"
+                            />
+                            <Typography variant="body2">{ext.note}</Typography>
+                          </Box>
+                        }
+                        secondary={`Erstellt am: ${dayjs(ext.created_at).format("DD.MM.YYYY")}`}
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+             ) : (
+               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                 Keine manuellen Verlängerungen vorhanden.
+               </Typography>
+             )}
+
+             <Divider sx={{ my: 2 }} />
+             
+             {/* Create new extension form */}
+             <Typography variant="subtitle2" gutterBottom>Neue Verlängerung hinzufügen</Typography>
+             <Box component="form" onSubmit={handleCreateExtension} sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+               <TextField
+                 label="Monate (+/-)"
+                 type="number"
+                 value={extensionForm.months}
+                 onChange={(e) => setExtensionForm(prev => ({ ...prev, months: e.target.value }))}
+                 required
+                 sx={{ width: 120 }}
+               />
+               <TextField
+                 label="Begründung / Notiz"
+                 value={extensionForm.note}
+                 onChange={(e) => setExtensionForm(prev => ({ ...prev, note: e.target.value }))}
+                 required
+                 fullWidth
+               />
+               <Button 
+                  type="submit" 
+                  variant="contained" 
+                  disabled={isExtending}
+                  startIcon={<AddIcon />}
+                  sx={{ whiteSpace: 'nowrap', mt: 0.5 }}
+                >
+                  Hinzufügen
+               </Button>
+             </Box>
+          </Box>
+        </DashboardCard>
+
+
+
         {/* Subtenants Section */}
         <DashboardCard title="Untermieter">
           {subtenants.length > 0 ? (
@@ -404,9 +611,32 @@ const EditTenantPage: React.FC = () => {
                 >
                   <ListItemText
                     primary={`${sub.name} ${sub.surname}`}
-                    secondary={`Untermieter vom ${dayjs(sub.move_in).format("DD.MM.YYYY")} bis ${dayjs(
-                      sub.move_out
-                    ).format("DD.MM.YYYY")}`}
+                    secondary={
+                      <Stack direction="column" spacing={0.5}>
+                        <Typography variant="body2" component="span">
+                           Untermieter vom {dayjs(sub.move_in).format("DD.MM.YYYY")} bis {dayjs(sub.move_out).format("DD.MM.YYYY")}
+                        </Typography>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                           {sub.university_confirmation ? (
+                             <Chip 
+                               icon={<CheckCircleOutlineIcon />} 
+                               label="Partner-Uni bestätigt" 
+                               color="success" 
+                               size="small" 
+                               variant="outlined" 
+                             />
+                           ) : (
+                             <Chip 
+                               icon={<HighlightOffIcon />} 
+                               label="Keine Bestätigung" 
+                               color="error" 
+                               size="small" 
+                               variant="outlined" 
+                             />
+                           )}
+                        </Stack>
+                      </Stack>
+                    }
                   />
                 </ListItem>
               ))}
@@ -480,26 +710,71 @@ const EditTenantPage: React.FC = () => {
           </Box>
         </DashboardCard>
 
-        {/* Termination Section */}
+                {/* --- Termination Section --- */}
         <DashboardCard title="Kündigen">
-          <Box component="form" onSubmit={handleTerminate} noValidate sx={{ p: 2 }}>
-            <Grid container spacing={2} alignItems="center">
-              <Grid size={{ xs: 12, sm: 10 }}>
-                <DatePicker
-                  label="Auszugsdatum"
-                  value={terminationDate}
-                  onChange={(date) => setTerminationDate(date)}
-                  slotProps={{ textField: { fullWidth: true, required: true } }}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 2 }}>
-                <Button type="submit" variant="contained" fullWidth disabled={isTerminating}>
-                  {isTerminating ? <CircularProgress size={24} /> : "Kündigen"}
-                </Button>
-              </Grid>
-            </Grid>
+          <Box sx={{ p: 2 }}>
+            {termination ? (
+              // View / Delete existing termination
+              <Alert 
+                severity="warning" 
+                action={
+                  <Button 
+                    color="inherit" 
+                    size="small" 
+                    onClick={handleRevokeTermination}
+                    disabled={isTerminating}
+                  >
+                    Kündigung aufheben
+                  </Button>
+                }
+              >
+                <Typography variant="subtitle1" fontWeight="bold">
+                  Vertrag gekündigt zum {dayjs(termination.date).format("DD.MM.YYYY")}
+                </Typography>
+                <Typography variant="body2">
+                  Grund: {termination.note || "Keine Notiz"}
+                </Typography>
+                <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+                  Erstellt am {dayjs(termination.created_at).format("DD.MM.YYYY HH:mm")}
+                </Typography>
+              </Alert>
+            ) : (
+              // Create new termination
+              <Box component="form" onSubmit={handleCreateTermination} noValidate>
+                 <Grid container spacing={2} alignItems="center">
+                  <Grid size={{ xs: 12, sm: 4 }}>
+                    <DatePicker
+                      label="Auszugsdatum (Vertragsende)"
+                      value={terminationForm.date}
+                      onChange={(date) => setTerminationForm((prev) => ({ ...prev, date }))}
+                      slotProps={{ textField: { fullWidth: true, required: true } }}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      label="Kündigungsgrund / Notiz"
+                      value={terminationForm.note}
+                      onChange={(e) => setTerminationForm((prev) => ({ ...prev, note: e.target.value }))}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 2 }}>
+                    <Button 
+                      type="submit" 
+                      variant="contained" 
+                      color="error" 
+                      fullWidth 
+                      disabled={isTerminating}
+                    >
+                      {isTerminating ? <CircularProgress size={24} /> : "Kündigen"}
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Box>
+            )}
           </Box>
         </DashboardCard>
+
       </Box>
 
       {/* Delete Confirmation Dialog */}

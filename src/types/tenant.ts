@@ -129,6 +129,7 @@ export interface Subtenant {
   name: string;
   surname: string;
   email: string;
+  university_confirmation: boolean;
   move_in: string; // move_in date for subtenant is a typo from the original code, should be move_in
   move_out: string;
 }
@@ -217,4 +218,18 @@ export interface EngagementOverviewGroup {
   department_name: string;
   department_full_name: string;
   engagements: AdminEngagement[];
+}
+
+export interface Termination {
+  tenant: number;
+  date: string;
+  note: string;
+  created_at: string;
+}
+
+export interface DepartmentExtension {
+  id: number;
+  months: number;
+  note: string;
+  created_at: string;
 }
