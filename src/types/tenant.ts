@@ -233,3 +233,43 @@ export interface DepartmentExtension {
   note: string;
   created_at: string;
 }
+
+export interface ContractCalculation {
+  move_in_date: string;
+  base_contract: {
+    duration_days: number;
+    projected_end: string;
+  };
+  standard_extensions: {
+    count: number;
+    days_per_extension: number;
+    total_added_days: number;
+  };
+  subtenancies: {
+    total_added_days: number;
+    count: number;
+    details: Array<{
+      start: string;
+      end: string;
+      days: number;
+    }>;
+  };
+  department_extensions: {
+    total_months: number;
+    details: Array<{
+      months: number;
+      note: string | null;
+      created_at: string;
+    }>;
+  };
+  calculation_steps: {
+    raw_date_before_snap: string;
+    calculated_end_of_month: string;
+  };
+  termination: {
+    is_active: boolean;
+    date: string | null;
+    note: string | null;
+  };
+  final_move_out_date: string;
+}

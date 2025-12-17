@@ -8,6 +8,7 @@ import {
   EngagementCreatePayload,
   TenantOverview,
   EngagementOverviewGroup,
+  ContractCalculation
 } from "../types/tenant";
 
 export const fetchGlobalSettings = async (): Promise<GlobalAppSettings> => {
@@ -116,5 +117,10 @@ export const heimratCreateApplication = async (formData: FormData): Promise<{ me
       "Content-Type": "multipart/form-data",
     },
   });
+  return response.data;
+};
+
+export const fetchContractCalculation = async (): Promise<ContractCalculation> => {
+  const response = await apiClient.get<ContractCalculation>("/api/tenants/my-contract-calculation");
   return response.data;
 };
