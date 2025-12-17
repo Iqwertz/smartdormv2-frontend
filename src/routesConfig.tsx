@@ -19,6 +19,7 @@ import {
   GroupWorkOutlined,
   LanOutlined,
   PersonAdd,
+  Print,
 } from "@mui/icons-material";
 import { ALL_FLOORS, ATTENDANCE_LINK_ROUTE } from "./config";
 
@@ -85,6 +86,15 @@ export const appRoutes: AppRouteItem[] = [
     element: <Pages.ViewApplicationsPage />,
     requiredGroups: [], // All authenticated users can view if enabled
     sidebar: false,
+  },
+  {
+    id: "print",
+    path: "/print",
+    element: <Pages.PrintPage />,
+    title: "Drucken",
+    icon: <Print />,
+    requiredGroups: ["tenant", "ADMIN"],
+    sidebar: true,
   },
   ////////////////////////////////////////////////////////////
   // Department Specific Routes:
