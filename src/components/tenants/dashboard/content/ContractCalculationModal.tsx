@@ -70,7 +70,7 @@ const ContractCalculationModal: React.FC<ContractCalculationModalProps> = ({ ope
     const years = days / 365;
     // Show integer if exact (3), else 1 decimal (3.5)
     const display = years % 1 === 0 ? years : years.toFixed(1);
-    return `${display} ${parseFloat(display) === 1 ? "Jahr" : "Jahre"}`;
+    return `${display} ${parseFloat(display.toString()) === 1 ? "Jahr" : "Jahre"}`;
   };
 
   // Converts days to months (e.g. 60 days -> 2 Monate)
