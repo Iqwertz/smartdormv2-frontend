@@ -175,6 +175,15 @@ export const appRoutes: AppRouteItem[] = [
     requiredGroups: ["VERWALTUNG", "ADMIN"],
     sidebar: true,
   },
+  {
+    id: "printing-admin",
+    path: "/department/printing",
+    element: <Pages.PrintingAdminPage />,
+    title: "Drucker",
+    icon: <Print />,
+    requiredGroups: ["VERWALTUNG", "ADMIN"],
+    sidebar: true,
+  },
   ////////////////////////////////////////////////////////////
   // Engagement Specific Routes:
   ////////////////////////////////////////////////////////////

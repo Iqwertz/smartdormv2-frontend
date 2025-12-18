@@ -69,14 +69,23 @@ export const endSession = async (sessionId: string): Promise<PrintSession> => {
 };
 
 /**
- * Submit a print job (file upload)
+ * Submit a print job (file upload with options)
  */
 export const submitPrintJob = async (
   sessionId: string,
-  file: File
+  file: File,
+  options?: { color_mode?: string; copies?: number }
 ): Promise<PrintJob> => {
   const formData = new FormData();
   formData.append("file", file);
+  if (options) {
+    if (options.color_mode) {
+      formData.append("color_mode", options.color_mode);
+    }
+    if (options.copies) {
+      formData.append("copies", options.copies.toString());
+    }
+  }
 
   const response = await apiClient.post<PrintJob>(
     `/api/tenants/printing/sessions/${sessionId}/print/`,
@@ -131,6 +140,164 @@ export const startScan = async (
     `/api/tenants/printing/sessions/${sessionId}/scan/start/`,
     options || {}
   );
+  return response.data;
+};
+
+// ============================================================================
+// Admin Endpoints (for department management)
+// ============================================================================
+
+export interface DeviceOverview {
+  device: {
+    id: number;
+    name: string;
+    location: string;
+    is_active: boolean;
+    allow_new_sessions: boolean;
+    price_per_page_color: string;
+    price_per_page_gray: string;
+    max_session_duration_minutes: number;
+    cups_printer_name: string;
+  };
+  active_session: {
+    session_id: string;
+    tenant_name: string;
+    started_at: string;
+  } | null;
+  statistics: {
+    total_sessions: number;
+    active_sessions: number;
+    total_jobs: number;
+    total_pages: number;
+    total_revenue: string;
+    this_month_pages: number;
+    this_month_revenue: string;
+  };
+}
+
+export interface DeviceStatistics {
+  device_id: number;
+  device_name: string;
+  period: {
+    start_date: string | null;
+    end_date: string | null;
+  };
+  sessions: {
+    total: number;
+    completed: number;
+    expired: number;
+    terminated: number;
+  };
+  jobs: {
+    total: number;
+    completed: number;
+    failed: number;
+    cancelled: number;
+    total_pages: number;
+    total_revenue: string;
+  };
+}
+
+export interface DeviceHistory {
+  sessions: PrintSession[];
+  jobs: PrintJob[];
+}
+
+/**
+ * Get device overview for admin
+ */
+export const fetchDeviceOverview = async (deviceId: number): Promise<DeviceOverview> => {
+  const response = await apiClient.get<DeviceOverview>(`/api/printing/device/${deviceId}/overview/`);
+  return response.data;
+};
+
+/**
+ * Get device statistics
+ */
+export const fetchDeviceStatistics = async (
+  deviceId: number,
+  startDate?: string,
+  endDate?: string
+): Promise<DeviceStatistics> => {
+  const params: any = {};
+  if (startDate) params.start_date = startDate;
+  if (endDate) params.end_date = endDate;
+  const response = await apiClient.get<DeviceStatistics>(`/api/printing/device/${deviceId}/statistics/`, {
+    params,
+  });
+  return response.data;
+};
+
+/**
+ * Update device settings
+ */
+export const updateDeviceSettings = async (
+  deviceId: number,
+  settings: { price_per_page_color?: string; price_per_page_gray?: string; max_session_duration_minutes?: number }
+): Promise<any> => {
+  const response = await apiClient.put(`/api/printing/device/${deviceId}/settings/`, settings);
+  return response.data;
+};
+
+/**
+ * Toggle device active/inactive
+ */
+export const toggleDeviceActive = async (deviceId: number): Promise<any> => {
+  const response = await apiClient.post(`/api/printing/device/${deviceId}/toggle-active/`);
+  return response.data;
+};
+
+/**
+ * Toggle allow new sessions
+ */
+export const toggleDeviceSessions = async (deviceId: number): Promise<any> => {
+  const response = await apiClient.post(`/api/printing/device/${deviceId}/toggle-sessions/`);
+  return response.data;
+};
+
+/**
+ * Terminate active session
+ */
+export const terminateDeviceSession = async (deviceId: number): Promise<PrintSession> => {
+  const response = await apiClient.post<PrintSession>(`/api/printing/device/${deviceId}/terminate-session/`);
+  return response.data;
+};
+
+/**
+ * Get device history
+ */
+export const fetchDeviceHistory = async (
+  deviceId: number,
+  startDate?: string,
+  endDate?: string,
+  status?: string
+): Promise<DeviceHistory> => {
+  const params: any = {};
+  if (startDate) params.start_date = startDate;
+  if (endDate) params.end_date = endDate;
+  if (status) params.status = status;
+  const response = await apiClient.get<DeviceHistory>(`/api/printing/device/${deviceId}/history/`, {
+    params,
+  });
+  return response.data;
+};
+
+// Tenant Billing Overview
+export interface TenantBillingOverview {
+  tenant_id: number;
+  tenant_name: string;
+  surname: string;
+  name: string;
+  email: string;
+  current_room: string;
+  total_cost: string;
+  total_pages: number;
+  total_jobs: number;
+  total_sessions: number;
+}
+
+export const fetchTenantBillingOverview = async (): Promise<TenantBillingOverview[]> => {
+  const response = await apiClient.get(`/api/printing/tenant-billing-overview/`);
   return response.data;
 };
 

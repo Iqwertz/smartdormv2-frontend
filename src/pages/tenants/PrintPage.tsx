@@ -13,6 +13,12 @@ import {
   ListItemText,
   IconButton,
   LinearProgress,
+  TextField,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  FormControl,
+  FormLabel,
 } from "@mui/material";
 import DashboardCard from "../../components/shared/DashboardCard";
 import "../../styles/bento-layout.scss";
@@ -53,6 +59,9 @@ const PrintPage: React.FC = () => {
   const [uploading, setUploading] = useState<boolean>(false);
   const [scanning, setScanning] = useState<boolean>(false);
   const [sessionTimeLeft, setSessionTimeLeft] = useState<number | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [colorMode, setColorMode] = useState<string>("Color");
+  const [copies, setCopies] = useState<number>(1);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { showNotification } = useNotification();
@@ -183,30 +192,54 @@ const PrintPage: React.FC = () => {
     }
   };
 
-  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file || !activeSession) return;
+    if (!file) return;
 
     // Validate file type
     if (file.type !== "application/pdf") {
       showNotification("Nur PDF-Dateien werden unterstützt.", "error");
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
       return;
     }
 
+    // Store file for configuration
+    setSelectedFile(file);
+    
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handlePrintSubmit = async () => {
+    if (!selectedFile || !activeSession) return;
+
     setUploading(true);
     try {
-      await submitPrintJob(activeSession.external_id, file);
+      await submitPrintJob(activeSession.external_id, selectedFile, {
+        color_mode: colorMode,
+        copies: copies,
+      });
       showNotification("Druckauftrag erfolgreich gesendet!", "success");
+      setSelectedFile(null);
+      setColorMode("Color");
+      setCopies(1);
       await loadData();
     } catch (error: any) {
       const errorMessage = error.response?.data?.error || "Fehler beim Senden des Druckauftrags.";
       showNotification(errorMessage, "error");
     } finally {
       setUploading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
     }
+  };
+
+  const handleClearFile = () => {
+    setSelectedFile(null);
+    setColorMode("Color");
+    setCopies(1);
   };
 
   const handleDownloadScan = async (scan: Scan) => {
@@ -316,7 +349,7 @@ const PrintPage: React.FC = () => {
                   sx={{ mr: 1 }}
                 />
                 <Chip
-                  label={`${deviceStatus.price_per_page} €/Seite`}
+                  label={`${deviceStatus.price_per_page_color} €/Seite (Farbe) / ${deviceStatus.price_per_page_gray} €/Seite (SW)`}
                   variant="outlined"
                   size="small"
                 />
@@ -415,9 +448,18 @@ const PrintPage: React.FC = () => {
                         </Box>
                       }
                       secondary={
-                        session.ended_at
-                          ? `Beendet: ${dayjs(session.ended_at).format("HH:mm")}`
-                          : "Aktiv"
+                        <Box>
+                          <Typography variant="body2">
+                            {session.ended_at
+                              ? `Beendet: ${dayjs(session.ended_at).format("HH:mm")}`
+                              : "Aktiv"}
+                          </Typography>
+                          {session.total_cost && parseFloat(session.total_cost) > 0 && (
+                            <Typography variant="caption" color="text.secondary">
+                              Kosten: {parseFloat(session.total_cost).toFixed(2)} €
+                            </Typography>
+                          )}
+                        </Box>
                       }
                     />
                   </ListItem>
@@ -489,19 +531,73 @@ const PrintPage: React.FC = () => {
                     onChange={handleFileSelect}
                     style={{ display: "none" }}
                   />
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    startIcon={<PrintIcon />}
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploading || sessionTimeLeft === 0}
-                    sx={{ mb: 2 }}
-                  >
-                    {uploading ? "Druckt..." : "PDF hochladen & drucken"}
-                  </Button>
-                  <Typography variant="caption" color="text.secondary">
-                    Nur PDF-Dateien werden unterstützt.
-                  </Typography>
+                  {!selectedFile ? (
+                    <>
+                      <Button
+                        variant="contained"
+                        fullWidth
+                        startIcon={<PrintIcon />}
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={sessionTimeLeft === 0}
+                        sx={{ mb: 2 }}
+                      >
+                        PDF auswählen
+                      </Button>
+                      <Typography variant="caption" color="text.secondary">
+                        Nur PDF-Dateien werden unterstützt.
+                      </Typography>
+                    </>
+                  ) : (
+                    <>
+                      <Box sx={{ mb: 2, p: 2, bgcolor: "background.paper", borderRadius: 1, border: "1px solid", borderColor: "divider" }}>
+                        <Typography variant="body2" gutterBottom>
+                          <strong>Ausgewählte Datei:</strong> {selectedFile.name}
+                        </Typography>
+                        
+                        <FormControl component="fieldset" sx={{ mt: 2, mb: 2, width: "100%" }}>
+                          <FormLabel component="legend">Farbmodus</FormLabel>
+                          <RadioGroup
+                            row
+                            value={colorMode}
+                            onChange={(e) => setColorMode(e.target.value)}
+                          >
+                            <FormControlLabel value="Color" control={<Radio />} label="Farbe" />
+                            <FormControlLabel value="Gray" control={<Radio />} label="Schwarz-Weiß" />
+                          </RadioGroup>
+                        </FormControl>
+
+                        <TextField
+                          label="Anzahl Kopien"
+                          type="number"
+                          value={copies}
+                          onChange={(e) => setCopies(parseInt(e.target.value) || 1)}
+                          inputProps={{ min: 1, max: 10 }}
+                          fullWidth
+                          size="small"
+                          sx={{ mb: 2 }}
+                        />
+
+                        <Box sx={{ display: "flex", gap: 1 }}>
+                          <Button
+                            variant="contained"
+                            fullWidth
+                            startIcon={<PrintIcon />}
+                            onClick={handlePrintSubmit}
+                            disabled={uploading || sessionTimeLeft === 0}
+                          >
+                            {uploading ? "Druckt..." : "Drucken"}
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            onClick={handleClearFile}
+                            disabled={uploading}
+                          >
+                            Abbrechen
+                          </Button>
+                        </Box>
+                      </Box>
+                    </>
+                  )}
                 </Box>
               </DashboardCard>
 

@@ -4,7 +4,8 @@ export interface DeviceStatus {
   location: string;
   is_active: boolean;
   allow_new_sessions: boolean;
-  price_per_page: string;
+  price_per_page_color: string;
+  price_per_page_gray: string;
   active_session: {
     session_id: string;
     tenant_name: string;
@@ -33,6 +34,7 @@ export interface PrintSession {
   started_at: string;
   ended_at: string | null;
   status: "ACTIVE" | "COMPLETED" | "EXPIRED" | "TERMINATED";
+  total_cost?: string;
 }
 
 export interface PrintSessionDetail extends PrintSession {
@@ -48,6 +50,7 @@ export interface PrintJob {
   tenant_name: string;
   device: number;
   filename: string;
+  color_mode: "Color" | "Gray";
   pages: number | null;
   cost: string | null;
   status: "PENDING" | "PRINTING" | "COMPLETED" | "FAILED" | "CANCELLED";
