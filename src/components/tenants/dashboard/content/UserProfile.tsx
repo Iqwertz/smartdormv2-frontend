@@ -1,9 +1,11 @@
 // src/components/dashboard/content/UserProfile.tsx
 import React, { useEffect, useState } from "react";
-import { Box, Typography, TextField, CircularProgress, Alert } from "@mui/material";
+import { Box, Typography, TextField, CircularProgress, Alert, InputAdornment, IconButton } from "@mui/material";
 import apiClient from "../../../../services/api";
 import { useAuth } from "../../../../context/AuthContext";
 import { TenantProfile } from "../../../../types/tenant";
+import ContractCalculationModal from "./ContractCalculationModal";
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 const fieldWidths = {
   name: "130px",
@@ -30,6 +32,7 @@ const UserProfile: React.FC = () => {
   const [tenantData, setTenantData] = useState<TenantProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [calcModalOpen, setCalcModalOpen] = useState(false);
 
   useEffect(() => {
     if (authState.isAuthenticated && authState.user) {
@@ -254,19 +257,35 @@ const UserProfile: React.FC = () => {
           "& .MuiInputBase-input": { fontSize: "0.9rem" },
         }}
       />
-      <TextField
+            <TextField
         label="Auszug"
-        type="date"
-        value={tenantData.move_out || ""}
+        // Remove type="date" to allow InputAdornment to render cleanly 
+        // or keep it but ensure the date string is formatted YYYY-MM-DD
+        value={tenantData.move_out ? new Date(tenantData.move_out).toLocaleDateString("de-DE") : ""}
         disabled
         variant="standard"
         size="small"
         sx={{
-          minWidth: fieldWidths.move_out,
+          minWidth: "140px", // Increased width slightly to fit icon
           flex: "1 1 auto",
           maxWidth: "100%",
           "& .MuiInputLabel-root": { fontSize: "0.9rem" },
-          "& .MuiInputBase-input": { fontSize: "0.9rem" },
+          "& .MuiInputBase-input": { fontSize: "0.9rem", color: 'text.primary', opacity: 1, WebkitTextFillColor: 'unset' },
+          "& .MuiInputBase-root.Mui-disabled": { color: 'text.primary' } // Make text readable
+        }}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton 
+                size="small" 
+                onClick={() => setCalcModalOpen(true)}
+                title="Berechnung anzeigen"
+                color="primary"
+              >
+                <InfoOutlinedIcon fontSize="small" />
+              </IconButton>
+            </InputAdornment>
+          ),
         }}
       />
       <TextField
@@ -328,6 +347,11 @@ const UserProfile: React.FC = () => {
           "& .MuiInputBase-input": { fontSize: "0.9rem" },
         }}
       />
+            <ContractCalculationModal 
+        open={calcModalOpen} 
+        onClose={() => setCalcModalOpen(false)} 
+      />
+
     </Box>
   );
 };
