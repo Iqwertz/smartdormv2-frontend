@@ -15,7 +15,7 @@ export const getPointsRequiredForExtension = (extensionNumber: number): number =
   // For any extension beyond the 5th, add 50 points per level
   const base = POINT_THRESHOLDS[POINT_THRESHOLDS.length - 1];
   const extraLevels = extensionNumber - POINT_THRESHOLDS.length;
-  return base + (extraLevels * POINTS_PER_EXTRA_LEVEL);
+  return base + extraLevels * POINTS_PER_EXTRA_LEVEL;
 };
 
 /**
@@ -23,7 +23,7 @@ export const getPointsRequiredForExtension = (extensionNumber: number): number =
  */
 export const calculateExtensionStatus = (currentPoints: number) => {
   let securedExtensions = 0;
-  
+
   // Check against predefined thresholds
   while (currentPoints >= getPointsRequiredForExtension(securedExtensions + 1)) {
     securedExtensions++;
@@ -32,7 +32,7 @@ export const calculateExtensionStatus = (currentPoints: number) => {
   const nextExtension = securedExtensions + 1;
   const pointsRequired = getPointsRequiredForExtension(nextExtension);
   const prevThreshold = getPointsRequiredForExtension(securedExtensions); // 0 if none
-  
+
   // Calculate progress percentage for the current level
   const pointsInLevel = currentPoints - prevThreshold;
   const rangeInLevel = pointsRequired - prevThreshold;
@@ -43,19 +43,19 @@ export const calculateExtensionStatus = (currentPoints: number) => {
     nextExtension,
     pointsRequired,
     missingPoints: pointsRequired - currentPoints,
-    progress
+    progress,
   };
 };
 
 /**
  * Calculates the deadline date by which the points for a specific extension must be collected.
- * Logic: 
- * 1. Ext: MoveIn + 2y 9m
- * 2. Ext: MoveIn + 3y 9m
- * n. Ext: MoveIn + (n+1)y + 9m
+ * Logic:
+ * 1. Ext: MoveIn + sublets + 2y 9m
+ * 2. Ext: MoveIn + sublets + 3y 9m
+ * n. Ext: MoveIn + sublets + (n+1)y + 9m
  */
-export const getExtensionDeadline = (moveInDate: string, extensionNumber: number): string => {
+export const getExtensionDeadline = (moveInDate: string, sublets: number, extensionNumber: number): string => {
   const moveIn = dayjs(moveInDate);
   const yearsToAdd = extensionNumber + 1;
-  return moveIn.add(yearsToAdd, 'year').add(9, 'month').format('YYYY-MM-DD');
+  return moveIn.add(sublets, "month").add(yearsToAdd, "year").add(9, "month").format("YYYY-MM-DD");
 };

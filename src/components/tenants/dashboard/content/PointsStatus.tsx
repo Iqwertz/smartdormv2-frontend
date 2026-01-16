@@ -9,50 +9,44 @@ import {
   Step,
   Stepper,
   StepLabel,
-  Tooltip,
   useTheme,
   useMediaQuery,
-  Chip,
 } from "@mui/material";
-import {
-  AutoAwesome,
-  AccessTime,
-  TrendingUp,
-  CheckCircle,
-} from "@mui/icons-material";
+import { AutoAwesome, AccessTime, TrendingUp, CheckCircle } from "@mui/icons-material";
 import apiClient from "../../../../services/api";
-import { TenantProfile } from "../../../../types/tenant";
-import {
-  calculateExtensionStatus,
-  getExtensionDeadline,
-} from "../../../../utils/extensionLogic";
+import { ContractCalculation, TenantProfile } from "../../../../types/tenant";
+import { calculateExtensionStatus, getExtensionDeadline } from "../../../../utils/extensionLogic";
+import { fetchContractCalculation } from "../../../../services/engagementService";
 import dayjs from "dayjs";
 import DashboardCard from "../../../shared/DashboardCard";
 
 const PointsStatus: React.FC = () => {
   const [profile, setProfile] = useState<TenantProfile | null>(null);
+  const [contractCalculation, setContractCalculation] = useState<ContractCalculation | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
-    apiClient
-      .get<TenantProfile>("/api/tenants/profile-data")
-      .then((res) => setProfile(res.data))
-      .catch(() => setError("Punkte konnten nicht geladen werden."))
+    Promise.all([apiClient.get<TenantProfile>("/api/tenants/profile-data"), fetchContractCalculation()])
+      .then(([profileRes, calculationRes]) => {
+        setProfile(profileRes.data);
+        setContractCalculation(calculationRes);
+      })
+      .catch(() => setError("Daten konnten nicht geladen werden."))
       .finally(() => setLoading(false));
   }, []);
 
   if (loading) return <CircularProgress />;
   if (error) return <Alert severity="error">{error}</Alert>;
-  if (!profile) return null;
+  if (!profile || !contractCalculation) return null;
 
   const currentPoints = profile.current_points || 0;
   const status = calculateExtensionStatus(currentPoints);
-  const nextDeadline = getExtensionDeadline(profile.move_in, status.nextExtension);
+  const nextDeadline = getExtensionDeadline(profile.move_in, contractCalculation.subtenancies, status.nextExtension);
   const formattedDeadline = dayjs(nextDeadline).format("DD.MM.YYYY");
-  const isDeadlineClose = dayjs(nextDeadline).diff(dayjs(), 'month') < 3;
+  const isDeadlineClose = dayjs(nextDeadline).diff(dayjs(), "month") < 3;
 
   return (
     <DashboardCard title="Wohnzeit & Punkte">
@@ -103,7 +97,7 @@ const PointsStatus: React.FC = () => {
               {status.missingPoints} Punkte fehlen
             </Typography>
           </Box>
-          
+
           <Box position="relative" display="inline-flex" width="100%">
             <LinearProgress
               variant="determinate"
@@ -120,7 +114,7 @@ const PointsStatus: React.FC = () => {
               }}
             />
           </Box>
-          
+
           <Box display="flex" justifyContent="space-between" mt={0.5}>
             <Typography variant="caption" color="text.secondary">
               {currentPoints}
@@ -153,14 +147,14 @@ const PointsStatus: React.FC = () => {
           >
             {isDeadlineClose ? <AccessTime color="warning" /> : <TrendingUp color="primary" />}
           </Box>
-          
+
           <Box>
             <Typography variant="subtitle2" fontWeight="bold">
               Deadline: {formattedDeadline}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Bis zu diesem Datum benötigst du <strong>{status.pointsRequired} Punkte</strong>, 
-              um die {status.nextExtension}. Verlängerung zu erhalten.
+              Bis zu diesem Datum benötigst du <strong>{status.pointsRequired} Punkte</strong>, um die{" "}
+              {status.nextExtension}. Verlängerung zu erhalten.
             </Typography>
           </Box>
         </Box>
@@ -170,12 +164,16 @@ const PointsStatus: React.FC = () => {
           <Box sx={{ mt: 3 }}>
             <Stepper alternativeLabel activeStep={status.securedExtensions}>
               {[1, 2, 3, 4, 5].map((level) => {
-                 const pts = level <= 5 ? [50, 150, 250, 300, 350][level-1] : "";
-                 return (
+                const pts = level <= 5 ? [50, 150, 250, 300, 350][level - 1] : "";
+                return (
                   <Step key={level}>
                     <StepLabel>
-                      <Typography variant="caption" display="block">{level}. Verl.</Typography>
-                      <Typography variant="caption" fontWeight="bold">{pts} Pkt.</Typography>
+                      <Typography variant="caption" display="block">
+                        {level}. Verl.
+                      </Typography>
+                      <Typography variant="caption" fontWeight="bold">
+                        {pts} Pkt.
+                      </Typography>
                     </StepLabel>
                   </Step>
                 );
