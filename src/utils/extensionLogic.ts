@@ -59,3 +59,36 @@ export const getExtensionDeadline = (moveInDate: string, sublets: number, extens
   const yearsToAdd = extensionNumber + 1;
   return moveIn.add(sublets, "month").add(yearsToAdd, "year").add(9, "month").format("YYYY-MM-DD");
 };
+
+// --- Converters ---
+
+// Converts days to years (e.g. 1095 days -> 3 Jahre)
+export const formatDaysToYearsString = (days: number): string => {
+  if (days === 0) return "0 Jahre";
+  const years = days / 365;
+  // Show integer if exact (3), else 1 decimal (3.5)
+  const display = years % 1 === 0 ? years : years.toFixed(1);
+  return `${display} ${parseFloat(display.toString()) === 1 ? "Jahr" : "Jahre"}`;
+};
+
+export const formatDaysToYears = (days: number): number => {
+  const years = days / 365;
+  // Show integer if exact (3), else 1 decimal (3.5)
+  const display = years % 1 === 0 ? years : years.toFixed(1);
+  return parseFloat(display.toString());
+};
+
+// Converts days to months (e.g. 60 days -> 2 Monate)
+export const formatDaysToMonthsString = (days: number): string => {
+  if (days === 0) return "0 Monate";
+  // Average days in a month including leap years
+  const months = Math.round(days / 30.44);
+  return ` ${months} ${months === 1 ? "Monat" : "Monate"}`;
+};
+
+export const formatDaysToMonths = (days: number): number => {
+  if (days === 0) return 0;
+  // Average days in a month including leap years
+  const months = Math.round(days / 30.44);
+  return months;
+};

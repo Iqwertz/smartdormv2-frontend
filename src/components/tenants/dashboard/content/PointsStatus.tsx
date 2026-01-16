@@ -15,7 +15,7 @@ import {
 import { AutoAwesome, AccessTime, TrendingUp, CheckCircle } from "@mui/icons-material";
 import apiClient from "../../../../services/api";
 import { ContractCalculation, TenantProfile } from "../../../../types/tenant";
-import { calculateExtensionStatus, getExtensionDeadline } from "../../../../utils/extensionLogic";
+import { calculateExtensionStatus, getExtensionDeadline, formatDaysToMonths } from "../../../../utils/extensionLogic";
 import { fetchContractCalculation } from "../../../../services/engagementService";
 import dayjs from "dayjs";
 import DashboardCard from "../../../shared/DashboardCard";
@@ -44,7 +44,11 @@ const PointsStatus: React.FC = () => {
 
   const currentPoints = profile.current_points || 0;
   const status = calculateExtensionStatus(currentPoints);
-  const nextDeadline = getExtensionDeadline(profile.move_in, contractCalculation.subtenancies, status.nextExtension);
+  const nextDeadline = getExtensionDeadline(
+    profile.move_in,
+    formatDaysToMonths(contractCalculation.subtenancies.total_added_days),
+    status.nextExtension
+  );
   const formattedDeadline = dayjs(nextDeadline).format("DD.MM.YYYY");
   const isDeadlineClose = dayjs(nextDeadline).diff(dayjs(), "month") < 3;
 
