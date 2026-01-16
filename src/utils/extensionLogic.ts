@@ -15,7 +15,7 @@ export const getPointsRequiredForExtension = (extensionNumber: number): number =
   // For any extension beyond the 5th, add 50 points per level
   const base = POINT_THRESHOLDS[POINT_THRESHOLDS.length - 1];
   const extraLevels = extensionNumber - POINT_THRESHOLDS.length;
-  return base + (extraLevels * POINTS_PER_EXTRA_LEVEL);
+  return base + extraLevels * POINTS_PER_EXTRA_LEVEL;
 };
 
 /**
@@ -23,7 +23,7 @@ export const getPointsRequiredForExtension = (extensionNumber: number): number =
  */
 export const calculateExtensionStatus = (currentPoints: number) => {
   let securedExtensions = 0;
-  
+
   // Check against predefined thresholds
   while (currentPoints >= getPointsRequiredForExtension(securedExtensions + 1)) {
     securedExtensions++;
@@ -32,7 +32,7 @@ export const calculateExtensionStatus = (currentPoints: number) => {
   const nextExtension = securedExtensions + 1;
   const pointsRequired = getPointsRequiredForExtension(nextExtension);
   const prevThreshold = getPointsRequiredForExtension(securedExtensions); // 0 if none
-  
+
   // Calculate progress percentage for the current level
   const pointsInLevel = currentPoints - prevThreshold;
   const rangeInLevel = pointsRequired - prevThreshold;
@@ -43,19 +43,52 @@ export const calculateExtensionStatus = (currentPoints: number) => {
     nextExtension,
     pointsRequired,
     missingPoints: pointsRequired - currentPoints,
-    progress
+    progress,
   };
 };
 
 /**
  * Calculates the deadline date by which the points for a specific extension must be collected.
- * Logic: 
- * 1. Ext: MoveIn + 2y 9m
- * 2. Ext: MoveIn + 3y 9m
- * n. Ext: MoveIn + (n+1)y + 9m
+ * Logic:
+ * 1. Ext: MoveIn + sublets + 2y 9m
+ * 2. Ext: MoveIn + sublets + 3y 9m
+ * n. Ext: MoveIn + sublets + (n+1)y + 9m
  */
-export const getExtensionDeadline = (moveInDate: string, extensionNumber: number): string => {
+export const getExtensionDeadline = (moveInDate: string, sublets: number, extensionNumber: number): string => {
   const moveIn = dayjs(moveInDate);
   const yearsToAdd = extensionNumber + 1;
-  return moveIn.add(yearsToAdd, 'year').add(9, 'month').format('YYYY-MM-DD');
+  return moveIn.add(sublets, "month").add(yearsToAdd, "year").add(9, "month").format("YYYY-MM-DD");
+};
+
+// --- Converters ---
+
+// Converts days to years (e.g. 1095 days -> 3 Jahre)
+export const formatDaysToYearsString = (days: number): string => {
+  if (days === 0) return "0 Jahre";
+  const years = days / 365;
+  // Show integer if exact (3), else 1 decimal (3.5)
+  const display = years % 1 === 0 ? years : years.toFixed(1);
+  return `${display} ${parseFloat(display.toString()) === 1 ? "Jahr" : "Jahre"}`;
+};
+
+export const formatDaysToYears = (days: number): number => {
+  const years = days / 365;
+  // Show integer if exact (3), else 1 decimal (3.5)
+  const display = years % 1 === 0 ? years : years.toFixed(1);
+  return parseFloat(display.toString());
+};
+
+// Converts days to months (e.g. 60 days -> 2 Monate)
+export const formatDaysToMonthsString = (days: number): string => {
+  if (days === 0) return "0 Monate";
+  // Average days in a month including leap years
+  const months = Math.round(days / 30.44);
+  return ` ${months} ${months === 1 ? "Monat" : "Monate"}`;
+};
+
+export const formatDaysToMonths = (days: number): number => {
+  if (days === 0) return 0;
+  // Average days in a month including leap years
+  const months = Math.round(days / 30.44);
+  return months;
 };

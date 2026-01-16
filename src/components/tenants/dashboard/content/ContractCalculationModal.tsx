@@ -25,7 +25,6 @@ import {
   AddCircleOutline,
   DateRange,
   EventBusy,
-  CheckCircle,
   ExpandMore,
   Calculate,
   Apartment,
@@ -36,6 +35,7 @@ import {
 import dayjs from "dayjs";
 import { fetchContractCalculation } from "../../../../services/engagementService";
 import { ContractCalculation } from "../../../../types/tenant";
+import { formatDaysToMonthsString, formatDaysToYearsString } from "../../../../utils/extensionLogic";
 
 interface ContractCalculationModalProps {
   open: boolean;
@@ -61,25 +61,6 @@ const ContractCalculationModal: React.FC<ContractCalculationModalProps> = ({ ope
   }, [open]);
 
   const formatDate = (date: string | null) => (date ? dayjs(date).format("DD.MM.YYYY") : "N/A");
-
-  // --- Converters ---
-
-  // Converts days to years (e.g. 1095 days -> 3 Jahre)
-  const formatDaysToYears = (days: number): string => {
-    if (days === 0) return "0 Jahre";
-    const years = days / 365;
-    // Show integer if exact (3), else 1 decimal (3.5)
-    const display = years % 1 === 0 ? years : years.toFixed(1);
-    return `${display} ${parseFloat(display.toString()) === 1 ? "Jahr" : "Jahre"}`;
-  };
-
-  // Converts days to months (e.g. 60 days -> 2 Monate)
-  const formatDaysToMonths = (days: number): string => {
-    if (days === 0) return "0 Monate";
-    // Average days in a month including leap years
-    const months = Math.round(days / 30.44);
-    return ` ${months} ${months === 1 ? "Monat" : "Monate"}`;
-  };
 
   // --- Layout Component ---
 
@@ -112,7 +93,7 @@ const ContractCalculationModal: React.FC<ContractCalculationModalProps> = ({ ope
       >
         {icon}
       </ListItemIcon>
-      
+
       {/* Flex container for the content to handle spacing properly */}
       <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%", gap: 1 }}>
         {/* Left Side: Title and Details */}
@@ -127,12 +108,22 @@ const ContractCalculationModal: React.FC<ContractCalculationModalProps> = ({ ope
           {(subValue || detail) && (
             <Box sx={{ mt: 0.5 }}>
               {subValue && (
-                <Typography variant="caption" display="block" color={isTotal ? "inherit" : "text.secondary"} sx={{ lineHeight: 1.2 }}>
+                <Typography
+                  variant="caption"
+                  display="block"
+                  color={isTotal ? "inherit" : "text.secondary"}
+                  sx={{ lineHeight: 1.2 }}
+                >
                   ({subValue})
                 </Typography>
               )}
               {detail && (
-                <Typography variant="caption" display="block" color={isTotal ? "inherit" : "text.secondary"} sx={{ lineHeight: 1.2 }}>
+                <Typography
+                  variant="caption"
+                  display="block"
+                  color={isTotal ? "inherit" : "text.secondary"}
+                  sx={{ lineHeight: 1.2 }}
+                >
                   {detail}
                 </Typography>
               )}
@@ -156,22 +147,22 @@ const ContractCalculationModal: React.FC<ContractCalculationModalProps> = ({ ope
   );
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose} 
-      maxWidth="sm" 
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
       fullWidth
       PaperProps={{
-        sx: { margin: isMobile ? 1 : 4, maxHeight: '90vh' }
+        sx: { margin: isMobile ? 1 : 4, maxHeight: "90vh" },
       }}
     >
-      <DialogTitle 
-        sx={{ 
-          display: "flex", 
-          alignItems: "center", 
+      <DialogTitle
+        sx={{
+          display: "flex",
+          alignItems: "center",
           justifyContent: "space-between",
           borderBottom: "1px solid #eee",
-          pb: 1
+          pb: 1,
         }}
       >
         <Box display="flex" alignItems="center" gap={1}>
@@ -194,17 +185,13 @@ const ContractCalculationModal: React.FC<ContractCalculationModalProps> = ({ ope
         {data && !loading && (
           <List disablePadding>
             {/* 1. Einzug */}
-            <CalculationRow
-              icon={<HomeOutlined />}
-              title="Einzugsdatum"
-              value={formatDate(data.move_in_date)}
-            />
+            <CalculationRow icon={<HomeOutlined />} title="Einzugsdatum" value={formatDate(data.move_in_date)} />
 
             {/* 2. Basisdauer (Years) */}
             <CalculationRow
               icon={<CalendarToday />}
               title="Basis-Mietdauer"
-              value={`+ ${formatDaysToYears(data.base_contract.duration_days)}`}
+              value={`+ ${formatDaysToYearsString(data.base_contract.duration_days)}`}
               subValue={`${data.base_contract.duration_days} Tage`}
             />
 
@@ -213,7 +200,7 @@ const ContractCalculationModal: React.FC<ContractCalculationModalProps> = ({ ope
               <CalculationRow
                 icon={<AddCircleOutline />}
                 title={`Verlängerungen (${data.standard_extensions.count})`}
-                value={`+ ${formatDaysToYears(data.standard_extensions.total_added_days)}`}
+                value={`+ ${formatDaysToYearsString(data.standard_extensions.total_added_days)}`}
                 subValue={`${data.standard_extensions.total_added_days} Tage`}
                 detail="Wohnzeitverlängerungen"
               />
@@ -225,27 +212,24 @@ const ContractCalculationModal: React.FC<ContractCalculationModalProps> = ({ ope
                 <CalculationRow
                   icon={<Apartment />}
                   title="Untervermietung"
-                  value={`+ ${formatDaysToMonths(data.subtenancies.total_added_days)}`}
+                  value={`+ ${formatDaysToMonthsString(data.subtenancies.total_added_days)}`}
                   subValue={`${data.subtenancies.total_added_days} Tage Gutschrift`}
                 />
-                <Accordion
-                  variant="outlined"
-                  sx={{ mb: 2, mt: -1, borderRadius: 2, "&:before": { display: "none" } }}
-                >
+                <Accordion variant="outlined" sx={{ mb: 2, mt: -1, borderRadius: 2, "&:before": { display: "none" } }}>
                   <AccordionSummary expandIcon={<ExpandMore />}>
                     <Typography variant="caption">Details ({data.subtenancies.count} Untermieter)</Typography>
                   </AccordionSummary>
                   <AccordionDetails sx={{ pt: 0, pb: 1, px: 2, bgcolor: "background.default" }}>
                     <List dense disablePadding>
                       {data.subtenancies.details.map((sub, idx) => (
-                        <ListItem key={idx} disablePadding sx={{ py: 0.5, borderBottom: '1px dashed #eee' }}>
+                        <ListItem key={idx} disablePadding sx={{ py: 0.5, borderBottom: "1px dashed #eee" }}>
                           <Box display="flex" justifyContent="space-between" width="100%">
-                             <Typography variant="caption" color="text.secondary">
-                               {formatDate(sub.start)} - {formatDate(sub.end)}
-                             </Typography>
-                             <Typography variant="caption" fontWeight="bold">
-                               +{sub.days} Tage
-                             </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              {formatDate(sub.start)} - {formatDate(sub.end)}
+                            </Typography>
+                            <Typography variant="caption" fontWeight="bold">
+                              +{sub.days} Tage
+                            </Typography>
                           </Box>
                         </ListItem>
                       ))}
@@ -263,24 +247,21 @@ const ContractCalculationModal: React.FC<ContractCalculationModalProps> = ({ ope
                   title="Sonderverlängerungen"
                   value={`+ ${data.department_extensions.total_months} Monate`}
                 />
-                <Accordion
-                  variant="outlined"
-                  sx={{ mb: 2, mt: -1, borderRadius: 2, "&:before": { display: "none" } }}
-                >
+                <Accordion variant="outlined" sx={{ mb: 2, mt: -1, borderRadius: 2, "&:before": { display: "none" } }}>
                   <AccordionSummary expandIcon={<ExpandMore />}>
                     <Typography variant="caption">Details anzeigen</Typography>
                   </AccordionSummary>
                   <AccordionDetails sx={{ pt: 0, pb: 1, px: 2, bgcolor: "background.default" }}>
                     <List dense disablePadding>
                       {data.department_extensions.details.map((ext, idx) => (
-                        <ListItem key={idx} disablePadding sx={{ py: 0.5, borderBottom: '1px dashed #eee' }}>
-                           <Box display="flex" justifyContent="space-between" width="100%" alignItems="center">
-                             <Typography variant="caption" sx={{maxWidth: '70%'}} noWrap title={ext.note || ""}>
-                               {ext.note || "Keine Notiz"}
-                             </Typography>
-                             <Typography variant="caption" fontWeight="bold">
-                               +{ext.months} Mon.
-                             </Typography>
+                        <ListItem key={idx} disablePadding sx={{ py: 0.5, borderBottom: "1px dashed #eee" }}>
+                          <Box display="flex" justifyContent="space-between" width="100%" alignItems="center">
+                            <Typography variant="caption" sx={{ maxWidth: "70%" }} noWrap title={ext.note || ""}>
+                              {ext.note || "Keine Notiz"}
+                            </Typography>
+                            <Typography variant="caption" fontWeight="bold">
+                              +{ext.months} Mon.
+                            </Typography>
                           </Box>
                         </ListItem>
                       ))}
