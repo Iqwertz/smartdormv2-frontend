@@ -1,15 +1,18 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Box, Alert, CircularProgress, Chip } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Claim } from "../../../types/tenant";
 import { fetchClaimsByStatus } from "../../../services/claimService";
 import dayjs from "dayjs";
 import { GridToolbar } from "@mui/x-data-grid/internals";
+import { useNavigate } from "react-router-dom";
 
 const CompletedClaimsTable: React.FC = () => {
   const [claims, setClaims] = useState<Claim[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const mouseDownPos = useRef<{ x: number; y: number } | null>(null);
 
   const loadClaims = useCallback(async () => {
     setLoading(true);
@@ -53,6 +56,22 @@ const CompletedClaimsTable: React.FC = () => {
     },
   ];
 
+  const handleMouseDown = (event: React.MouseEvent) => {
+    mouseDownPos.current = { x: event.clientX, y: event.clientY };
+  };
+
+  const handleRowClick = (params: { row: Claim }, event: React.MouseEvent) => {
+    if (mouseDownPos.current) {
+      const dx = Math.abs(event.clientX - mouseDownPos.current.x);
+      const dy = Math.abs(event.clientY - mouseDownPos.current.y);
+      // If mouse moved more than 5 pixels, consider it a text selection
+      if (dx > 5 || dy > 5) {
+        return;
+      }
+    }
+    navigate(`/department/edit-tenant/${params.row.tenant.id}`);
+  };
+
   if (loading) return <CircularProgress />;
   if (error) return <Alert severity="error">{error}</Alert>;
 
@@ -63,14 +82,23 @@ const CompletedClaimsTable: React.FC = () => {
         columns={columns}
         loading={loading}
         getRowId={(row) => row.id}
-        sx={{ height: "100%" }}
+        sx={{ 
+          height: "100%",
+          "& .MuiDataGrid-row": {
+            cursor: "pointer",
+          },
+        }}
         slots={{ toolbar: GridToolbar }}
         showToolbar
         slotProps={{
           toolbar: {
             showQuickFilter: true,
           },
+          row: {
+            onMouseDown: handleMouseDown,
+          },
         }}
+        onRowClick={handleRowClick}
       />
     </Box>
   );

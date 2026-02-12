@@ -1,5 +1,5 @@
 // src/components/admin/TenantDataTable.tsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Box, Alert } from "@mui/material";
 import { DataGrid, GridColDef, GridActionsCellItem } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
@@ -17,6 +17,7 @@ const TenantDataTable: React.FC<TenantDataTableProps> = ({ status = "current", t
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const mouseDownPos = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -41,6 +42,29 @@ const TenantDataTable: React.FC<TenantDataTableProps> = ({ status = "current", t
 
   const handleEditClick = (id: number) => {
     navigate(`/department/edit-tenant/${id}`);
+  };
+
+  const handleRowClick = (params: { id: number | string }, event: React.MouseEvent) => {
+    // Check if text is selected
+    const selection = window.getSelection();
+    if (selection && selection.toString().length > 0) {
+      return;
+    }
+
+    // Check if mouse moved significantly (indicating a drag/selection)
+    if (mouseDownPos.current) {
+      const dx = Math.abs(event.clientX - mouseDownPos.current.x);
+      const dy = Math.abs(event.clientY - mouseDownPos.current.y);
+      if (dx > 5 || dy > 5) {
+        return;
+      }
+    }
+
+    navigate(`/department/edit-tenant/${params.id}`);
+  };
+
+  const handleMouseDown = (event: React.MouseEvent) => {
+    mouseDownPos.current = { x: event.clientX, y: event.clientY };
   };
 
   const columns: GridColDef<TenantProfile>[] = [
@@ -125,7 +149,7 @@ const TenantDataTable: React.FC<TenantDataTableProps> = ({ status = "current", t
   }
 
   return (
-    <Box sx={{ width: "100%", height: "100%" }}>
+    <Box sx={{ width: "100%", height: "100%" }} onMouseDown={handleMouseDown}>
       {title && <h2>{title}</h2>}
       <DataGrid
         rows={rows}
@@ -140,7 +164,11 @@ const TenantDataTable: React.FC<TenantDataTableProps> = ({ status = "current", t
         }}
         sx={{
           height: "100%",
+          "& .MuiDataGrid-row": {
+            cursor: "pointer",
+          },
         }}
+        onRowClick={handleRowClick}
         initialState={{
           pagination: {
             paginationModel: { page: 0, pageSize: 25 },

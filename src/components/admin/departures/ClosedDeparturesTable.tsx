@@ -1,15 +1,17 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Box, Alert, CircularProgress } from "@mui/material";
-import { DataGrid, GridActionsCellItem, GridColDef, GridDownloadIcon } from "@mui/x-data-grid";
+import { DataGrid, GridActionsCellItem, GridColDef, GridDownloadIcon, GridRowParams } from "@mui/x-data-grid";
 import { Departure } from "../../../types/tenant";
 import { downloadDepartureForm, fetchDeparturesByStatus } from "../../../services/departureService";
 import dayjs from "dayjs";
 import { GridToolbar } from "@mui/x-data-grid/internals";
+import { useNavigate } from "react-router-dom";
 
 const ClosedDeparturesTable: React.FC = () => {
   const [departures, setDepartures] = useState<Departure[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const loadDepartures = useCallback(async () => {
     setLoading(true);
@@ -33,6 +35,10 @@ const ClosedDeparturesTable: React.FC = () => {
     document.body.appendChild(link);
     link.click();
     link.parentNode?.removeChild(link);
+  };
+
+  const handleRowClick = (params: GridRowParams<Departure>) => {
+    navigate(`/department/edit-tenant/${params.row.tenant.id}`);
   };
 
   useEffect(() => {
@@ -87,10 +93,16 @@ const ClosedDeparturesTable: React.FC = () => {
         columns={columns}
         loading={loading}
         getRowId={(row) => row.tenant.id}
+        onRowClick={handleRowClick}
         initialState={{
           sorting: { sortModel: [{ field: "tenant.move_out", sort: "desc" }] },
         }}
-        sx={{ height: "100%" }}
+        sx={{ 
+          height: "100%",
+          "& .MuiDataGrid-row": {
+            cursor: "pointer",
+          },
+        }}
         slots={{ toolbar: GridToolbar }}
         showToolbar
         slotProps={{

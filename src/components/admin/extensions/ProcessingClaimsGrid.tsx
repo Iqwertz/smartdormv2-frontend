@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Box, Alert, CircularProgress, Grid, Card, CardContent, Typography, Button } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { useNavigate } from "react-router-dom";
 import { Claim } from "../../../types/tenant";
 import { fetchClaimsByStatus, processClaimDecision } from "../../../services/claimService";
 import { useNotification } from "../../../context/NotificationContext";
@@ -14,6 +15,8 @@ const ProcessingClaimsGrid: React.FC = () => {
     {}
   );
   const { showNotification } = useNotification();
+  const navigate = useNavigate();
+  const mouseDownPos = useRef<{ x: number; y: number } | null>(null);
 
   const loadClaims = useCallback(async () => {
     setLoading(true);
@@ -51,6 +54,36 @@ const ProcessingClaimsGrid: React.FC = () => {
     }
   };
 
+  const handleMouseDown = (e: React.MouseEvent) => {
+    mouseDownPos.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handleCardClick = (e: React.MouseEvent, tenantId: number) => {
+    // Don't navigate if clicking on interactive elements
+    const target = e.target as HTMLElement;
+    if (target.closest("button") || target.closest("input") || target.closest(".MuiPickersPopper-root")) {
+      return;
+    }
+
+    // Check if user was selecting text (mouse moved significantly)
+    if (mouseDownPos.current) {
+      const dx = Math.abs(e.clientX - mouseDownPos.current.x);
+      const dy = Math.abs(e.clientY - mouseDownPos.current.y);
+      if (dx > 5 || dy > 5) {
+        mouseDownPos.current = null;
+        return;
+      }
+    }
+
+    // Check if there's selected text
+    const selection = window.getSelection();
+    if (selection && selection.toString().length > 0) {
+      return;
+    }
+
+    navigate(`/department/edit-tenant/${tenantId}`);
+  };
+
   if (loading) return <CircularProgress />;
   if (error) return <Alert severity="error">{error}</Alert>;
   if (claims.length === 0) return <Typography>Keine Anträge in Bearbeitung.</Typography>;
@@ -61,7 +94,12 @@ const ProcessingClaimsGrid: React.FC = () => {
         const isDeciding = decisionStates[claim.id]?.isDeciding || false;
         return (
           <Grid size={{ xs: 12, sm: 6, md: 4 }} key={claim.id}>
-            <Card variant="outlined">
+            <Card
+              variant="outlined"
+              onMouseDown={handleMouseDown}
+              onMouseUp={(e) => handleCardClick(e, claim.tenant.id)}
+              sx={{ cursor: "pointer" }}
+            >
               <CardContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 <Typography variant="h6">
                   {claim.tenant.name} {claim.tenant.surname}

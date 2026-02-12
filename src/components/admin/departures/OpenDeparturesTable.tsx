@@ -4,6 +4,7 @@ import { DataGrid, GridColDef, GridActionsCellItem } from "@mui/x-data-grid";
 import { Departure } from "../../../types/tenant";
 import { fetchDeparturesByStatus, sendDepartureReminder } from "../../../services/departureService";
 import { useNotification } from "../../../context/NotificationContext";
+import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import EmailIcon from "@mui/icons-material/Email";
 import { GridToolbar } from "@mui/x-data-grid/internals";
@@ -13,6 +14,7 @@ const OpenDeparturesTable: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { showNotification } = useNotification();
+  const navigate = useNavigate();
 
   const loadDepartures = useCallback(async () => {
     setLoading(true);
@@ -91,7 +93,7 @@ const OpenDeparturesTable: React.FC = () => {
         initialState={{
           sorting: { sortModel: [{ field: "created_on", sort: "desc" }] },
         }}
-        sx={{ height: "100%" }}
+        sx={{ height: "100%", cursor: "pointer" }}
         slots={{ toolbar: GridToolbar }}
         showToolbar
         slotProps={{
@@ -99,6 +101,7 @@ const OpenDeparturesTable: React.FC = () => {
             showQuickFilter: true,
           },
         }}
+        onRowClick={(params) => navigate(`/department/edit-tenant/${params.row.tenant.id}`)}
       />
     </Box>
   );
