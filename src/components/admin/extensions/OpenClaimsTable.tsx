@@ -4,6 +4,7 @@ import { DataGrid, GridColDef, GridActionsCellItem } from "@mui/x-data-grid";
 import { Claim } from "../../../types/tenant";
 import { fetchClaimsByStatus, sendClaimReminder, updateClaimStatus } from "../../../services/claimService";
 import { useNotification } from "../../../context/NotificationContext";
+import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import EmailIcon from "@mui/icons-material/Email";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
@@ -14,6 +15,7 @@ const OpenClaimsTable: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { showNotification } = useNotification();
+  const navigate = useNavigate();
 
   const loadClaims = useCallback(async () => {
     setLoading(true);
@@ -49,6 +51,15 @@ const OpenClaimsTable: React.FC = () => {
     } catch (err: any) {
       showNotification(err.response?.data?.error || "Status-Update fehlgeschlagen.", "error");
     }
+  };
+
+  const handleRowClick = (params: any) => {
+    // Check if text is selected - if so, don't navigate
+    const selection = window.getSelection();
+    if (selection && selection.toString().length > 0) {
+      return;
+    }
+    navigate(`/department/edit-tenant/${params.row.tenant.id}`);
   };
 
   const columns: GridColDef<Claim>[] = [
@@ -108,7 +119,12 @@ const OpenClaimsTable: React.FC = () => {
         columns={columns}
         loading={loading}
         getRowId={(row) => row.id}
-        sx={{ height: "100%" }}
+        sx={{ 
+          height: "100%",
+          "& .MuiDataGrid-row": {
+            cursor: "pointer",
+          },
+        }}
         slots={{ toolbar: GridToolbar }}
         showToolbar
         slotProps={{
@@ -121,6 +137,7 @@ const OpenClaimsTable: React.FC = () => {
             sortModel: [{ field: "move_out", sort: "asc" }],
           },
         }}
+        onRowClick={handleRowClick}
       />
     </Box>
   );

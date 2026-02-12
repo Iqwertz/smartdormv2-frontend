@@ -12,6 +12,7 @@ import {
   ListItemIcon,
   Button,
   Paper,
+  Link,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -21,6 +22,7 @@ import { useNotification } from "../../../context/NotificationContext";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import dayjs, { Dayjs } from "dayjs";
+import { useNavigate } from "react-router-dom";
 
 const ConfirmedDeparturesList: React.FC = () => {
   const [departures, setDepartures] = useState<Departure[]>([]);
@@ -28,6 +30,7 @@ const ConfirmedDeparturesList: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [closingStates, setClosingStates] = useState<Record<number, { newDate: Dayjs | null; isClosing: boolean }>>({});
   const { showNotification } = useNotification();
+  const navigate = useNavigate();
 
   const loadDepartures = useCallback(async () => {
     setLoading(true);
@@ -65,6 +68,10 @@ const ConfirmedDeparturesList: React.FC = () => {
     }
   };
 
+  const handleTenantClick = (tenantId: number) => {
+    navigate(`/department/edit-tenant/${tenantId}`);
+  };
+
   if (loading) return <CircularProgress />;
   if (error) return <Alert severity="error">{error}</Alert>;
   if (departures.length === 0) return <Typography>Keine bestätigten Auszüge gefunden.</Typography>;
@@ -90,9 +97,14 @@ const ConfirmedDeparturesList: React.FC = () => {
                     }}
                   >
                     <Box>
-                      <Typography variant="h6">
+                      <Link
+                        component="button"
+                        variant="h6"
+                        onClick={() => handleTenantClick(dep.tenant.id)}
+                        sx={{ cursor: "pointer", textDecoration: "none", "&:hover": { textDecoration: "underline" } }}
+                      >
                         {dep.tenant.name} {dep.tenant.surname}
-                      </Typography>
+                      </Link>
                       <Typography color="text.secondary">Zimmer: {dep.tenant.current_room}</Typography>
                       <Typography color="text.secondary">
                         Auszug am: {dayjs(dep.tenant.move_out).format("DD.MM.YYYY")}

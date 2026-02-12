@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Box, Alert, CircularProgress } from "@mui/material";
 import { DataGrid, GridColDef, GridActionsCellItem } from "@mui/x-data-grid";
 import { TenantProfile } from "../../../types/tenant";
 import { fetchDepartureCandidates, createDeparture } from "../../../services/departureService";
 import { useNotification } from "../../../context/NotificationContext";
+import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { GridToolbar } from "@mui/x-data-grid/internals";
@@ -13,6 +14,8 @@ const DepartureCandidatesTable: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { showNotification } = useNotification();
+  const navigate = useNavigate();
+  const mouseDownPos = useRef<{ x: number; y: number } | null>(null);
 
   const loadCandidates = useCallback(async () => {
     setLoading(true);
@@ -39,6 +42,29 @@ const DepartureCandidatesTable: React.FC = () => {
     } catch (err: any) {
       showNotification(err.response?.data?.error || "Erstellen des Antrags fehlgeschlagen.", "error");
     }
+  };
+
+  const handleRowMouseDown = (event: React.MouseEvent) => {
+    mouseDownPos.current = { x: event.clientX, y: event.clientY };
+  };
+
+  const handleRowClick = (params: any, event: React.MouseEvent) => {
+    // Check if text was selected (dragging)
+    if (mouseDownPos.current) {
+      const dx = Math.abs(event.clientX - mouseDownPos.current.x);
+      const dy = Math.abs(event.clientY - mouseDownPos.current.y);
+      // If mouse moved more than 5px, consider it a drag/selection
+      if (dx > 5 || dy > 5) {
+        return;
+      }
+    }
+    
+    // Don't navigate if clicking on actions column
+    if ((event.target as HTMLElement).closest('[data-field="actions"]')) {
+      return;
+    }
+
+    navigate(`/department/edit-tenant/${params.id}`);
   };
 
   const columns: GridColDef<TenantProfile>[] = [
@@ -81,14 +107,23 @@ const DepartureCandidatesTable: React.FC = () => {
         initialState={{
           sorting: { sortModel: [{ field: "move_out", sort: "asc" }] },
         }}
-        sx={{ height: "100%" }}
+        sx={{ 
+          height: "100%",
+          "& .MuiDataGrid-row": {
+            cursor: "pointer",
+          },
+        }}
         slots={{ toolbar: GridToolbar }}
         showToolbar
         slotProps={{
           toolbar: {
             showQuickFilter: true,
           },
+          row: {
+            onMouseDown: handleRowMouseDown,
+          },
         }}
+        onRowClick={handleRowClick}
       />
     </Box>
   );
