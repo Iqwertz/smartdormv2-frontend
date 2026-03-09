@@ -6,6 +6,7 @@ import TenantEngagementTable from "../../components/engagements/TenantEngagement
 import EngagementTenantTable from "../../components/engagements/EngagementTenantTable";
 import TenantExport from "../../components/engagements/TenantExport";
 import TenantEngagementTableMinimal from "../../components/engagements/TenantEngagementTableMinimal";
+import TenantStatisticsTab from "../../components/engagements/TenantStatisticsTab";
 
 const TenantOverviewPage: React.FC = () => {
   const tabs = [
@@ -28,6 +29,11 @@ const TenantOverviewPage: React.FC = () => {
       label: "HSV-Vertreter",
       content: <TenantEngagementTableMinimal />,
       authGroups: ["ADMIN", "HSV-Vertreter"],
+    },
+    {
+      label: "Statistiken",
+      content: <TenantStatisticsTab />,
+      authGroups: ["ADMIN", "Heimrat", "Inforeferat"],
     },
   ];
 

@@ -273,3 +273,26 @@ export interface ContractCalculation {
   };
   final_move_out_date: string;
 }
+
+export interface TenantStatistics {
+  scope: "current" | "all";
+  total_tenants: number;
+  age: { average: number; min: number; max: number };
+  stay_duration: {
+    average_days: number;
+    average_months: number;
+    min_days: number;
+    max_days: number;
+  };
+  gender_distribution: Record<string, number>;
+  nationalities: Record<string, number>;
+  universities: Record<string, number>;
+  study_fields: Record<string, number>;
+  points: { average: number; min: number; max: number; total: number };
+  floor_distribution: Record<string, number>;
+  engagements: {
+    tenants_with_any_engagement: number;
+    tenants_without_engagement: number;
+    average_per_tenant: number;
+  };
+}

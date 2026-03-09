@@ -299,6 +299,17 @@ const EditTenantPage: React.FC = () => {
     }
   };
 
+  const handleDeleteRental = async (rentalId: number) => {
+    try {
+      await apiClient.delete(`/api/department/rentals/${rentalId}/delete/`);
+      showNotification("Vermietung gelöscht.", "success");
+      fetchTenantData();
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.error || "Löschen fehlgeschlagen.";
+      showNotification(errorMessage, "error");
+    }
+  };
+
   if (loading) return <CircularProgress />;
   if (error && !tenant) return <Alert severity="error">{error}</Alert>;
   if (!tenant) return <Alert severity="info">Kein Bewohner ausgewählt.</Alert>;
@@ -657,7 +668,18 @@ const EditTenantPage: React.FC = () => {
                 .map((rental, index) => {
                   const isCurrentRoom = index === 0;
                   return (
-                    <ListItem key={rental.id}>
+                    <ListItem
+                      key={rental.id}
+                      secondaryAction={
+                        <IconButton
+                          edge="end"
+                          aria-label="delete"
+                          onClick={() => handleDeleteRental(rental.id)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      }
+                    >
                       <ListItemText
                         primary={`Zimmer ${rental.room_name}${isCurrentRoom ? " (Aktuell)" : ""}`}
                         secondary={
