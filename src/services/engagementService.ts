@@ -8,7 +8,8 @@ import {
   EngagementCreatePayload,
   TenantOverview,
   EngagementOverviewGroup,
-  ContractCalculation
+  ContractCalculation,
+  TenantStatistics
 } from "../types/tenant";
 
 export const fetchGlobalSettings = async (): Promise<GlobalAppSettings> => {
@@ -81,6 +82,13 @@ export const fetchTenantOverviewData = async (): Promise<TenantOverview[]> => {
 
 export const fetchEngagementOverviewData = async (): Promise<EngagementOverviewGroup[]> => {
   const response = await apiClient.get<EngagementOverviewGroup[]>("/api/engagements/misc/engagement-overview-data/");
+  return response.data;
+};
+
+export const fetchTenantStatistics = async (scope: "current" | "all" = "current"): Promise<TenantStatistics> => {
+  const response = await apiClient.get<TenantStatistics>("/api/engagements/misc/tenant-statistics/", {
+    params: { scope },
+  });
   return response.data;
 };
 
