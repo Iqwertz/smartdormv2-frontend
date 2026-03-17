@@ -294,10 +294,18 @@ export interface TenantBillingOverview {
   total_pages: number;
   total_jobs: number;
   total_sessions: number;
+  debt: string;
+  debt_pages: number;
+  debt_jobs: number;
 }
 
 export const fetchTenantBillingOverview = async (): Promise<TenantBillingOverview[]> => {
   const response = await apiClient.get(`/api/printing/tenant-billing-overview/`);
+  return response.data;
+};
+
+export const settleTenantDebt = async (tenantId: number): Promise<any> => {
+  const response = await apiClient.post(`/api/printing/tenant/${tenantId}/settle-debt/`);
   return response.data;
 };
 

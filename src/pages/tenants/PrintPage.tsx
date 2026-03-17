@@ -35,7 +35,7 @@ import {
   startScan,
 } from "../../services/printingService";
 import { useNotification } from "../../context/NotificationContext";
-import { DeviceStatus, PrintSession, PrintSessionDetail, PrintJob, Scan } from "../../types/printing";
+import { DeviceStatus, MyCosts, PrintSession, PrintSessionDetail, PrintJob, Scan } from "../../types/printing";
 import PrintIcon from "@mui/icons-material/Print";
 import ScannerIcon from "@mui/icons-material/Scanner";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
@@ -49,7 +49,7 @@ dayjs.extend(duration);
 
 const PrintPage: React.FC = () => {
   const [deviceStatus, setDeviceStatus] = useState<DeviceStatus | null>(null);
-  const [myCosts, setMyCosts] = useState<{ total_cost: string; this_month_cost: string } | null>(null);
+  const [myCosts, setMyCosts] = useState<MyCosts | null>(null);
   const [mySessions, setMySessions] = useState<PrintSession[]>([]);
   const [myScans, setMyScans] = useState<Scan[]>([]);
   const [activeSession, setActiveSession] = useState<PrintSessionDetail | null>(null);
@@ -382,6 +382,9 @@ const PrintPage: React.FC = () => {
               <Box>
                 <Typography variant="body2" gutterBottom>
                   <strong>Gesamt:</strong> {parseFloat(myCosts.total_cost).toFixed(2)} €
+                </Typography>
+                <Typography variant="body2" gutterBottom>
+                  <strong>Schuld:</strong> {parseFloat(myCosts.debt).toFixed(2)} €
                 </Typography>
                 <Typography variant="body2" gutterBottom>
                   <strong>Dieser Monat:</strong> {parseFloat(myCosts.this_month_cost).toFixed(2)} €

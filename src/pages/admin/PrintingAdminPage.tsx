@@ -29,7 +29,7 @@ const PrintingAdminPage: React.FC = () => {
         cardSx={{
           height: "calc(100dvh - 100px)",
         }}
-        contentSx={{ height: "100%", padding: 2, overflowY: "auto" }}
+        contentSx={{ height: "100%", padding: 2, overflowY: "auto", overflowX: "auto" }}
       />
     </Box>
   );

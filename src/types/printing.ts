@@ -22,6 +22,9 @@ export interface MyCosts {
   this_month_pages: number;
   total_jobs: number;
   this_month_jobs: number;
+  debt: string;
+  debt_pages: number;
+  debt_jobs: number;
 }
 
 export interface PrintSession {
