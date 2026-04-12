@@ -3,6 +3,7 @@ import { Html5QrcodeScanner } from "html5-qrcode";
 import { Box, Typography, Container, CircularProgress, Alert } from "@mui/material";
 import attendanceService from "../../services/attendanceService";
 import DashboardCard from "../../components/shared/DashboardCard";
+import { useNotification } from "../../context/NotificationContext";
 
 interface AttendanceScannerProps {
   onSuccess?: () => void;
@@ -11,9 +12,9 @@ interface AttendanceScannerProps {
 }
 
 const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ onSuccess, isModal, active = true }) => {
-  const [scanResult, setScanResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { showNotification } = useNotification();
   const scannerRef = React.useRef<Html5QrcodeScanner | null>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -75,28 +76,22 @@ const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ onSuccess, isModa
         attendanceService
           .scanAttendance(sessionId, token)
           .then((res) => {
-            setScanResult(res.data.message || "Erfolgreich eingecheckt!");
+            showNotification(res.data.message || "Erfolgreich eingecheckt!", "success");
             if (onSuccess) {
-              setTimeout(() => {
-                if (!unmounted) onSuccess();
-              }, 1500);
+              if (!unmounted) onSuccess();
             } else {
-              setTimeout(() => {
-                if (!unmounted) {
-                  setScanResult(null);
-                  html5QrcodeScanner.resume();
-                }
-              }, 3000);
+              if (!unmounted) {
+                html5QrcodeScanner.resume();
+              }
             }
           })
           .catch((err) => {
             setError(err.response?.data?.error || "Fehler beim Scannen!");
-            setTimeout(() => {
-              if (!unmounted) {
-                setError(null);
-                html5QrcodeScanner.resume();
-              }
-            }, 3000);
+            showNotification(error || "Fehler beim Scannen!", "error");
+            if (!unmounted) {
+              setError(null);
+              html5QrcodeScanner.resume();
+            }
           })
           .finally(() => {
             if (!unmounted) {
@@ -107,11 +102,10 @@ const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ onSuccess, isModa
       } catch (e) {
         console.warn(e);
         setError("Ungültiges QR Code Format. Zeigt er auf SmartDorm?");
-        setTimeout(() => {
-          if (!unmounted) {
-            setError(null);
-          }
-        }, 3000);
+        showNotification(error || "Ungültiges QR Code Format. Zeigt er auf SmartDorm?", "error");
+        if (!unmounted) {
+          setError(null);
+        }
       }
     };
 
@@ -129,16 +123,6 @@ const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ onSuccess, isModa
 
   const content = (
     <Box sx={{ p: isModal ? 0 : 2, bgcolor: isModal ? "transparent" : "background.paper", borderRadius: 2 }}>
-      {scanResult && (
-        <Alert severity="success" sx={{ mb: 2 }}>
-          {scanResult}
-        </Alert>
-      )}
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
       {loading && (
         <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
           <CircularProgress />

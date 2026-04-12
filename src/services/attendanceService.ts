@@ -42,8 +42,17 @@ export interface QrTokenResponse {
 export interface AttendanceReportTenant {
   tenant_id: number;
   tenant_name: string;
+  surname?: string;
+  name?: string;
+  current_room?: string;
+  current_floor?: string;
   parts_attended: number[];
   manual_overrides: number[];
+}
+
+export interface AttendanceReportResponse {
+  session: AttendanceSession;
+  rows: AttendanceReportTenant[];
 }
 
 const ATTENDANCE_API = "/api/attendance"; // Base appended in apiClient? No, apiClient base is API_BASE_URL. Routes are mapped to /api/attendance/... Let's use /attendance if api.ts's API_BASE_URL handles /api
@@ -61,6 +70,9 @@ export const attendanceService = {
   getSessions: (eventId: number) => apiClient.get<AttendanceSession[]>(`${ATTENDANCE_API}/events/${eventId}/sessions/`),
   createSession: (eventId: number) =>
     apiClient.post<AttendanceSession>(`${ATTENDANCE_API}/events/${eventId}/sessions/`),
+  toggleSessionStatus: (sessionId: number) =>
+    apiClient.post<AttendanceSession>(`${ATTENDANCE_API}/sessions/${sessionId}/toggle-status/`),
+  deleteSession: (sessionId: number) => apiClient.delete(`${ATTENDANCE_API}/sessions/${sessionId}/delete/`),
   startSession: (sessionId: number, part: number) =>
     apiClient.post<AttendanceSession>(`${ATTENDANCE_API}/sessions/${sessionId}/start/`, { part }),
   stopSession: (sessionId: number) =>
@@ -74,7 +86,7 @@ export const attendanceService = {
 
   // Reports & Overrides
   getReport: (sessionId: number) =>
-    apiClient.get<AttendanceReportTenant[]>(`${ATTENDANCE_API}/sessions/${sessionId}/report/`),
+    apiClient.get<AttendanceReportResponse>(`${ATTENDANCE_API}/sessions/${sessionId}/report/`),
   manualOverride: (sessionId: number, tenantId: number, part: number, present: boolean) =>
     apiClient.post(`${ATTENDANCE_API}/sessions/${sessionId}/override/`, { tenant_id: tenantId, part, present }),
 

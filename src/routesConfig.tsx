@@ -169,15 +169,6 @@ export const appRoutes: AppRouteItem[] = [
   // Engagement Specific Routes:
   ////////////////////////////////////////////////////////////
   {
-    id: "attendance-scanner",
-    path: "/attendance/scan",
-    element: <Pages.AttendanceScanner />,
-    title: "Anwesenheit scannen",
-    icon: <QrCode2Icon />,
-    requiredGroups: ["tenant", "ADMIN"],
-    sidebar: true,
-  },
-  {
     id: "attendance-display",
     path: "/attendance/display/:sessionId",
     element: <Pages.ActiveSessionDisplay />,

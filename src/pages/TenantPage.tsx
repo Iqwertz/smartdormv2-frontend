@@ -85,9 +85,6 @@ const TenantPage: React.FC = () => {
         </div>
         <div className="right">
           <DashboardCard title="Anwesenheit">
-            <Typography sx={{ mb: 2 }}>
-              Scanne den QR Code auf einer Veranstaltung, um deine Teilnahme einzutragen.
-            </Typography>
             <Button
               variant="contained"
               fullWidth
