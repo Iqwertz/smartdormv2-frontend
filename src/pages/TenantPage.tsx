@@ -15,11 +15,23 @@ import ExternalServicesStatus from "../components/tenants/dashboard/content/Exte
 import CalendarWidget from "../components/tenants/dashboard/content/CalendarWidget";
 import PointsStatus from "../components/tenants/dashboard/content/PointsStatus";
 import AttendanceHistoryCard from "../components/tenants/AttendanceHistoryCard";
+import { lazy, Suspense } from "react";
+import { Dialog, DialogContent, DialogTitle, CircularProgress, DialogActions } from "@mui/material";
+import QrCodeScannerIcon from "@mui/icons-material/QrCodeScanner";
+
+const AttendanceScanner = lazy(() => import("../components/tenants/AttendanceScanner"));
 
 const TenantPage: React.FC = () => {
   const [departure, setDeparture] = useState<Departure | null>(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
+  const [attendanceHistoryRefresh, setAttendanceHistoryRefresh] = useState(0);
   const [settings, setSettings] = useState<GlobalAppSettings | null>(null);
+
+  const handleAttendanceScanSuccess = () => {
+    setShowScanner(false);
+    setAttendanceHistoryRefresh((prev) => prev + 1);
+  };
 
   useEffect(() => {
     const checkDeparture = async () => {
@@ -72,6 +84,19 @@ const TenantPage: React.FC = () => {
           </DashboardCard>
         </div>
         <div className="right">
+          <DashboardCard title="Anwesenheit">
+            <Typography sx={{ mb: 2 }}>
+              Scanne den QR Code auf einer Veranstaltung, um deine Teilnahme einzutragen.
+            </Typography>
+            <Button
+              variant="contained"
+              fullWidth
+              startIcon={<QrCodeScannerIcon />}
+              onClick={() => setShowScanner(true)}
+            >
+              QR Code Scannen
+            </Button>
+          </DashboardCard>
           <DashboardCard title="Quick Links">
             <QuickLinks></QuickLinks>
           </DashboardCard>
@@ -94,8 +119,8 @@ const TenantPage: React.FC = () => {
               </Button>
             </DashboardCard>
           )}
-          <PointsStatus /> 
-          <AttendanceHistoryCard />
+          <PointsStatus />
+          <AttendanceHistoryCard refreshTrigger={attendanceHistoryRefresh} />
           <DashboardCard title="Settings">
             <Settings />
           </DashboardCard>
@@ -104,6 +129,34 @@ const TenantPage: React.FC = () => {
       {departure && (
         <DepartureDecisionPopup open={showPopup} onClose={() => setShowPopup(false)} departure={departure} />
       )}
+      <Dialog
+        open={showScanner}
+        onClose={() => setShowScanner(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          style: {
+            backgroundColor: "transparent",
+            boxShadow: "none",
+            overflow: "visible", // So the dashboard card title chip isn't cut off
+          },
+        }}
+      >
+        <DashboardCard title="Anwesenheit scannen" contentSx={{ p: 2 }}>
+          <Suspense
+            fallback={
+              <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
+                <CircularProgress />
+              </Box>
+            }
+          >
+            <AttendanceScanner active={showScanner} isModal={true} onSuccess={handleAttendanceScanSuccess} />
+          </Suspense>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
+            <Button onClick={() => setShowScanner(false)}>Abbrechen</Button>
+          </Box>
+        </DashboardCard>
+      </Dialog>
     </Box>
   );
 };

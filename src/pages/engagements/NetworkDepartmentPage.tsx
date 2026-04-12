@@ -19,6 +19,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import TabbedDashboardCard from "../../components/shared/TabbedDashboardCard";
 import apiClient from "../../services/api";
 import { useNotification } from "../../context/NotificationContext"; // Assuming this exists
+import EventManagementTab from "../../components/networkdepartment/EventManagementTab";
 
 // --- Types ---
 interface Department {
@@ -286,6 +287,10 @@ const NetworkDepartmentPage: React.FC = () => {
     {
       label: "Referate verwalten",
       content: <ReferatsManagement />,
+    },
+    {
+      label: "Anwesenheits Events",
+      content: <EventManagementTab />,
     },
   ];
 

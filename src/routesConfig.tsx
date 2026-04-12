@@ -169,15 +169,6 @@ export const appRoutes: AppRouteItem[] = [
   // Engagement Specific Routes:
   ////////////////////////////////////////////////////////////
   {
-    id: "attendance-events",
-    path: "/attendance/events",
-    element: <Pages.AttendanceEventManagement />,
-    title: "Anwesenheit Events",
-    icon: <QrCode2Icon />,
-    requiredGroups: ["Netzwerkreferat", "Heimrat", "ADMIN"],
-    sidebar: true,
-  },
-  {
     id: "attendance-scanner",
     path: "/attendance/scan",
     element: <Pages.AttendanceScanner />,
@@ -226,6 +217,15 @@ export const appRoutes: AppRouteItem[] = [
     title: "Heimrat",
     icon: <FilterVintageOutlined />,
     requiredGroups: ["Heimrat", "ADMIN"],
+    sidebar: true,
+  },
+  {
+    id: "attendance-manage",
+    path: "/attendance/manage",
+    element: <Pages.ManageEventsPage />,
+    title: "Anwesenheit verwalten",
+    icon: <QrCode2Icon />,
+    requiredGroups: [], // Accessible, sidebar rendering is handled dynamically
     sidebar: true,
   },
   {
@@ -343,7 +343,7 @@ export const getSidebarItems = (userGroups: string[]): AppRouteItem[] => {
         route.icon &&
         (!route.requiredGroups ||
           route.requiredGroups.length === 0 ||
-          route.requiredGroups.some((group) => userGroups.includes(group)))
+          route.requiredGroups.some((group) => userGroups.includes(group))),
     );
 
     if (visibleRoutes.length === 0) return false;
@@ -360,7 +360,7 @@ export const getInitialRedirectPath = (userGroups: string[]): string => {
     .filter(
       (route) =>
         (route.requiredGroups && route.requiredGroups.length === 0) ||
-        route.requiredGroups?.some((group) => userGroups.includes(group))
+        route.requiredGroups?.some((group) => userGroups.includes(group)),
     )
     .sort((a, b) => {
       const orderA = a.defaultRedirectOrder ?? Infinity;

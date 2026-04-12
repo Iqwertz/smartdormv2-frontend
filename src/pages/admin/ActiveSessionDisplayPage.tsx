@@ -13,16 +13,21 @@ const ActiveSessionDisplayPage: React.FC = () => {
 
   const fetchSessionData = () => {
     if (!sessionId) return;
-    attendanceService.getSessions(parseInt(sessionId, 10)).then(res => { // Wait, getSessions is by eventId. We need to fetch all or we just pull the token directly.
-      // Easiest is to just try getting the token. If it fails, session is not active.
-    }).catch(console.error);
-    
+    attendanceService
+      .getSessions(parseInt(sessionId, 10))
+      .then((res) => {
+        // Wait, getSessions is by eventId. We need to fetch all or we just pull the token directly.
+        // Easiest is to just try getting the token. If it fails, session is not active.
+      })
+      .catch(console.error);
+
     // Better: let's just poll getCurrentToken.
-    attendanceService.getCurrentToken(parseInt(sessionId, 10))
-      .then(res => {
+    attendanceService
+      .getCurrentToken(parseInt(sessionId, 10))
+      .then((res) => {
         setToken(res.data.token);
       })
-      .catch(err => {
+      .catch((err) => {
         console.warn("Could not get token, session might be stopped", err);
         setToken(null);
       })
@@ -37,14 +42,16 @@ const ActiveSessionDisplayPage: React.FC = () => {
 
   const handleStartPart = (part: number) => {
     if (!sessionId) return;
-    attendanceService.startSession(parseInt(sessionId, 10), part)
+    attendanceService
+      .startSession(parseInt(sessionId, 10), part)
       .then(() => fetchSessionData())
       .catch(console.error);
   };
 
   const handleStopSession = () => {
     if (!sessionId) return;
-    attendanceService.stopSession(parseInt(sessionId, 10))
+    attendanceService
+      .stopSession(parseInt(sessionId, 10))
       .then(() => navigate("/attendance/events"))
       .catch(console.error);
   };
@@ -52,28 +59,40 @@ const ActiveSessionDisplayPage: React.FC = () => {
   if (loading) return <CircularProgress />;
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 8, gap: 4 }}>
-      <Typography variant="h2" gutterBottom>Anwesenheit Scanner</Typography>
-      
+    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", pt: 8, gap: 4 }}>
+      <Typography variant="h2" gutterBottom>
+        Anwesenheit Scanner
+      </Typography>
+
       {token ? (
         <Paper sx={{ p: 4, bgcolor: "white" }}>
-          <QRCodeSVG 
-            value={JSON.stringify({ sessionId, token })} 
-            size={400} 
-            level="H" 
-          />
+          <QRCodeSVG value={JSON.stringify({ sessionId, token })} size={400} level="H" />
         </Paper>
       ) : (
-        <Typography variant="h5" color="textSecondary">Warte auf Start eines Parts...</Typography>
+        <Typography variant="h5" color="textSecondary">
+          Warte auf Start eines Parts...
+        </Typography>
       )}
 
-      {token && <Typography variant="h4" color="primary">Bitte scannen sie den Code in der SmartDorm App.</Typography>}
+      {token && (
+        <Typography variant="h4" color="primary">
+          Bitte scannen sie den Code in der SmartDorm App.
+        </Typography>
+      )}
 
-      <Box sx={{ mt: 5, display: 'flex', gap: 2 }}>
-        <Button variant="contained" color="success" onClick={() => handleStartPart(1)}>Start Part 1</Button>
-        <Button variant="contained" color="success" onClick={() => handleStartPart(2)}>Start Part 2</Button>
-        <Button variant="contained" color="success" onClick={() => handleStartPart(3)}>Start Part 3</Button>
-        <Button variant="contained" color="error" onClick={handleStopSession}>Session beenden</Button>
+      <Box sx={{ mt: 5, display: "flex", gap: 2 }}>
+        <Button variant="contained" color="success" onClick={() => handleStartPart(1)}>
+          Start Part 1
+        </Button>
+        <Button variant="contained" color="success" onClick={() => handleStartPart(2)}>
+          Start Part 2
+        </Button>
+        <Button variant="contained" color="success" onClick={() => handleStartPart(3)}>
+          Start Part 3
+        </Button>
+        <Button variant="contained" color="error" onClick={handleStopSession}>
+          Session beenden
+        </Button>
       </Box>
     </Box>
   );
