@@ -14,6 +14,7 @@ import { fetchGlobalSettings } from "../services/engagementService";
 import ExternalServicesStatus from "../components/tenants/dashboard/content/ExternalServicesStatus";
 import CalendarWidget from "../components/tenants/dashboard/content/CalendarWidget";
 import PointsStatus from "../components/tenants/dashboard/content/PointsStatus";
+import AttendanceHistoryCard from "../components/tenants/AttendanceHistoryCard";
 
 const TenantPage: React.FC = () => {
   const [departure, setDeparture] = useState<Departure | null>(null);
@@ -94,6 +95,7 @@ const TenantPage: React.FC = () => {
             </DashboardCard>
           )}
           <PointsStatus /> 
+          <AttendanceHistoryCard />
           <DashboardCard title="Settings">
             <Settings />
           </DashboardCard>

@@ -11,6 +11,7 @@ import DirectionsRunOutlined from "@mui/icons-material/DirectionsRunOutlined";
 import ArticleOutlined from "@mui/icons-material/ArticleOutlined";
 import BedOutlined from "@mui/icons-material/BedOutlined";
 import DrawOutlinedIcon from "@mui/icons-material/DrawOutlined";
+import QrCode2Icon from "@mui/icons-material/QrCode2";
 import {
   AssignmentOutlined,
   FilterVintageOutlined,
@@ -167,6 +168,38 @@ export const appRoutes: AppRouteItem[] = [
   ////////////////////////////////////////////////////////////
   // Engagement Specific Routes:
   ////////////////////////////////////////////////////////////
+  {
+    id: "attendance-events",
+    path: "/attendance/events",
+    element: <Pages.AttendanceEventManagement />,
+    title: "Anwesenheit Events",
+    icon: <QrCode2Icon />,
+    requiredGroups: ["Netzwerkreferat", "Heimrat", "ADMIN"],
+    sidebar: true,
+  },
+  {
+    id: "attendance-scanner",
+    path: "/attendance/scan",
+    element: <Pages.AttendanceScanner />,
+    title: "Anwesenheit scannen",
+    icon: <QrCode2Icon />,
+    requiredGroups: ["tenant", "ADMIN"],
+    sidebar: true,
+  },
+  {
+    id: "attendance-display",
+    path: "/attendance/display/:sessionId",
+    element: <Pages.ActiveSessionDisplay />,
+    requiredGroups: ["Netzwerkreferat", "Heimrat", "ADMIN"],
+    sidebar: false,
+  },
+  {
+    id: "attendance-report",
+    path: "/attendance/report/:sessionId",
+    element: <Pages.AttendanceReport />,
+    requiredGroups: ["Netzwerkreferat", "Heimrat", "ADMIN"],
+    sidebar: false,
+  },
   {
     id: "tenant-overview",
     path: "/tenant-overview",

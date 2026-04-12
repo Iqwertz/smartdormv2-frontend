@@ -30,3 +30,8 @@ export const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
     <p>Not implemented, will be implemented in the future.</p>
   </div>
 );
+
+export const AttendanceEventManagement = React.lazy(() => import("./pages/admin/EventManagementPage"));
+export const ActiveSessionDisplay = React.lazy(() => import("./pages/admin/ActiveSessionDisplayPage"));
+export const AttendanceScanner = React.lazy(() => import("./pages/AttendanceScannerPage"));
+export const AttendanceReport = React.lazy(() => import("./pages/admin/AttendanceReportPage"));
