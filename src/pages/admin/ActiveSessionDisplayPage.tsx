@@ -12,6 +12,7 @@ const DARK_COLOR = "rgb(59, 6, 6)";
 const ActiveSessionDisplayPage: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const [eventName, setEventName] = useState("Anwesenheit");
+  const [sessionTitle, setSessionTitle] = useState("Session");
   const [partsCount, setPartsCount] = useState(0);
   const [token, setToken] = useState<string | null>(null);
   const [currentPart, setCurrentPart] = useState<number | null>(null);
@@ -42,6 +43,10 @@ const ActiveSessionDisplayPage: React.FC = () => {
       setEventName(matchedSession.event_details.name);
       setPartsCount(matchedSession.event_details.parts_count);
     }
+
+    if (matchedSession?.title) {
+      setSessionTitle(matchedSession.title);
+    }
   }, [sessionId, sessionNumber]);
 
   const fetchToken = useCallback(async () => {
@@ -54,6 +59,7 @@ const ActiveSessionDisplayPage: React.FC = () => {
       const res = await attendanceService.getCurrentToken(parseInt(sessionId, 10));
       setToken(res.data.token);
       setCurrentPart(res.data.part);
+      setSessionTitle(res.data.session_title || `Session ${sessionId}`);
     } catch (error) {
       console.warn("Could not get token, session might be stopped", error);
       setToken(null);
@@ -120,7 +126,7 @@ const ActiveSessionDisplayPage: React.FC = () => {
     >
       <Box sx={{ width: "100%", maxWidth: 760 }}>
         <DashboardCard
-          title={eventName}
+          title={`${eventName} · ${sessionTitle}`}
           cardSx={{
             border: `1px solid rgba(197, 133, 146, 0.35)`,
             background: "rgba(255, 255, 255, 0.92)",
@@ -146,7 +152,7 @@ const ActiveSessionDisplayPage: React.FC = () => {
                     boxShadow: "0 16px 40px rgba(128, 22, 44, 0.16)",
                   }}
                 >
-                  <QRCodeSVG value={JSON.stringify({ sessionId, token })} size={420} level="H" />
+                  <QRCodeSVG value={JSON.stringify({ sessionId, token, sessionTitle })} size={420} level="H" />
                 </Paper>
               ) : (
                 <Paper
@@ -163,6 +169,21 @@ const ActiveSessionDisplayPage: React.FC = () => {
             </Box>
 
             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1.5 }}>
+              <Box
+                sx={{
+                  px: 2,
+                  py: 1,
+                  borderRadius: 999,
+                  bgcolor: "rgba(128, 22, 44, 0.08)",
+                  color: PRIMARY_COLOR,
+                  fontWeight: 800,
+                  minWidth: 110,
+                  textAlign: "center",
+                }}
+              >
+                {sessionTitle}
+              </Box>
+
               <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" justifyContent="center">
                 {partOptions.map((part) => (
                   <Button

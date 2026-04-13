@@ -75,8 +75,13 @@ const EventManagementPage: React.FC = () => {
   };
 
   const handleCreateSession = (eventId: number) => {
+    const event = events.find((candidate) => candidate.id === eventId);
+    const defaultTitle = event ? `${event.name} - ${new Date().toLocaleDateString()}` : "Neue Session";
+    const title = window.prompt("Session-Titel", defaultTitle);
+    if (title === null) return;
+
     attendanceService
-      .createSession(eventId)
+      .createSession(eventId, title.trim())
       .then(() => fetchEvents())
       .catch(console.error);
   };
@@ -111,8 +116,8 @@ const EventManagementPage: React.FC = () => {
             {sessions[evt.id]?.map((session) => (
               <ListItem key={session.id} divider>
                 <ListItemText
-                  primary={`Datum: ${new Date(session.date).toLocaleDateString()} - Status: ${session.status}`}
-                  secondary={`Aktueller Part: ${session.current_part} / ${evt.parts_count}`}
+                  primary={session.title || `Session ${session.id}`}
+                  secondary={`Datum: ${new Date(session.date).toLocaleDateString()} · Status: ${session.status} · Aktueller Part: ${session.current_part} / ${evt.parts_count}`}
                 />
                 <Box sx={{ display: "flex", gap: 1 }}>
                   {session.status === "CREATED" && (

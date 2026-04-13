@@ -84,6 +84,12 @@ const TenantPage: React.FC = () => {
           </DashboardCard>
         </div>
         <div className="right">
+          <DashboardCard title="Quick Links">
+            <QuickLinks></QuickLinks>
+          </DashboardCard>
+          <DashboardCard title="Kalender" contentSx={{ p: 0 }}>
+            <CalendarWidget></CalendarWidget>
+          </DashboardCard>
           <DashboardCard title="Anwesenheit">
             <Button
               variant="contained"
@@ -93,12 +99,6 @@ const TenantPage: React.FC = () => {
             >
               QR Code Scannen
             </Button>
-          </DashboardCard>
-          <DashboardCard title="Quick Links">
-            <QuickLinks></QuickLinks>
-          </DashboardCard>
-          <DashboardCard title="Kalender" contentSx={{ p: 0 }}>
-            <CalendarWidget></CalendarWidget>
           </DashboardCard>
           {settings?.applications_open && (
             <DashboardCard title="Referatsbewerbung">

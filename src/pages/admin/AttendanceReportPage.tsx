@@ -14,6 +14,7 @@ const AttendanceReportPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [partsCount, setPartsCount] = useState(0);
   const [requiredParts, setRequiredParts] = useState(0);
+  const [sessionTitle, setSessionTitle] = useState<string>("Anwesenheitsreport");
 
   const fetchReport = useCallback(() => {
     if (!sessionId) return;
@@ -24,7 +25,7 @@ const AttendanceReportPage: React.FC = () => {
         const payload = res.data as unknown as
           | {
               rows: AttendanceReportTenant[];
-              session: { event_details: { parts_count: number; required_parts: number } };
+              session: { title: string; event_details: { parts_count: number; required_parts: number } };
             }
           | AttendanceReportTenant[];
 
@@ -32,12 +33,14 @@ const AttendanceReportPage: React.FC = () => {
           setReport(payload);
           setPartsCount(0);
           setRequiredParts(0);
+          setSessionTitle(`Session ${sessionId}`);
           return;
         }
 
         setReport(payload.rows);
         setPartsCount(payload.session.event_details.parts_count);
         setRequiredParts(payload.session.event_details.required_parts);
+        setSessionTitle(payload.session.title || `Session ${sessionId}`);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -168,7 +171,7 @@ const AttendanceReportPage: React.FC = () => {
       className="page-root"
     >
       <DashboardCard
-        title={`Anwesenheitsreport (Session ${sessionId})`}
+        title={`${sessionTitle} · Anwesenheitsreport`}
         cardSx={{ height: "100%", display: "flex", flexDirection: "column" }}
         contentSx={{ flexGrow: 1, display: "flex", flexDirection: "column", padding: 2, height: "100%" }}
       >

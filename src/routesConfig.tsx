@@ -220,6 +220,13 @@ export const appRoutes: AppRouteItem[] = [
     sidebar: true,
   },
   {
+    id: "attendance-base-overview",
+    path: "/attendance/base-attendance/:eventId",
+    element: <Pages.BaseAttendanceOverview />,
+    requiredGroups: ["Netzwerkreferat", "Heimrat", "ADMIN"],
+    sidebar: false,
+  },
+  {
     id: "engagement-management",
     path: "/referate",
     element: <Pages.EngagementManagementPage />,

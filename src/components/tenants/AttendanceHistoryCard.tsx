@@ -21,6 +21,7 @@ interface AttendanceHistoryCardProps {
 type SessionSummary = {
   sessionId: number;
   eventName: string;
+  sessionTitle: string;
   sessionDate: string;
   partsAttended: number;
   maxParts: number;
@@ -54,6 +55,7 @@ const AttendanceHistoryCard: React.FC<AttendanceHistoryCardProps> = ({ refreshTr
         grouped.set(record.session, {
           sessionId: record.session,
           eventName: record.event_name || "Veranstaltung",
+          sessionTitle: record.session_title || record.event_name || "Session",
           sessionDate: record.session_date || record.timestamp,
           maxParts: record.event_parts_count || 0,
           requiredParts: record.event_required_parts || 0,
@@ -70,7 +72,11 @@ const AttendanceHistoryCard: React.FC<AttendanceHistoryCardProps> = ({ refreshTr
     });
 
     const sessionSummaries = Array.from(grouped.values())
-      .map(({ attendedParts, ...entry }) => entry)
+      .map((entry) => {
+        const { attendedParts, ...summary } = entry;
+        void attendedParts;
+        return summary;
+      })
       .sort((a, b) => new Date(b.sessionDate).getTime() - new Date(a.sessionDate).getTime());
 
     const byEventName = new Map<string, SessionSummary[]>();
@@ -119,7 +125,10 @@ const AttendanceHistoryCard: React.FC<AttendanceHistoryCardProps> = ({ refreshTr
                 <List dense sx={{ py: 0 }}>
                   {eventGroup.sessions.map((session) => (
                     <ListItem key={session.sessionId} divider sx={{ px: 0 }}>
-                      <ListItemText secondary={new Date(session.sessionDate).toLocaleDateString()} />
+                      <ListItemText
+                        primary={session.sessionTitle}
+                        secondary={new Date(session.sessionDate).toLocaleDateString()}
+                      />
                       <Typography sx={{ color: "primary.main", fontWeight: 700 }}>
                         {session.partsAttended}/{session.maxParts || "?"}
                       </Typography>

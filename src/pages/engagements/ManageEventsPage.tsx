@@ -16,6 +16,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ViewListIcon from "@mui/icons-material/ViewList";
 import attendanceService, { AttendanceEvent, AttendanceSession } from "../../services/attendanceService";
 import DashboardCard from "../../components/shared/DashboardCard";
 
@@ -47,8 +48,13 @@ const ManageEventsPage: React.FC = () => {
   }, []);
 
   const handleCreateSession = (eventId: number) => {
+    const event = events.find((candidate) => candidate.id === eventId);
+    const defaultTitle = event ? `${event.name} - ${new Date().toLocaleDateString()}` : "Neue Session";
+    const title = window.prompt("Session-Titel", defaultTitle);
+    if (title === null) return;
+
     attendanceService
-      .createSession(eventId)
+      .createSession(eventId, title.trim())
       .then(() => fetchEvents())
       .catch(console.error);
   };
@@ -112,14 +118,24 @@ const ManageEventsPage: React.FC = () => {
             key={evt.id}
             title={evt.name}
             action={
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={<AddIcon />}
-                onClick={() => handleCreateSession(evt.id)}
-              >
-                Neue Session starten
-              </Button>
+              <Box sx={{ display: "flex", gap: 1 }}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<ViewListIcon />}
+                  onClick={() => navigate(`/attendance/base-attendance/${evt.id}`)}
+                >
+                  Übersicht
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<AddIcon />}
+                  onClick={() => handleCreateSession(evt.id)}
+                >
+                  Neue Session starten
+                </Button>
+              </Box>
             }
             cardSx={{ mb: 3 }}
           >
@@ -134,8 +150,8 @@ const ManageEventsPage: React.FC = () => {
                     {idx > 0 && <Divider />}
                     <ListItem sx={{ px: 0, py: 1.5 }}>
                       <ListItemText
-                        primary={`Datum: ${new Date(session.date).toLocaleDateString()} - Status: ${session.status}`}
-                        secondary={`Aktueller Part: ${session.current_part} / ${evt.parts_count}`}
+                        primary={session.title || `Session ${session.id}`}
+                        secondary={`Datum: ${new Date(session.date).toLocaleDateString()} · Status: ${session.status} · Aktueller Part: ${session.current_part} / ${evt.parts_count}`}
                       />
                       <Box sx={{ display: "flex", gap: 1 }}>
                         {session.status === "CREATED" && (
