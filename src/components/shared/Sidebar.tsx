@@ -8,7 +8,8 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import EditIcon from "@mui/icons-material/Edit";
 import { useAuth } from "../../context/AuthContext";
-import { getSidebarItems } from "../../routesConfig";
+import { getSidebarItems, appRoutes } from "../../routesConfig";
+import attendanceService from "../../services/attendanceService";
 import Tooltip from "./Tooltip";
 
 export interface AppSidebarItem {
@@ -24,6 +25,7 @@ const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [referatDropdownOpen, setReferatDropdownOpen] = useState(false);
+  const [hasEvents, setHasEvents] = useState(false);
   const { authState, logout } = useAuth();
   const location = useLocation();
   const previousPathnameRef = useRef(location.pathname);
@@ -34,6 +36,10 @@ const Sidebar: React.FC = () => {
 
       const normalItems = items
         .filter((item) => !("routes" in item))
+        .filter((item) => {
+          if (!("routes" in item) && item.id === "attendance-manage" && !hasEvents) return false;
+          return true;
+        })
         .map((route) => {
           if ("routes" in route) return null;
           return {
@@ -64,7 +70,7 @@ const Sidebar: React.FC = () => {
       };
     }
     return { sidebarItems: [], referatItems: [] };
-  }, [authState.user?.groups]);
+  }, [authState.user?.groups, hasEvents]);
 
   const handleLogout = async () => {
     await logout();
@@ -77,6 +83,17 @@ const Sidebar: React.FC = () => {
   const toggleReferatDropdown = () => {
     setReferatDropdownOpen(!referatDropdownOpen);
   };
+
+  useEffect(() => {
+    if (authState.user) {
+      attendanceService
+        .getManageableEvents()
+        .then((res) => {
+          setHasEvents(res.data.length > 0);
+        })
+        .catch(console.error);
+    }
+  }, [authState.user]);
 
   useEffect(() => {
     const checkIfMobile = () => {
@@ -180,7 +197,7 @@ const Sidebar: React.FC = () => {
                       <span className="links_name">{item.title}</span>
                     </Link>
                   </li>
-                )
+                ),
             )}
           </ul>
         )}
@@ -215,7 +232,7 @@ const Sidebar: React.FC = () => {
                     </Link>
                   </Tooltip>
                 </li>
-              )
+              ),
           )}
 
           {renderReferatDropdown()}
