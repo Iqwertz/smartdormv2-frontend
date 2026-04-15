@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Html5QrcodeScanner } from "html5-qrcode";
+import { Html5QrcodeScanner, Html5QrcodeScanType } from "html5-qrcode";
 import { Box, Typography, Container, CircularProgress, Alert } from "@mui/material";
 import attendanceService from "../../services/attendanceService";
 import DashboardCard from "../../components/shared/DashboardCard";
@@ -54,7 +54,11 @@ const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ onSuccess, isModa
     innerWrapper.id = uniqueId;
     containerRef.current.appendChild(innerWrapper);
 
-    const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+    const config = {
+      fps: 10,
+      qrbox: { width: 250, height: 250 },
+      supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
+    };
     const html5QrcodeScanner = new Html5QrcodeScanner(uniqueId, config, false);
     scannerRef.current = html5QrcodeScanner;
 
