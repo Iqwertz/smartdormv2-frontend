@@ -17,7 +17,7 @@ import {
 import Grid from "@mui/material/Grid";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { Departure } from "../../../types/tenant";
-import { fetchDeparturesByStatus, closeDeparture } from "../../../services/departureService";
+import { fetchDeparturesByStatus, closeDeparture, revertDeparture } from "../../../services/departureService";
 import { useNotification } from "../../../context/NotificationContext";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -63,6 +63,26 @@ const ConfirmedDeparturesList: React.FC = () => {
       loadDepartures();
     } catch (err: any) {
       showNotification(err.response?.data?.error || "Abschließen fehlgeschlagen.", "error");
+    } finally {
+      setClosingStates((prev) => ({ ...prev, [id]: { ...(prev[id] || {}), isClosing: false } }));
+    }
+  };
+
+  const handleRevertDeparture = async (id: number) => {
+    if (
+      !window.confirm(
+        "Sind Sie sicher, dass Sie den Auszug abbrechen möchten? Alle Unterschriften und Auszugsdaten werden gelöscht. Dies lässt sich nicht rückgängig machen.",
+      )
+    ) {
+      return;
+    }
+    setClosingStates((prev) => ({ ...prev, [id]: { ...(prev[id] || {}), isClosing: true } }));
+    try {
+      await revertDeparture(id);
+      showNotification("Auszug erfolgreich abgebrochen.", "success");
+      loadDepartures();
+    } catch (err: any) {
+      showNotification(err.response?.data?.error || "Abbrechen fehlgeschlagen.", "error");
     } finally {
       setClosingStates((prev) => ({ ...prev, [id]: { ...(prev[id] || {}), isClosing: false } }));
     }
@@ -181,6 +201,16 @@ const ConfirmedDeparturesList: React.FC = () => {
                   </List>
                 </Grid>
               </Grid>
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={() => handleRevertDeparture(dep.tenant.id)}
+                disabled={isClosing}
+                size="small"
+                sx={{ mt: 1 }}
+              >
+                Auszug zurückiehen
+              </Button>
             </CardContent>
           </Card>
         );
