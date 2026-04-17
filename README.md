@@ -52,3 +52,12 @@ export default tseslint.config({
   },
 })
 ```
+
+## Demo Mode
+
+To enable the demo mode which displays a hint on the login screen (login with username `demo` and password `demo`), add the following environment variable to your `.env` or `.env.development` file:
+
+```env
+VITE_DEMO_MODE=true
+```
+

@@ -11,6 +11,7 @@ import DirectionsRunOutlined from "@mui/icons-material/DirectionsRunOutlined";
 import ArticleOutlined from "@mui/icons-material/ArticleOutlined";
 import BedOutlined from "@mui/icons-material/BedOutlined";
 import DrawOutlinedIcon from "@mui/icons-material/DrawOutlined";
+import QrCode2Icon from "@mui/icons-material/QrCode2";
 import {
   AssignmentOutlined,
   FilterVintageOutlined,
@@ -168,6 +169,20 @@ export const appRoutes: AppRouteItem[] = [
   // Engagement Specific Routes:
   ////////////////////////////////////////////////////////////
   {
+    id: "attendance-display",
+    path: "/attendance/display/:sessionId",
+    element: <Pages.ActiveSessionDisplay />,
+    requiredGroups: ["Netzwerkreferat", "Heimrat", "ADMIN"],
+    sidebar: false,
+  },
+  {
+    id: "attendance-report",
+    path: "/attendance/report/:sessionId",
+    element: <Pages.AttendanceReport />,
+    requiredGroups: ["Netzwerkreferat", "Heimrat", "ADMIN"],
+    sidebar: false,
+  },
+  {
     id: "tenant-overview",
     path: "/tenant-overview",
     element: <Pages.TenantOverviewPage />,
@@ -194,6 +209,22 @@ export const appRoutes: AppRouteItem[] = [
     icon: <FilterVintageOutlined />,
     requiredGroups: ["Heimrat", "ADMIN"],
     sidebar: true,
+  },
+  {
+    id: "attendance-manage",
+    path: "/attendance/manage",
+    element: <Pages.ManageEventsPage />,
+    title: "Anwesenheit verwalten",
+    icon: <QrCode2Icon />,
+    requiredGroups: [], // Accessible, sidebar rendering is handled dynamically
+    sidebar: true,
+  },
+  {
+    id: "attendance-base-overview",
+    path: "/attendance/base-attendance/:eventId",
+    element: <Pages.BaseAttendanceOverview />,
+    requiredGroups: ["Netzwerkreferat", "Heimrat", "ADMIN"],
+    sidebar: false,
   },
   {
     id: "engagement-management",
@@ -310,7 +341,7 @@ export const getSidebarItems = (userGroups: string[]): AppRouteItem[] => {
         route.icon &&
         (!route.requiredGroups ||
           route.requiredGroups.length === 0 ||
-          route.requiredGroups.some((group) => userGroups.includes(group)))
+          route.requiredGroups.some((group) => userGroups.includes(group))),
     );
 
     if (visibleRoutes.length === 0) return false;
@@ -327,7 +358,7 @@ export const getInitialRedirectPath = (userGroups: string[]): string => {
     .filter(
       (route) =>
         (route.requiredGroups && route.requiredGroups.length === 0) ||
-        route.requiredGroups?.some((group) => userGroups.includes(group))
+        route.requiredGroups?.some((group) => userGroups.includes(group)),
     )
     .sort((a, b) => {
       const orderA = a.defaultRedirectOrder ?? Infinity;
