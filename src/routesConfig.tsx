@@ -172,14 +172,14 @@ export const appRoutes: AppRouteItem[] = [
     id: "attendance-display",
     path: "/attendance/display/:sessionId",
     element: <Pages.ActiveSessionDisplay />,
-    requiredGroups: ["Netzwerkreferat", "Heimrat", "ADMIN"],
+    requiredGroups: [], // Accessible, sidebar rendering is handled dynamically
     sidebar: false,
   },
   {
     id: "attendance-report",
     path: "/attendance/report/:sessionId",
     element: <Pages.AttendanceReport />,
-    requiredGroups: ["Netzwerkreferat", "Heimrat", "ADMIN"],
+    requiredGroups: [], // Accessible, sidebar rendering is handled dynamically
     sidebar: false,
   },
   {
@@ -223,7 +223,7 @@ export const appRoutes: AppRouteItem[] = [
     id: "attendance-base-overview",
     path: "/attendance/base-attendance/:eventId",
     element: <Pages.BaseAttendanceOverview />,
-    requiredGroups: ["Netzwerkreferat", "Heimrat", "ADMIN"],
+    requiredGroups: [], // Accessible, sidebar rendering is handled dynamically
     sidebar: false,
   },
   {

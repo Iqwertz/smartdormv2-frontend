@@ -19,7 +19,6 @@ import LazyImage from "../../components/shared/LazyImage"; // Import the new com
 import { GridDownloadIcon } from "@mui/x-data-grid";
 import { API_BASE_URL } from "../../config";
 import { getNextSemester, getPreviousSemester } from "../../services/helperService";
-import { textAlign } from "@mui/system";
 
 const ViewApplicationsPage: React.FC = () => {
   const [settings, setSettings] = useState<GlobalAppSettings | null>(null);
@@ -71,14 +70,17 @@ const ViewApplicationsPage: React.FC = () => {
 
   const groupedApplications = useMemo(() => {
     if (!applications) return {};
-    const grouped = applications.reduce((acc, app) => {
-      const deptName = app.department.full_name;
-      if (!acc[deptName]) {
-        acc[deptName] = [];
-      }
-      acc[deptName].push(app);
-      return acc;
-    }, {} as Record<string, EngagementApplicationData[]>);
+    const grouped = applications.reduce(
+      (acc, app) => {
+        const deptName = app.department.full_name;
+        if (!acc[deptName]) {
+          acc[deptName] = [];
+        }
+        acc[deptName].push(app);
+        return acc;
+      },
+      {} as Record<string, EngagementApplicationData[]>,
+    );
 
     // Sort departments by name
     const sortedEntries = Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b));
