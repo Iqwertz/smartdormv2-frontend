@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Box, Button, Paper, CircularProgress, Stack } from "@mui/material";
+import { Box, Button, Paper, CircularProgress, Stack, Dialog, DialogContent } from "@mui/material";
 import { QRCodeSVG } from "qrcode.react";
 import DashboardCard from "../../components/shared/DashboardCard";
 import attendanceService, { AttendanceEvent, AttendanceSession } from "../../services/attendanceService";
@@ -17,6 +17,7 @@ const ActiveSessionDisplayPage: React.FC = () => {
   const [token, setToken] = useState<string | null>(null);
   const [currentPart, setCurrentPart] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isFullscreenQR, setIsFullscreenQR] = useState(false);
   const navigate = useNavigate();
 
   const sessionNumber = useMemo(() => (sessionId ? Number.parseInt(sessionId, 10) : NaN), [sessionId]);
@@ -119,8 +120,8 @@ const ActiveSessionDisplayPage: React.FC = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        px: 2,
-        py: 4,
+        px: 1,
+        py: 2,
         background: "linear-gradient(180deg, rgba(128, 22, 44, 0.06) 0%, rgba(197, 133, 146, 0.05) 100%)",
       }}
     >
@@ -142,18 +143,63 @@ const ActiveSessionDisplayPage: React.FC = () => {
               }}
             >
               {token ? (
-                <Paper
-                  elevation={0}
-                  sx={{
-                    p: 2,
-                    borderRadius: 4,
-                    bgcolor: "#fff",
-                    border: `4px solid ${ACCENT_COLOR}`,
-                    boxShadow: "0 16px 40px rgba(128, 22, 44, 0.16)",
-                  }}
-                >
-                  <QRCodeSVG value={JSON.stringify({ sessionId, token, sessionTitle })} size={420} level="H" />
-                </Paper>
+                <>
+                  <Paper
+                    elevation={0}
+                    onClick={() => setIsFullscreenQR(true)}
+                    sx={{
+                      p: 1,
+                      borderRadius: 4,
+                      bgcolor: "#fff",
+                      border: `4px solid ${ACCENT_COLOR}`,
+                      boxShadow: "0 16px 40px rgba(128, 22, 44, 0.16)",
+                      cursor: "pointer",
+                      transition: "transform 0.2s",
+                      "&:hover": { transform: "scale(1.02)" },
+                    }}
+                  >
+                    <QRCodeSVG value={JSON.stringify({ sessionId, token, sessionTitle })} size={420} level="H" />
+                  </Paper>
+                  <Dialog
+                    open={isFullscreenQR}
+                    onClose={() => setIsFullscreenQR(false)}
+                    maxWidth="xl"
+                    PaperProps={{
+                      sx: {
+                        p: { xs: 2, sm: 4 },
+                        borderRadius: 4,
+                        bgcolor: "#fff",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        margin: 2,
+                      },
+                    }}
+                  >
+                    <Box
+                      onClick={() => setIsFullscreenQR(false)}
+                      sx={{
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <QRCodeSVG
+                        value={JSON.stringify({ sessionId, token, sessionTitle })}
+                        size={1024}
+                        level="H"
+                        style={{
+                          width: "100%",
+                          height: "auto",
+                          maxWidth: "80vh",
+                          maxHeight: "80vh",
+                          display: "block",
+                        }}
+                      />
+                    </Box>
+                  </Dialog>
+                </>
               ) : (
                 <Paper
                   elevation={0}

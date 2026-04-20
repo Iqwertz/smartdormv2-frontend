@@ -58,6 +58,9 @@ const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ onSuccess, isModa
       fps: 10,
       qrbox: { width: 250, height: 250 },
       supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
+      videoConstraints: {
+        facingMode: "environment",
+      },
     };
     const html5QrcodeScanner = new Html5QrcodeScanner(uniqueId, config, false);
     scannerRef.current = html5QrcodeScanner;
