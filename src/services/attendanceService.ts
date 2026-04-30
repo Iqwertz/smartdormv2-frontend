@@ -36,9 +36,8 @@ export interface AttendanceRecord {
 }
 
 export interface QrTokenResponse {
-  token: string;
+  code: string;
   part: number;
-  session_id: number;
   session_title?: string;
 }
 
@@ -130,8 +129,8 @@ export const attendanceService = {
   // Scans & Checks
   getCurrentToken: (sessionId: number) =>
     apiClient.get<QrTokenResponse>(`${ATTENDANCE_API}/sessions/${sessionId}/current-token/`),
-  scanAttendance: (sessionId: number, token: string) =>
-    apiClient.post<{ message?: string; error?: string }>(`${ATTENDANCE_API}/scan/`, { session_id: sessionId, token }),
+  scanAttendance: (code: string) =>
+    apiClient.post<{ message?: string; error?: string }>(`${ATTENDANCE_API}/scan/`, { code }),
 
   // Reports & Overrides
   getReport: (sessionId: number) =>

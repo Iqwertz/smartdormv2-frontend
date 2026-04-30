@@ -20,7 +20,7 @@ import {
   LanOutlined,
   PersonAdd,
 } from "@mui/icons-material";
-import { ALL_FLOORS } from "./config";
+import { ALL_FLOORS, ATTENDANCE_LINK_ROUTE } from "./config";
 
 // Import all lazy page components from the dedicated pages file.
 import * as Pages from "./pages";
@@ -318,6 +318,7 @@ export const appRoutes: AppRouteItem[] = [
 ];
 
 export const loginRoute = "/login";
+export const attendanceCheckInRoute = ATTENDANCE_LINK_ROUTE;
 export const defaultAuthenticatedRoute = "/dashboard"; // Fallback if no specific route is found
 
 export const getSidebarItems = (userGroups: string[]): AppRouteItem[] => {

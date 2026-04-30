@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Box, Button, Paper, CircularProgress, Stack, Dialog, DialogContent } from "@mui/material";
+import { Box, Button, Paper, CircularProgress, Stack, Dialog } from "@mui/material";
 import { QRCodeSVG } from "qrcode.react";
 import DashboardCard from "../../components/shared/DashboardCard";
 import attendanceService, { AttendanceEvent, AttendanceSession } from "../../services/attendanceService";
+import { buildAttendanceLink } from "../../utils/attendanceLink";
 
 const PRIMARY_COLOR = "rgb(128, 22, 44)";
 const ACCENT_COLOR = "rgb(197, 133, 146)";
@@ -14,7 +15,7 @@ const ActiveSessionDisplayPage: React.FC = () => {
   const [eventName, setEventName] = useState("Anwesenheit");
   const [sessionTitle, setSessionTitle] = useState("Session");
   const [partsCount, setPartsCount] = useState(0);
-  const [token, setToken] = useState<string | null>(null);
+  const [attendanceCode, setAttendanceCode] = useState<string | null>(null);
   const [currentPart, setCurrentPart] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [isFullscreenQR, setIsFullscreenQR] = useState(false);
@@ -58,12 +59,12 @@ const ActiveSessionDisplayPage: React.FC = () => {
 
     try {
       const res = await attendanceService.getCurrentToken(parseInt(sessionId, 10));
-      setToken(res.data.token);
+      setAttendanceCode(res.data.code);
       setCurrentPart(res.data.part);
       setSessionTitle(res.data.session_title || `Session ${sessionId}`);
     } catch (error) {
       console.warn("Could not get token, session might be stopped", error);
-      setToken(null);
+      setAttendanceCode(null);
       setCurrentPart(null);
     }
   }, [sessionId]);
@@ -142,7 +143,7 @@ const ActiveSessionDisplayPage: React.FC = () => {
                 justifyContent: "center",
               }}
             >
-              {token ? (
+              {attendanceCode ? (
                 <>
                   <Paper
                     elevation={0}
@@ -158,7 +159,7 @@ const ActiveSessionDisplayPage: React.FC = () => {
                       "&:hover": { transform: "scale(1.02)" },
                     }}
                   >
-                    <QRCodeSVG value={JSON.stringify({ sessionId, token, sessionTitle })} size={420} level="H" />
+                    <QRCodeSVG value={buildAttendanceLink(attendanceCode)} size={420} level="H" />
                   </Paper>
                   <Dialog
                     open={isFullscreenQR}
@@ -186,7 +187,7 @@ const ActiveSessionDisplayPage: React.FC = () => {
                       }}
                     >
                       <QRCodeSVG
-                        value={JSON.stringify({ sessionId, token, sessionTitle })}
+                        value={buildAttendanceLink(attendanceCode)}
                         size={1024}
                         level="H"
                         style={{

@@ -18,6 +18,8 @@ import AttendanceHistoryCard from "../components/tenants/AttendanceHistoryCard";
 import { lazy, Suspense } from "react";
 import { Dialog, DialogContent, DialogTitle, CircularProgress, DialogActions } from "@mui/material";
 import QrCodeScannerIcon from "@mui/icons-material/QrCodeScanner";
+import AttendanceResultPopup from "../components/attendance/AttendanceResultPopup";
+import { ATTENDANCE_RESULT_STORAGE_KEY } from "../utils/attendanceConstants";
 
 const AttendanceScanner = lazy(() => import("../components/tenants/AttendanceScanner"));
 
@@ -123,6 +125,10 @@ const TenantPage: React.FC = () => {
           </DashboardCard>
         </div>
       </div>
+      <AttendanceResultPopup
+        storageKey={ATTENDANCE_RESULT_STORAGE_KEY}
+        onClosed={() => setAttendanceHistoryRefresh((prev) => prev + 1)}
+      />
       {departure && (
         <DepartureDecisionPopup open={showPopup} onClose={() => setShowPopup(false)} departure={departure} />
       )}

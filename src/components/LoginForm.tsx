@@ -25,7 +25,8 @@ const LoginForm: React.FC = () => {
 
   const isDemoMode = import.meta.env.VITE_DEMO_MODE === "true";
 
-  const from = location.state?.from?.pathname || null;
+  const fromLocation = location.state?.from;
+  const from = fromLocation ? `${fromLocation.pathname}${fromLocation.search ?? ""}${fromLocation.hash ?? ""}` : null;
 
   useEffect(() => {
     if (authState.isAuthenticated && authState.user) {
