@@ -47,7 +47,7 @@ const PointsStatus: React.FC = () => {
   const nextDeadline = getExtensionDeadline(
     profile.move_in,
     formatDaysToMonths(contractCalculation.subtenancies.total_added_days),
-    status.nextExtension
+    status.nextExtension,
   );
   const formattedDeadline = dayjs(nextDeadline).format("DD.MM.YYYY");
   const isDeadlineClose = dayjs(nextDeadline).diff(dayjs(), "month") < 3;
@@ -168,7 +168,7 @@ const PointsStatus: React.FC = () => {
           <Box sx={{ mt: 3 }}>
             <Stepper alternativeLabel activeStep={status.securedExtensions}>
               {[1, 2, 3, 4, 5].map((level) => {
-                const pts = level <= 5 ? [50, 150, 250, 300, 350][level - 1] : "";
+                const pts = level <= 5 ? [75, 150, 250, 300, 350][level - 1] : "";
                 return (
                   <Step key={level}>
                     <StepLabel>

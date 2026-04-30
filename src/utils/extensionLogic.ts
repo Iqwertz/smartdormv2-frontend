@@ -1,7 +1,7 @@
 // src/utils/extensionLogic.ts
 import dayjs from "dayjs";
 
-export const POINT_THRESHOLDS = [50, 150, 250, 300, 350];
+export const POINT_THRESHOLDS = [75, 150, 250, 300, 350];
 const POINTS_PER_EXTRA_LEVEL = 50;
 
 /**
