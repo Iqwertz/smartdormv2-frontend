@@ -5,13 +5,21 @@ import { CircularProgress, Typography, Box } from "@mui/material";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./context/AuthContext";
 import AppLayout from "./layout/AppLayout";
-import { appRoutes, loginRoute, getInitialRedirectPath, AppRouteGroup, AppRoute } from "./routesConfig";
+import {
+  appRoutes,
+  loginRoute,
+  getInitialRedirectPath,
+  AppRouteGroup,
+  AppRoute,
+  attendanceCheckInRoute,
+} from "./routesConfig";
 import { useTracking } from "./hooks/useTracking";
 
 // Lazy load pages that are not in the main appRoutes array
 const LoginPage = React.lazy(() => import("./pages/LoginPage"));
 const PasswordResetPage = React.lazy(() => import("./pages/PasswordResetPage"));
 const Error404Page = React.lazy(() => import("./pages/Error404Page"));
+const AttendanceCheckInPage = React.lazy(() => import("./pages/engagements/AttendanceCheckInPage"));
 
 const InitialLoadingScreen: React.FC = () => (
   <div className="background">
@@ -66,6 +74,7 @@ function App() {
         <Routes>
           <Route path={loginRoute} element={<LoginPage />} />
           <Route path="/password-reset" element={<PasswordResetPage />} />
+          <Route path={attendanceCheckInRoute} element={<AttendanceCheckInPage />} />
 
           {/* Routes that use AppLayout and require authentication */}
           <Route element={<AppLayout />}>

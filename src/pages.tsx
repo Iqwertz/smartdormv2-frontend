@@ -33,5 +33,6 @@ export const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
 
 export const ManageEventsPage = React.lazy(() => import("./pages/engagements/ManageEventsPage"));
 export const ActiveSessionDisplay = React.lazy(() => import("./pages/engagements/ActiveSessionDisplayPage"));
+export const AttendanceCheckInPage = React.lazy(() => import("./pages/engagements/AttendanceCheckInPage"));
 export const AttendanceReport = React.lazy(() => import("./pages/engagements/AttendanceReportPage"));
 export const BaseAttendanceOverview = React.lazy(() => import("./pages/engagements/BaseAttendanceOverviewPage"));

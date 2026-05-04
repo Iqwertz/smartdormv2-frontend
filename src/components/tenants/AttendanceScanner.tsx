@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import { Html5QrcodeScanner, Html5QrcodeScanType } from "html5-qrcode";
-import { Box, Typography, Container, CircularProgress, Alert } from "@mui/material";
+import { Box, CircularProgress, Alert } from "@mui/material";
+import { useNavigate, useLocation } from "react-router-dom";
 import attendanceService from "../../services/attendanceService";
 import DashboardCard from "../../components/shared/DashboardCard";
 import { useNotification } from "../../context/NotificationContext";
+import { useAuth } from "../../context/AuthContext";
+import { getAttendanceCodeFromUrl, parseAttendanceCode } from "../../utils/attendanceLink";
+import { ATTENDANCE_RESULT_STORAGE_KEY, ATTENDANCE_CODE_STORAGE_KEY } from "../../utils/attendanceConstants";
 
 interface AttendanceScannerProps {
   onSuccess?: () => void;
@@ -15,6 +19,9 @@ const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ onSuccess, isModa
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const { showNotification } = useNotification();
+  const { authState } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const scannerRef = React.useRef<Html5QrcodeScanner | null>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -65,15 +72,25 @@ const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ onSuccess, isModa
     const html5QrcodeScanner = new Html5QrcodeScanner(uniqueId, config, false);
     scannerRef.current = html5QrcodeScanner;
 
-    const onScanSuccess = (decodedText: string, decodedResult: any) => {
+    const onScanSuccess = (decodedText: string) => {
       if (loadingRef.current) return;
 
       try {
-        const data = JSON.parse(decodedText);
-        const sessionId = parseInt(data.sessionId, 10);
-        const token = data.token;
+        const code = getAttendanceCodeFromUrl(decodedText);
+        const parsedCode = code ? parseAttendanceCode(code) : null;
 
-        if (!sessionId || !token) throw new Error("Invalid QR Code Format");
+        if (!code || !parsedCode) {
+          throw new Error("Ungültiger Anwesenheits-QR-Code.");
+        }
+
+        // If not authenticated, store code and redirect to login
+        if (!authState.isAuthenticated) {
+          sessionStorage.setItem(ATTENDANCE_CODE_STORAGE_KEY, code);
+          sessionStorage.setItem(ATTENDANCE_RESULT_STORAGE_KEY, JSON.stringify({ type: "awaiting-login" }));
+          html5QrcodeScanner.pause(true);
+          navigate("/login", { state: { from: location } });
+          return;
+        }
 
         setLoading(true);
         loadingRef.current = true;
@@ -81,9 +98,16 @@ const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ onSuccess, isModa
         html5QrcodeScanner.pause(true); // Pause scanning while submitting
 
         attendanceService
-          .scanAttendance(sessionId, token)
+          .scanAttendance(code)
           .then((res) => {
-            showNotification(res.data.message || "Erfolgreich eingecheckt!", "success");
+            const successMessage = res.data.message || "Erfolgreich eingecheckt!";
+            sessionStorage.setItem(
+              ATTENDANCE_RESULT_STORAGE_KEY,
+              JSON.stringify({ type: "success", message: successMessage }),
+            );
+            sessionStorage.removeItem(ATTENDANCE_CODE_STORAGE_KEY);
+            window.dispatchEvent(new CustomEvent("attendanceResultUpdated"));
+            showNotification(successMessage, "success");
             if (onSuccess) {
               if (!unmounted) onSuccess();
             } else {
@@ -93,10 +117,16 @@ const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ onSuccess, isModa
             }
           })
           .catch((err) => {
-            setError(err.response?.data?.error || "Fehler beim Scannen!");
-            showNotification(error || "Fehler beim Scannen!", "error");
+            const errorMessage = err.response?.data?.error || "Fehler beim Scannen!";
+            sessionStorage.setItem(
+              ATTENDANCE_RESULT_STORAGE_KEY,
+              JSON.stringify({ type: "error", message: errorMessage }),
+            );
+            sessionStorage.removeItem(ATTENDANCE_CODE_STORAGE_KEY);
+            window.dispatchEvent(new CustomEvent("attendanceResultUpdated"));
+            setError(errorMessage);
+            showNotification(errorMessage, "error");
             if (!unmounted) {
-              setError(null);
               html5QrcodeScanner.resume();
             }
           })
@@ -108,15 +138,13 @@ const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ onSuccess, isModa
           });
       } catch (e) {
         console.warn(e);
-        setError("Ungültiges QR Code Format. Zeigt er auf SmartDorm?");
-        showNotification(error || "Ungültiges QR Code Format. Zeigt er auf SmartDorm?", "error");
-        if (!unmounted) {
-          setError(null);
-        }
+        const errorMessage = "Ungültiges QR Code Format. Zeigt er auf SmartDorm?";
+        setError(errorMessage);
+        showNotification(errorMessage, "error");
       }
     };
 
-    const onScanFailure = (error: any) => {
+    const onScanFailure = () => {
       // Ignore routine scan errors as it parses wildly
     };
 
@@ -126,7 +154,7 @@ const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ onSuccess, isModa
       unmounted = true;
       shutdownScanner();
     };
-  }, [active, onSuccess, shutdownScanner]);
+  }, [active, onSuccess, shutdownScanner, showNotification, authState.isAuthenticated, navigate, location]);
 
   const content = (
     <Box sx={{ p: isModal ? 0 : 2, bgcolor: isModal ? "transparent" : "background.paper", borderRadius: 2 }}>
@@ -134,6 +162,12 @@ const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ onSuccess, isModa
         <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
           <CircularProgress />
         </Box>
+      )}
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
       )}
 
       {/* The DOM element needed by html5-qrcode */}
