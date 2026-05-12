@@ -41,7 +41,11 @@ type EventTypeGroup = {
 
 const AttendanceHistoryCard: React.FC<AttendanceHistoryCardProps> = ({ refreshTrigger = 0 }) => {
   const [history, setHistory] = useState<
-    (AttendanceRecord & { is_base_attendance?: boolean; base_attendance_note?: string | null })[]
+    (AttendanceRecord & {
+      is_base_attendance?: boolean;
+      base_attendance_note?: string | null;
+      base_attendance_sessions_count?: number;
+    })[]
   >([]);
   const [loading, setLoading] = useState(true);
 
