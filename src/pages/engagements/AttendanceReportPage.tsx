@@ -61,6 +61,14 @@ const AttendanceReportPage: React.FC = () => {
     [fetchReport, sessionId],
   );
 
+  const attendanceCountsByPart = useMemo(() => {
+    const counts: Record<number, number> = {};
+    for (let i = 1; i <= partsCount; i++) {
+      counts[i] = report.filter((r) => r.parts_attended.includes(i)).length;
+    }
+    return counts;
+  }, [report, partsCount]);
+
   const columns = useMemo<GridColDef[]>(() => {
     const cols: GridColDef[] = [
       {
@@ -121,13 +129,33 @@ const AttendanceReportPage: React.FC = () => {
       const partNum = i + 1;
       cols.push({
         field: `part_${partNum}`,
-        headerName: `Part ${partNum}`,
+        headerName: `Part ${partNum} (${attendanceCountsByPart[partNum] || 0})`,
         width: 120,
-        sortable: false,
+        sortable: true,
         filterable: false,
         disableColumnMenu: true,
         align: "center",
         headerAlign: "center",
+        sortComparator: (v1, v2, cellParams1, cellParams2) => {
+          const row1 = cellParams1.api.getRow(cellParams1.id) as AttendanceReportTenant;
+          const row2 = cellParams2.api.getRow(cellParams2.id) as AttendanceReportTenant;
+
+          if (!row1 || !row2) return 0;
+
+          const isPresent1 = row1.parts_attended.includes(partNum);
+          const isOverride1 = row1.manual_overrides.includes(partNum);
+
+          const isPresent2 = row2.parts_attended.includes(partNum);
+          const isOverride2 = row2.manual_overrides.includes(partNum);
+
+          // Priority: attended (3) > manually registered (2) > not attended (1)
+          const getPriority = (isPresent: boolean, isOverride: boolean) => (isPresent ? 3 : isOverride ? 2 : 1);
+
+          const priority1 = getPriority(isPresent1, isOverride1);
+          const priority2 = getPriority(isPresent2, isOverride2);
+
+          return priority2 - priority1; // Descending order
+        },
         renderCell: (params) => {
           const row = params.row as AttendanceReportTenant;
           const isPresent = row.parts_attended.includes(partNum);
@@ -157,7 +185,7 @@ const AttendanceReportPage: React.FC = () => {
     }
 
     return cols;
-  }, [partsCount, requiredParts, handleOverride]);
+  }, [partsCount, requiredParts, handleOverride, attendanceCountsByPart]);
 
   return (
     <Box
