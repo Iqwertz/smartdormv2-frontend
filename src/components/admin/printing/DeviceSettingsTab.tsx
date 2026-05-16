@@ -19,6 +19,7 @@ const DeviceSettingsTab: React.FC = () => {
   const [pricePerPageColor, setPricePerPageColor] = useState<string>("");
   const [pricePerPageGray, setPricePerPageGray] = useState<string>("");
   const [sessionDuration, setSessionDuration] = useState<number>(30);
+  const [ipAddress, setIpAddress] = useState<string>("");
 
   useEffect(() => {
     const loadData = async () => {
@@ -30,6 +31,7 @@ const DeviceSettingsTab: React.FC = () => {
         setPricePerPageColor(parseFloat(data.device.price_per_page_color).toFixed(2));
         setPricePerPageGray(parseFloat(data.device.price_per_page_gray).toFixed(2));
         setSessionDuration(data.device.max_session_duration_minutes);
+        setIpAddress(data.device.ip_address || "");
       } catch (err) {
         setError("Einstellungen konnten nicht geladen werden.");
       } finally {
@@ -58,6 +60,7 @@ const DeviceSettingsTab: React.FC = () => {
         price_per_page_color: priceColor.toFixed(2),
         price_per_page_gray: priceGray.toFixed(2),
         max_session_duration_minutes: sessionDuration,
+        ip_address: ipAddress.trim(),
       });
       showNotification("Einstellungen gespeichert.", "success");
       // Reload to get updated data
@@ -113,6 +116,17 @@ const DeviceSettingsTab: React.FC = () => {
               onChange={(e) => setSessionDuration(parseInt(e.target.value) || 30)}
               inputProps={{ min: "1" }}
               helperText="Nach dieser Zeit endet die Session automatisch"
+            />
+            <TextField
+              label="Drucker-IP (Raspberry Pi)"
+              value={ipAddress}
+              onChange={(e) => setIpAddress(e.target.value)}
+              placeholder="z.B. 10.50.0.15"
+              helperText={
+                overview.device.ip_address
+                  ? `Aktuell: ${overview.device.ip_address}`
+                  : "Noch nicht gesetzt – ohne IP wird auf die CUPS_SERVER-Umgebungsvariable zurückgegriffen."
+              }
             />
             <Box>
               <Button variant="contained" onClick={handleSave} disabled={saving}>

@@ -158,6 +158,7 @@ export interface DeviceOverview {
     price_per_page_gray: string;
     max_session_duration_minutes: number;
     cups_printer_name: string;
+    ip_address: string;
   };
   active_session: {
     session_id: string;
@@ -233,7 +234,12 @@ export const fetchDeviceStatistics = async (
  */
 export const updateDeviceSettings = async (
   deviceId: number,
-  settings: { price_per_page_color?: string; price_per_page_gray?: string; max_session_duration_minutes?: number }
+  settings: {
+    price_per_page_color?: string;
+    price_per_page_gray?: string;
+    max_session_duration_minutes?: number;
+    ip_address?: string;
+  }
 ): Promise<any> => {
   const response = await apiClient.put(`/api/printing/device/${deviceId}/settings/`, settings);
   return response.data;
