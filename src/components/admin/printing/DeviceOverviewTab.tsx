@@ -78,7 +78,7 @@ const DeviceOverviewTab: React.FC = () => {
     <Box>
       <Grid container spacing={2}>
         {/* Device Status Card */}
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -117,7 +117,7 @@ const DeviceOverviewTab: React.FC = () => {
         </Grid>
 
         {/* Active Session Card */}
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -153,7 +153,7 @@ const DeviceOverviewTab: React.FC = () => {
         </Grid>
 
         {/* Statistics Cards */}
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -175,7 +175,7 @@ const DeviceOverviewTab: React.FC = () => {
           </Card>
         </Grid>
 
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
