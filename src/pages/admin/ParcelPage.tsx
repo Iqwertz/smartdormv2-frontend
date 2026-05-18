@@ -88,21 +88,19 @@ const ParcelPage: React.FC = () => {
       registered: isRegistered,
     };
 
-    // The backend create_parcel_view uses room for tenant identification preferentially,
-    // or name/surname for either tenant or subtenant.
-    // If it's a tenant and has a room, using the room is more specific.
-    // If it's a subtenant, or a tenant without a current_room in the selection data (should not happen for current tenants),
-    // then name/surname is the fallback.
-    if (selectedTenant.type === "tenant" && selectedTenant.current_room) {
-      payload.room = selectedTenant.current_room;
-    } else if (selectedTenant.name && selectedTenant.surname) {
-      // This branch will be used for subtenants, or tenants if room isn't specified/available
+    // Always send name and surname to allow the backend to fall back to them
+    if (selectedTenant.name && selectedTenant.surname) {
       payload.name = selectedTenant.name;
       payload.surname = selectedTenant.surname;
     } else {
-      setFormError("Ausgewählter Empfänger hat weder Zimmer (für Mieter) noch vollständigen Namen.");
+      setFormError("Ausgewählter Empfänger hat keinen vollständigen Namen.");
       setIsSubmitting(false);
       return;
+    }
+
+    // Also send room if available for preferential room-based routing
+    if (selectedTenant.type === "tenant" && selectedTenant.current_room) {
+      payload.room = selectedTenant.current_room;
     }
     try {
       await createParcel(payload);
@@ -174,7 +172,6 @@ const ParcelPage: React.FC = () => {
   return (
     <Box
       sx={{
-        p: 2,
         display: "flex",
         flexDirection: "column",
         gap: 2,
@@ -182,6 +179,7 @@ const ParcelPage: React.FC = () => {
         maxWidth: "1200px",
         margin: "0 auto",
       }}
+      className="page-root"
     >
       <DashboardCard title="Paket hinzufügen">
         <Box component="form" onSubmit={handleCreateParcel} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>

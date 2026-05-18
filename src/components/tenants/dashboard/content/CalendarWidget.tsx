@@ -1,126 +1,158 @@
-// src/components/tenants/dashboard/content/CalendarWidget.tsx
-/*
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Box,
   Typography,
-  CircularProgress,
   Alert,
-  Tooltip,
-  Badge,
+  // Badge is no longer needed for the CustomDay component
   Button,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   List,
-  ListItem,
   ListItemText,
   IconButton,
-  Link,
+  ListItemButton,
 } from "@mui/material";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { PickersDay, PickersDayProps } from "@mui/x-date-pickers/PickersDay";
 import CloseIcon from "@mui/icons-material/Close";
-import LaunchIcon from "@mui/icons-material/Launch";
 import apiClient from "../../../../services/api";
-import ICAL from "ical.js";
-import dayjs, { Dayjs } from "dayjs"; // Import dayjs
-
-// Ensure dayjs plugins are available if needed (e.g., for formatting)
+import dayjs, { Dayjs } from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat";
-import isBetween from "dayjs/plugin/isBetween";
+import { useAuth } from "../../../../context/AuthContext";
 dayjs.extend(localizedFormat);
-dayjs.extend(isBetween);
 
+// --- Interfaces for the new API response ---
+interface ApiReservation {
+  name: string;
+  roomNumber?: string;
+  userId: string;
+  email: string;
+  description?: string;
+  time: [string, string]; // ISO date strings
+  id?: number;
+  color?: string;
+}
+
+interface ApiCalendarEntry extends ApiReservation {
+  id: number;
+  location?: string;
+  calendarId: string;
+  title: string;
+  emoji: string;
+}
+
+// --- Component's internal event structure (MODIFIED) ---
+// We now store calendarId and color to use them later.
 interface CalendarEvent {
-  uid: string; // Unique ID for key prop
+  uid: string;
   summary: string;
-  start: Dayjs; // Use Dayjs objects
-  end: Dayjs; // Use Dayjs objects
+  start: Dayjs;
+  end: Dayjs;
   location?: string;
   description?: string;
   isAllDay: boolean;
+  calendarId: string; // Added
+  color?: string; // Added
 }
 
-interface CustomPickerDayProps extends PickersDayProps<Dayjs> {
-  hasEvents?: boolean;
+// --- Information about a calendar to be rendered as a dot ---
+interface CalendarDotInfo {
+  id: string;
+  color: string;
 }
 
-// Custom Day component to show badge
+// --- Custom Day component props (MODIFIED) ---
+interface CustomPickerDayProps extends PickersDayProps {
+  // Instead of a boolean, we now pass an array of calendar info objects
+  calendars?: CalendarDotInfo[];
+}
+
+// --- Custom Day component to show multiple colored dots (MODIFIED) ---
 const CustomDay = React.memo((props: CustomPickerDayProps) => {
-  const { day, outsideCurrentMonth, hasEvents, ...other } = props;
+  const { calendars, ...other } = props;
 
+  // We wrap the PickersDay in a Box with relative positioning
+  // to absolutely position the dots container at the bottom.
   return (
-    <Badge
-      key={props.day.toString()}
-      overlap="circular"
-      color="primary"
-      variant="dot"
-      invisible={!hasEvents || outsideCurrentMonth} // Hide badge if no events or outside month
-    >
-      <PickersDay {...other} outsideCurrentMonth={outsideCurrentMonth} day={day} />
-    </Badge>
+    <Box sx={{ position: "relative" }}>
+      <PickersDay {...other} />
+      {calendars && calendars.length > 0 && !props.outsideCurrentMonth && (
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: 4,
+            left: 0,
+            right: 0,
+            display: "flex",
+            justifyContent: "center",
+            gap: "3px", // Space between dots
+          }}
+        >
+          {calendars.map((cal) => (
+            <Box
+              key={cal.id}
+              sx={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                backgroundColor: cal.color || "grey", // Fallback color
+              }}
+            />
+          ))}
+        </Box>
+      )}
+    </Box>
   );
 });
 
+// --- Main Calendar Widget Component ---
 const CalendarWidget: React.FC = () => {
-  const [value, setValue] = useState<Dayjs | null>(dayjs()); // Selected value in calendar
+  const [viewDate, setViewDate] = useState<Dayjs>(dayjs());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [calendarUrl, setcalendarUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const { authState } = useAuth();
 
   // Dialog State
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
   const [selectedDayEvents, setSelectedDayEvents] = useState<CalendarEvent[]>([]);
 
-  // Fetch and Parse ICS Data
   useEffect(() => {
     setLoading(true);
     setError(null);
+
     apiClient
-      .get<{ icsData: string; icsUrl: string; calendarUrl: string }>("api/tenants/calendar-proxy")
+      .get<ApiCalendarEntry[]>("https://api-rooms.schollheim.net/api/getCalendar", {
+        params: {
+          year: viewDate.year(),
+          month: viewDate.month(),
+          roles: authState.user?.groups || [],
+        },
+      })
       .then((response) => {
-        setcalendarUrl(response.data.calendarUrl); // Store the URL
-        try {
-          const jcalData = ICAL.parse(response.data.icsData); // Parse the ICS data string
-          const comp = new ICAL.Component(jcalData);
-          const vevents = comp.getAllSubcomponents("vevent");
-          const parsedEvents: CalendarEvent[] = [];
+        // MODIFIED: Capture calendarId and color during parsing
+        const parsedEvents: CalendarEvent[] = response.data.map((entry) => {
+          const start = dayjs(entry.time[0]);
+          const end = dayjs(entry.time[1]);
+          const isAllDay =
+            start.hour() === 0 && start.minute() === 0 && start.second() === 0 && end.diff(start, "hour") >= 24;
 
-          vevents.forEach((vevent: any) => {
-            const event = new ICAL.Event(vevent);
-            const startDate = dayjs(event.startDate.toJSDate());
-            const endDate = dayjs(event.endDate.toJSDate());
-
-            let isAllDay = false;
-            const duration = event.duration.toSeconds();
-            if (duration > 0 && duration % (24 * 60 * 60) === 0) {
-              isAllDay = true;
-            } else if (event.endDate.isDate && !endDate.isSame(startDate, "day")) {
-              // Check if end is midnight
-              isAllDay = endDate.hour() === 0 && endDate.minute() === 0 && endDate.second() === 0;
-            }
-
-            parsedEvents.push({
-              uid: event.uid || `${event.summary}-${startDate.toISOString()}`,
-              summary: event.summary || "Kein Titel",
-              start: startDate,
-              end: endDate,
-              location: event.location || undefined,
-              description: event.description || undefined,
-              isAllDay: isAllDay,
-            });
-          });
-
-          setEvents(parsedEvents);
-        } catch (parseError) {
-          console.error("Failed to parse ICS data:", parseError);
-          setError("Kalenderdaten konnten nicht verarbeitet werden.");
-          setEvents([]);
-        }
+          return {
+            uid: entry.id.toString(),
+            summary: `${entry.emoji} ${entry.title}`,
+            start,
+            end,
+            location: entry.location || entry.roomNumber,
+            description: entry.description,
+            isAllDay,
+            calendarId: entry.calendarId,
+            color: entry.color,
+          };
+        });
+        setEvents(parsedEvents);
       })
       .catch((err) => {
         console.error("Failed to fetch calendar data:", err);
@@ -129,150 +161,154 @@ const CalendarWidget: React.FC = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [viewDate, authState.user?.groups]);
+  const eventsByDay = useMemo(() => {
+    const dayMap = new Map<string, CalendarDotInfo[]>();
 
-  const eventDays = useMemo(() => {
-    const days = new Set<string>();
     events.forEach((event) => {
       let current = event.start.startOf("day");
-      const iterationEndDate =
-        event.isAllDay && event.end.isSame(event.end.startOf("day"))
-          ? event.end.subtract(1, "day").endOf("day")
-          : event.end;
+      const iterationEndDate = event.isAllDay ? event.end.subtract(1, "day").endOf("day") : event.end;
 
-      while (current.isBefore(iterationEndDate, "day") || current.isSame(iterationEndDate, "day")) {
-        days.add(current.format("YYYY-MM-DD"));
+      while (current.isBefore(iterationEndDate) || current.isSame(iterationEndDate, "day")) {
+        const dayKey = current.format("YYYY-MM-DD");
+
+        // Get or initialize the array for this day
+        if (!dayMap.has(dayKey)) {
+          dayMap.set(dayKey, []);
+        }
+        const calendarsForDay = dayMap.get(dayKey)!;
+
+        // Add the calendar info for this event ONLY if it's not already there for this day
+        const calendarExists = calendarsForDay.some((c) => c.id === event.calendarId);
+        if (!calendarExists && event.color) {
+          // Only add if it has a color
+          calendarsForDay.push({ id: event.calendarId, color: event.color });
+        }
+
         current = current.add(1, "day");
       }
     });
-    return days;
+
+    return dayMap;
   }, [events]);
 
-  const handleMonthChange = (date: Dayjs) => {
-    console.log("Month changed to:", date.format("YYYY-MM"));
-  };
+  const handleDayClick = useCallback(
+    (day: Dayjs | null) => {
+      if (!day) return;
 
-  const handleDayClick = (day: Dayjs) => {
-    setValue(day);
+      const eventsOnDay = events.filter((event) => {
+        const targetDayStart = day.startOf("day");
+        const targetDayEnd = day.endOf("day");
+        const effectiveEventEnd =
+          event.isAllDay && event.end.isSame(event.end.startOf("day")) && !event.end.isSame(event.start, "day")
+            ? event.end.subtract(1, "millisecond")
+            : event.end;
+        return event.start.isBefore(targetDayEnd) && effectiveEventEnd.isAfter(targetDayStart);
+      });
 
-    const eventsOnDay = events.filter((event) => {
-      const targetDayStart = day.startOf("day");
-      const targetDayEnd = day.endOf("day");
-      const eventStart = event.start;
-      const eventEnd = event.end;
-
-      const effectiveEventEnd =
-        event.isAllDay && eventEnd.isSame(eventEnd.startOf("day")) && !eventEnd.isSame(eventStart, "day")
-          ? eventEnd.subtract(1, "millisecond")
-          : eventEnd;
-
-      return eventStart.isBefore(targetDayEnd) && effectiveEventEnd.isAfter(targetDayStart);
-    });
-
-    setSelectedDate(day);
-    setSelectedDayEvents(eventsOnDay);
-    setIsDialogOpen(true);
-  };
-
-  const handleCloseDialog = () => {
-    setIsDialogOpen(false);
-    setSelectedDate(null);
-  };
+      setSelectedDate(day);
+      setSelectedDayEvents(eventsOnDay);
+      setIsDialogOpen(true);
+    },
+    [events]
+  );
+  const handleCloseDialog = () => setIsDialogOpen(false);
 
   const formatEventTime = (event: CalendarEvent): string => {
     if (event.isAllDay) return "Ganztägig";
-    const start = event.start.format("HH:mm");
 
-    const end =
-      event.end.isSame(event.start) || event.end.isSame(event.start.add(1, "day").startOf("day"))
-        ? ""
-        : ` - ${event.end.format("HH:mm")}`;
-    return `${start}${end}`;
+    const start = event.start;
+    const end = event.end;
+
+    if (end.isSame(start)) {
+      return start.format("HH:mm");
+    }
+
+    let formattedString = "";
+    const isMultiDay = !start.isSame(end, "day");
+
+    if (isMultiDay) {
+      formattedString += start.format("DD.MM ");
+    }
+    formattedString += start.format("HH:mm");
+    formattedString += " - ";
+
+    if (isMultiDay) {
+      formattedString += end.format("DD.MM ");
+    }
+    formattedString += end.format("HH:mm");
+
+    return formattedString;
   };
-
-  const cardAction = calendarUrl ? (
-    <Button
-      size="small"
-      color="primary"
-      href={calendarUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      endIcon={<LaunchIcon />}
-    >
-      Kalender öffnen
-    </Button>
-  ) : null;
 
   return (
     <>
-      {loading && (
-        <Box display="flex" justifyContent="center" alignItems="center" p={3}>
-          <CircularProgress />
-        </Box>
-      )}
+      <DateCalendar
+        onMonthChange={(date) => setViewDate(date)}
+        onChange={handleDayClick}
+        loading={loading}
+        slots={{
+          // MODIFIED: Pass the array of unique calendars for the day to CustomDay
+          day: (dayProps) => {
+            const dayKey = dayProps.day.format("YYYY-MM-DD");
+            return <CustomDay {...dayProps} calendars={eventsByDay.get(dayKey)} />;
+          },
+        }}
+        slotProps={{
+          calendarHeader: {
+            disabled: loading,
+          },
+        }}
+        sx={{
+          width: "100%",
+        }}
+      />
       {error && !loading && (
-        <Box p={2}>
+        <Box px={2} pb={1}>
           <Alert severity="error">{error}</Alert>
         </Box>
       )}
-      {!loading && !error && (
-        <DateCalendar
-          value={value}
-          onChange={handleDayClick} // Use our handler to open dialog
-          onMonthChange={handleMonthChange}
-          loading={loading}
-          // Render custom day component with badge
-          slots={{
-            day: (dayProps) => <CustomDay {...dayProps} hasEvents={eventDays.has(dayProps.day.format("YYYY-MM-DD"))} />,
-          }}
-          sx={{
-            width: "100%",
-            maxHeight: "450px",
-          }}
-        />
-      )}
+
       <Dialog onClose={handleCloseDialog} open={isDialogOpen} maxWidth="xs" fullWidth>
         <DialogTitle sx={{ m: 0, p: 2 }}>
           Termine am {selectedDate?.format("LL")}
           <IconButton
             aria-label="close"
             onClick={handleCloseDialog}
-            sx={{
-              position: "absolute",
-              right: 8,
-              top: 8,
-              color: (theme) => theme.palette.grey[500],
-            }}
+            sx={{ position: "absolute", right: 8, top: 8, color: (theme) => theme.palette.grey[500] }}
           >
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent dividers>
+        <DialogContent dividers sx={{ p: 0 }}>
           {selectedDayEvents.length > 0 ? (
-            <List dense>
+            <List dense sx={{ py: 0 }}>
               {selectedDayEvents.map((event) => (
-                <ListItem key={event.uid} disablePadding>
-                  <Tooltip title={event.description || ""} arrow placement="top-start">
-                    <ListItemText
-                      primary={event.summary}
-                      secondary={`${formatEventTime(event)}${event.location ? ` - ${event.location}` : ""}`}
-                    />
-                  </Tooltip>
-                </ListItem>
+                <ListItemButton
+                  key={event.uid}
+                  component="a"
+                  href="https://rooms.schollheim.net/#/calendar"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  divider
+                >
+                  <ListItemText
+                    primary={event.summary}
+                    secondary={`${formatEventTime(event)}${event.location ? ` - ${event.location}` : ""}`}
+                  />
+                </ListItemButton>
               ))}
             </List>
           ) : (
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="text.secondary" sx={{ p: 2 }}>
               Keine Termine für diesen Tag.
             </Typography>
           )}
         </DialogContent>
-        <DialogActions sx={{ justifyContent: "space-between", padding: "8px 24px" }}>
-          {calendarUrl && (
-            <Link href={calendarUrl} target="_blank" rel="noopener noreferrer" variant="body2">
-              Kalendar
-            </Link>
-          )}
+        <DialogActions sx={{ justifyContent: "space-between" }}>
+          <Button href="https://rooms.schollheim.net/#/calendar" target="_blank" rel="noopener noreferrer">
+            Termin eintragen
+          </Button>
           <Button onClick={handleCloseDialog}>Schließen</Button>
         </DialogActions>
       </Dialog>
@@ -281,4 +317,3 @@ const CalendarWidget: React.FC = () => {
 };
 
 export default CalendarWidget;
-*/

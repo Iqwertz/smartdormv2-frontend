@@ -7,6 +7,7 @@ import {
   MenuBookOutlined,
   MeetingRoomOutlined,
   LocalLaundryServiceOutlined,
+  CalendarTodayOutlined,
 } from "@mui/icons-material";
 
 // JSON configuration for quick links
@@ -34,6 +35,12 @@ const quickLinksConfig = [
     label: "Rooms",
     icon: <MeetingRoomOutlined fontSize="small" />,
     url: "https://rooms.Schollheim.net",
+  },
+  {
+    id: "kalender",
+    label: "Kalender",
+    icon: <CalendarTodayOutlined fontSize="small" />,
+    url: "https://rooms.Schollheim.net/#/calendar",
   },
   {
     id: "waschmaschinen",

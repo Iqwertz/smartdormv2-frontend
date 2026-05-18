@@ -12,15 +12,17 @@ import {
   ListItemIcon,
   Button,
   Paper,
+  Link,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { Departure } from "../../../types/tenant";
-import { fetchDeparturesByStatus, closeDeparture } from "../../../services/departureService";
+import { fetchDeparturesByStatus, closeDeparture, revertDeparture } from "../../../services/departureService";
 import { useNotification } from "../../../context/NotificationContext";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import dayjs, { Dayjs } from "dayjs";
+import { useNavigate } from "react-router-dom";
 
 const ConfirmedDeparturesList: React.FC = () => {
   const [departures, setDepartures] = useState<Departure[]>([]);
@@ -28,6 +30,7 @@ const ConfirmedDeparturesList: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [closingStates, setClosingStates] = useState<Record<number, { newDate: Dayjs | null; isClosing: boolean }>>({});
   const { showNotification } = useNotification();
+  const navigate = useNavigate();
 
   const loadDepartures = useCallback(async () => {
     setLoading(true);
@@ -65,6 +68,30 @@ const ConfirmedDeparturesList: React.FC = () => {
     }
   };
 
+  const handleRevertDeparture = async (id: number) => {
+    if (
+      !window.confirm(
+        "Sind Sie sicher, dass Sie den Auszug abbrechen möchten? Alle Unterschriften und Auszugsdaten werden gelöscht. Dies lässt sich nicht rückgängig machen.",
+      )
+    ) {
+      return;
+    }
+    setClosingStates((prev) => ({ ...prev, [id]: { ...(prev[id] || {}), isClosing: true } }));
+    try {
+      await revertDeparture(id);
+      showNotification("Auszug erfolgreich abgebrochen.", "success");
+      loadDepartures();
+    } catch (err: any) {
+      showNotification(err.response?.data?.error || "Abbrechen fehlgeschlagen.", "error");
+    } finally {
+      setClosingStates((prev) => ({ ...prev, [id]: { ...(prev[id] || {}), isClosing: false } }));
+    }
+  };
+
+  const handleTenantClick = (tenantId: number) => {
+    navigate(`/department/edit-tenant/${tenantId}`);
+  };
+
   if (loading) return <CircularProgress />;
   if (error) return <Alert severity="error">{error}</Alert>;
   if (departures.length === 0) return <Typography>Keine bestätigten Auszüge gefunden.</Typography>;
@@ -90,9 +117,14 @@ const ConfirmedDeparturesList: React.FC = () => {
                     }}
                   >
                     <Box>
-                      <Typography variant="h6">
+                      <Link
+                        component="button"
+                        variant="h6"
+                        onClick={() => handleTenantClick(dep.tenant.id)}
+                        sx={{ cursor: "pointer", textDecoration: "none", "&:hover": { textDecoration: "underline" } }}
+                      >
                         {dep.tenant.name} {dep.tenant.surname}
-                      </Typography>
+                      </Link>
                       <Typography color="text.secondary">Zimmer: {dep.tenant.current_room}</Typography>
                       <Typography color="text.secondary">
                         Auszug am: {dayjs(dep.tenant.move_out).format("DD.MM.YYYY")}
@@ -169,6 +201,16 @@ const ConfirmedDeparturesList: React.FC = () => {
                   </List>
                 </Grid>
               </Grid>
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={() => handleRevertDeparture(dep.tenant.id)}
+                disabled={isClosing}
+                size="small"
+                sx={{ mt: 1 }}
+              >
+                Auszug zurückiehen
+              </Button>
             </CardContent>
           </Card>
         );

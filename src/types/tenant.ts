@@ -129,6 +129,7 @@ export interface Subtenant {
   name: string;
   surname: string;
   email: string;
+  university_confirmation: boolean;
   move_in: string; // move_in date for subtenant is a typo from the original code, should be move_in
   move_out: string;
 }
@@ -217,4 +218,81 @@ export interface EngagementOverviewGroup {
   department_name: string;
   department_full_name: string;
   engagements: AdminEngagement[];
+}
+
+export interface Termination {
+  tenant: number;
+  date: string;
+  note: string;
+  created_at: string;
+}
+
+export interface DepartmentExtension {
+  id: number;
+  months: number;
+  note: string;
+  created_at: string;
+}
+
+export interface ContractCalculation {
+  move_in_date: string;
+  base_contract: {
+    duration_days: number;
+    projected_end: string;
+  };
+  standard_extensions: {
+    count: number;
+    days_per_extension: number;
+    total_added_days: number;
+  };
+  subtenancies: {
+    total_added_days: number;
+    count: number;
+    details: Array<{
+      start: string;
+      end: string;
+      days: number;
+    }>;
+  };
+  department_extensions: {
+    total_months: number;
+    details: Array<{
+      months: number;
+      note: string | null;
+      created_at: string;
+    }>;
+  };
+  calculation_steps: {
+    raw_date_before_snap: string;
+    calculated_end_of_month: string;
+  };
+  termination: {
+    is_active: boolean;
+    date: string | null;
+    note: string | null;
+  };
+  final_move_out_date: string;
+}
+
+export interface TenantStatistics {
+  scope: "current" | "all";
+  total_tenants: number;
+  age: { average: number; min: number; max: number };
+  stay_duration: {
+    average_days: number;
+    average_months: number;
+    min_days: number;
+    max_days: number;
+  };
+  gender_distribution: Record<string, number>;
+  nationalities: Record<string, number>;
+  universities: Record<string, number>;
+  study_fields: Record<string, number>;
+  points: { average: number; min: number; max: number; total: number };
+  floor_distribution: Record<string, number>;
+  engagements: {
+    tenants_with_any_engagement: number;
+    tenants_without_engagement: number;
+    average_per_tenant: number;
+  };
 }

@@ -75,9 +75,15 @@ const CreateEngagementForm: React.FC<{ onEngagementCreated: () => void }> = ({ o
     try {
       await createEngagementAdmin(formData as EngagementCreatePayload);
       showNotification("Amt erfolgreich erstellt.", "success");
-      setFormData({ compensate: false });
+      setFormData({
+        tenant_id: undefined,
+        department_id: undefined,
+        semester: undefined,
+        note: "",
+        compensate: false,
+      });
       onEngagementCreated(); // Trigger refresh in parent
-    } catch (err) {
+    } catch {
       showNotification("Erstellen fehlgeschlagen.", "error");
     } finally {
       setIsSubmitting(false);
@@ -91,17 +97,20 @@ const CreateEngagementForm: React.FC<{ onEngagementCreated: () => void }> = ({ o
       <Autocomplete
         options={tenants}
         getOptionLabel={(o) => o.label}
+        value={tenants.find((t) => parseInt(t.id) === formData.tenant_id) || null}
         onChange={(_, v) => setFormData((p) => ({ ...p, tenant_id: v ? parseInt(v.id) : undefined }))}
         renderInput={(params) => <TextField {...params} label="Mieter" required />}
       />
       <Autocomplete
         options={departments}
         getOptionLabel={(o) => o.full_name}
+        value={departments.find((d) => d.id === formData.department_id) || null}
         onChange={(_, v) => setFormData((p) => ({ ...p, department_id: v ? v.id : undefined }))}
         renderInput={(params) => <TextField {...params} label="Referat" required />}
       />
       <Autocomplete
         options={generateSemesterOptions()}
+        value={formData.semester || null}
         onChange={(_, v) => setFormData((p) => ({ ...p, semester: v || undefined }))}
         renderInput={(params) => <TextField {...params} label="Semester" required />}
       />
@@ -109,6 +118,7 @@ const CreateEngagementForm: React.FC<{ onEngagementCreated: () => void }> = ({ o
         label="Notiz (optional)"
         multiline
         rows={3}
+        value={formData.note || ""}
         onChange={(e) => setFormData((p) => ({ ...p, note: e.target.value }))}
       />
       <FormControlLabel
@@ -339,7 +349,7 @@ const EngagementManagementPage: React.FC = () => {
   ];
 
   return (
-    <Box sx={{ maxWidth: "1600px", margin: "0 auto" }}>
+    <Box sx={{ maxWidth: "1600px", margin: "0 auto" }} className="page-root">
       <TabbedDashboardCard
         title="Referate verwalten"
         tabs={tabs}

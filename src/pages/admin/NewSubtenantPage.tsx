@@ -77,7 +77,7 @@ const NewSubtenantPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: "800px", margin: "0 auto" }}>
+    <Box sx={{ maxWidth: "800px", margin: "0 auto" }} className="page-root">
       <DashboardCard title="Neuen Untermieter anlegen">
         <form onSubmit={handleSubmit}>
           <Grid container spacing={2}>

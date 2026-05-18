@@ -23,7 +23,10 @@ const LoginForm: React.FC = () => {
   const { login, authState } = useAuth();
   const theme = useTheme();
 
-  const from = location.state?.from?.pathname || null;
+  const isDemoMode = import.meta.env.VITE_DEMO_MODE === "true";
+
+  const fromLocation = location.state?.from;
+  const from = fromLocation ? `${fromLocation.pathname}${fromLocation.search ?? ""}${fromLocation.hash ?? ""}` : null;
 
   useEffect(() => {
     if (authState.isAuthenticated && authState.user) {
@@ -80,6 +83,12 @@ const LoginForm: React.FC = () => {
         <Typography component="h1" variant="h5">
           Login
         </Typography>
+        {isDemoMode && (
+          <Alert severity="info" sx={{ width: "100%", mt: 2 }}>
+            Demo Version:
+            <br /> Login with user "<strong>demo</strong>" &amp; password "<strong>demo</strong>".
+          </Alert>
+        )}
         {error && (
           <Alert severity="error" sx={{ width: "100%", mt: 2 }}>
             {error}

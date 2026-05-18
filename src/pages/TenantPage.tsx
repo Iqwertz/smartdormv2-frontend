@@ -5,7 +5,6 @@ import UserProfile from "../components/tenants/dashboard/content/UserProfile";
 import DashboardCard from "../components/shared/DashboardCard";
 import "../styles/bento-layout.scss";
 import Settings from "../components/tenants/dashboard/content/Settings";
-//import CalendarWidget from "../components/tenants/dashboard/content/CalendarWidget";
 import MyEngagements from "../components/tenants/dashboard/content/MyEngagements";
 import QuickLinks from "../components/tenants/dashboard/content/QuickLinks";
 import DepartureDecisionPopup from "../components/tenants/dashboard/content/DepartureDecisionPopup";
@@ -13,11 +12,28 @@ import { fetchMyDeparture } from "../services/departureService";
 import { Departure, GlobalAppSettings } from "../types/tenant";
 import { fetchGlobalSettings } from "../services/engagementService";
 import ExternalServicesStatus from "../components/tenants/dashboard/content/ExternalServicesStatus";
+import CalendarWidget from "../components/tenants/dashboard/content/CalendarWidget";
+import PointsStatus from "../components/tenants/dashboard/content/PointsStatus";
+import AttendanceHistoryCard from "../components/tenants/AttendanceHistoryCard";
+import { lazy, Suspense } from "react";
+import { Dialog, DialogContent, DialogTitle, CircularProgress, DialogActions } from "@mui/material";
+import QrCodeScannerIcon from "@mui/icons-material/QrCodeScanner";
+import AttendanceResultPopup from "../components/attendance/AttendanceResultPopup";
+import { ATTENDANCE_RESULT_STORAGE_KEY } from "../utils/attendanceConstants";
+
+const AttendanceScanner = lazy(() => import("../components/tenants/AttendanceScanner"));
 
 const TenantPage: React.FC = () => {
   const [departure, setDeparture] = useState<Departure | null>(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
+  const [attendanceHistoryRefresh, setAttendanceHistoryRefresh] = useState(0);
   const [settings, setSettings] = useState<GlobalAppSettings | null>(null);
+
+  const handleAttendanceScanSuccess = () => {
+    setShowScanner(false);
+    setAttendanceHistoryRefresh((prev) => prev + 1);
+  };
 
   useEffect(() => {
     const checkDeparture = async () => {
@@ -43,7 +59,7 @@ const TenantPage: React.FC = () => {
   }, []);
 
   return (
-    <Box sx={{ px: 1, py: 1 }}>
+    <Box sx={{ px: 1, py: 1 }} className="page-root">
       {" "}
       <div className="grid">
         <div className="left">
@@ -73,9 +89,18 @@ const TenantPage: React.FC = () => {
           <DashboardCard title="Quick Links">
             <QuickLinks></QuickLinks>
           </DashboardCard>
-          <DashboardCard title="Kalendar">
-            {/* <CalendarWidget></CalendarWidget> */}
-            Coming soon...
+          <DashboardCard title="Kalender" contentSx={{ p: 0 }}>
+            <CalendarWidget></CalendarWidget>
+          </DashboardCard>
+          <DashboardCard title="Anwesenheit">
+            <Button
+              variant="contained"
+              fullWidth
+              startIcon={<QrCodeScannerIcon />}
+              onClick={() => setShowScanner(true)}
+            >
+              QR Code Scannen
+            </Button>
           </DashboardCard>
           {settings?.applications_open && (
             <DashboardCard title="Referatsbewerbung">
@@ -93,14 +118,48 @@ const TenantPage: React.FC = () => {
               </Button>
             </DashboardCard>
           )}
+          <PointsStatus />
+          <AttendanceHistoryCard refreshTrigger={attendanceHistoryRefresh} />
           <DashboardCard title="Settings">
             <Settings />
           </DashboardCard>
         </div>
       </div>
+      <AttendanceResultPopup
+        storageKey={ATTENDANCE_RESULT_STORAGE_KEY}
+        onClosed={() => setAttendanceHistoryRefresh((prev) => prev + 1)}
+      />
       {departure && (
         <DepartureDecisionPopup open={showPopup} onClose={() => setShowPopup(false)} departure={departure} />
       )}
+      <Dialog
+        open={showScanner}
+        onClose={() => setShowScanner(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          style: {
+            backgroundColor: "transparent",
+            boxShadow: "none",
+            overflow: "visible", // So the dashboard card title chip isn't cut off
+          },
+        }}
+      >
+        <DashboardCard title="Anwesenheit scannen" contentSx={{ p: 2 }}>
+          <Suspense
+            fallback={
+              <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
+                <CircularProgress />
+              </Box>
+            }
+          >
+            <AttendanceScanner active={showScanner} isModal={true} onSuccess={handleAttendanceScanSuccess} />
+          </Suspense>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
+            <Button onClick={() => setShowScanner(false)}>Abbrechen</Button>
+          </Box>
+        </DashboardCard>
+      </Dialog>
     </Box>
   );
 };

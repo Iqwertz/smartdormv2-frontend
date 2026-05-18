@@ -16,6 +16,7 @@ import {
 import { ExpandLess, ExpandMore } from "@mui/icons-material"; // Import icons
 import { Engagement } from "../../../../types/tenant";
 import apiClient from "../../../../services/api";
+import { isHigherSemester } from "../../../../services/helperService";
 
 const MyEngagements: React.FC = () => {
   const [engagements, setEngagements] = useState<Engagement[]>([]);
@@ -29,7 +30,16 @@ const MyEngagements: React.FC = () => {
     apiClient
       .get<Engagement[]>("/api/tenants/my-engagements")
       .then((response) => {
-        setEngagements(response.data);
+        // Sort engagements by semester (newest first)
+        const sortedEngagements = [...response.data].sort((a, b) => {
+          if (isHigherSemester(a.semester, b.semester)) {
+            return -1;
+          } else if (isHigherSemester(b.semester, a.semester)) {
+            return 1;
+          }
+          return 0;
+        });
+        setEngagements(sortedEngagements);
         setError(null);
       })
       .catch((err) => {

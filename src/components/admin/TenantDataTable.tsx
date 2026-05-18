@@ -1,5 +1,5 @@
 // src/components/admin/TenantDataTable.tsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Box, Alert } from "@mui/material";
 import { DataGrid, GridColDef, GridActionsCellItem } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
@@ -17,6 +17,7 @@ const TenantDataTable: React.FC<TenantDataTableProps> = ({ status = "current", t
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const mouseDownPos = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -43,6 +44,29 @@ const TenantDataTable: React.FC<TenantDataTableProps> = ({ status = "current", t
     navigate(`/department/edit-tenant/${id}`);
   };
 
+  const handleRowClick = (params: { id: number | string }, event: React.MouseEvent) => {
+    // Check if text is selected
+    const selection = window.getSelection();
+    if (selection && selection.toString().length > 0) {
+      return;
+    }
+
+    // Check if mouse moved significantly (indicating a drag/selection)
+    if (mouseDownPos.current) {
+      const dx = Math.abs(event.clientX - mouseDownPos.current.x);
+      const dy = Math.abs(event.clientY - mouseDownPos.current.y);
+      if (dx > 5 || dy > 5) {
+        return;
+      }
+    }
+
+    navigate(`/department/edit-tenant/${params.id}`);
+  };
+
+  const handleMouseDown = (event: React.MouseEvent) => {
+    mouseDownPos.current = { x: event.clientX, y: event.clientY };
+  };
+
   const columns: GridColDef<TenantProfile>[] = [
     {
       field: "actions",
@@ -63,6 +87,10 @@ const TenantDataTable: React.FC<TenantDataTableProps> = ({ status = "current", t
     },
     { field: "surname", headerName: "Nachname", width: 140 },
     { field: "name", headerName: "Vorname", width: 140 },
+    { field: "current_room", headerName: "Zimmer", width: 100 },
+    { field: "current_floor", headerName: "Flur", width: 80 },
+    { field: "extension", headerName: "Verlängerungen", type: "number", width: 120 },
+    { field: "sublet", headerName: "Untermiete (Monate)", type: "number", width: 150 },
     { field: "username", headerName: "Benutzername", width: 130 },
     { field: "email", headerName: "E-Mail", width: 200 },
     {
@@ -77,8 +105,6 @@ const TenantDataTable: React.FC<TenantDataTableProps> = ({ status = "current", t
     { field: "tel_number", headerName: "Telefon", width: 150, sortable: false },
     { field: "university", headerName: "Universität", width: 120 },
     { field: "study_field", headerName: "Studienfach", width: 160 },
-    { field: "current_room", headerName: "Zimmer", width: 100 },
-    { field: "current_floor", headerName: "Flur", width: 80 },
     {
       field: "move_in",
       headerName: "Einzug",
@@ -112,8 +138,6 @@ const TenantDataTable: React.FC<TenantDataTableProps> = ({ status = "current", t
       type: "number",
       width: 90,
     },
-    { field: "extension", headerName: "Verlängerungen", type: "number", width: 120 },
-    { field: "sublet", headerName: "Untermiete (Monate)", type: "number", width: 150 },
     { field: "note", headerName: "Notiz", width: 200, sortable: false, hideable: true },
     { field: "new_address", headerName: "Neue Adresse", width: 220, sortable: false, hideable: true },
     { field: "id", headerName: "ID", width: 80, type: "number", hideable: true },
@@ -125,7 +149,7 @@ const TenantDataTable: React.FC<TenantDataTableProps> = ({ status = "current", t
   }
 
   return (
-    <Box sx={{ width: "100%", height: "100%" }}>
+    <Box sx={{ width: "100%", height: "100%" }} onMouseDown={handleMouseDown}>
       {title && <h2>{title}</h2>}
       <DataGrid
         rows={rows}
@@ -140,7 +164,11 @@ const TenantDataTable: React.FC<TenantDataTableProps> = ({ status = "current", t
         }}
         sx={{
           height: "100%",
+          "& .MuiDataGrid-row": {
+            cursor: "pointer",
+          },
         }}
+        onRowClick={handleRowClick}
         initialState={{
           pagination: {
             paginationModel: { page: 0, pageSize: 25 },

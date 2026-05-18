@@ -13,7 +13,7 @@ export const createDeparture = async (tenantId: number): Promise<Departure> => {
 };
 
 export const fetchDeparturesByStatus = async (
-  status: "CREATED" | "CONFIRMED" | "POSTPONED" | "CLOSED"
+  status: "CREATED" | "CONFIRMED" | "POSTPONED" | "CLOSED",
 ): Promise<Departure[]> => {
   const response = await apiClient.get<Departure[]>("/api/department/departures/list/", { params: { status } });
   return response.data;
@@ -30,6 +30,11 @@ export const closeDeparture = async (departureId: number, moveOutDate?: string):
   return response.data;
 };
 
+export const revertDeparture = async (departureId: number): Promise<{ message: string }> => {
+  const response = await apiClient.post(`/api/department/departures/${departureId}/revert/`);
+  return response.data;
+};
+
 // For Tenants
 export const fetchMyDeparture = async (): Promise<Departure> => {
   const response = await apiClient.get<Departure>("/api/tenants/my-departure/");
@@ -38,7 +43,7 @@ export const fetchMyDeparture = async (): Promise<Departure> => {
 
 export const decideOnDeparture = async (
   decision: "CONFIRM" | "POSTPONE",
-  bankDetails?: { name: string; iban: string }
+  bankDetails?: { name: string; iban: string },
 ): Promise<{ message: string }> => {
   const payload = { decision, ...bankDetails };
   const response = await apiClient.post("/api/tenants/my-departure/decide/", payload);

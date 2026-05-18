@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Box, Alert, Button } from "@mui/material";
 import { DataGrid, GridColDef, GridActionsCellItem } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
@@ -18,6 +18,7 @@ const SubtenantDataTable: React.FC<SubtenantDataTableProps> = ({ status }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const mouseDownPos = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -80,6 +81,24 @@ const SubtenantDataTable: React.FC<SubtenantDataTableProps> = ({ status }) => {
     );
   }
 
+  const handleRowMouseDown = (event: React.MouseEvent) => {
+    mouseDownPos.current = { x: event.clientX, y: event.clientY };
+  };
+
+  const handleRowClick = (params: { id: string | number }, event: React.MouseEvent) => {
+    if (mouseDownPos.current) {
+      const dx = Math.abs(event.clientX - mouseDownPos.current.x);
+      const dy = Math.abs(event.clientY - mouseDownPos.current.y);
+      // If mouse moved more than 5px, consider it a drag/selection, not a click
+      if (dx > 5 || dy > 5) {
+        mouseDownPos.current = null;
+        return;
+      }
+    }
+    mouseDownPos.current = null;
+    navigate(`/department/edit-subtenant/${params.id}`);
+  };
+
   return (
     <Box sx={{ height: "100%", width: "100%" }}>
       <Box
@@ -105,7 +124,12 @@ const SubtenantDataTable: React.FC<SubtenantDataTableProps> = ({ status }) => {
           toolbar: {
             showQuickFilter: true,
           },
+          row: {
+            onMouseDown: handleRowMouseDown,
+          },
         }}
+        onRowClick={handleRowClick}
+        sx={{ cursor: "pointer" }}
       />
     </Box>
   );

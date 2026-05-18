@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Box, Alert, CircularProgress } from "@mui/material";
+import { Box, Alert, CircularProgress, Tooltip } from "@mui/material";
 import { DataGrid, GridColDef, GridActionsCellItem } from "@mui/x-data-grid";
 import { Claim } from "../../../types/tenant";
 import { fetchClaimsByStatus, sendClaimReminder, updateClaimStatus } from "../../../services/claimService";
 import { useNotification } from "../../../context/NotificationContext";
+import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import EmailIcon from "@mui/icons-material/Email";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
@@ -14,6 +15,7 @@ const OpenClaimsTable: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { showNotification } = useNotification();
+  const navigate = useNavigate();
 
   const loadClaims = useCallback(async () => {
     setLoading(true);
@@ -51,25 +53,36 @@ const OpenClaimsTable: React.FC = () => {
     }
   };
 
+  const handleRowClick = (params: any) => {
+    // Check if text is selected - if so, don't navigate
+    const selection = window.getSelection();
+    if (selection && selection.toString().length > 0) {
+      return;
+    }
+    navigate(`/department/edit-tenant/${params.row.tenant.id}`);
+  };
+
   const columns: GridColDef<Claim>[] = [
     {
       field: "actions",
       type: "actions",
       headerName: "Aktionen",
-      width: 150,
+      width: 100,
       getActions: ({ row }) => [
-        <GridActionsCellItem
-          icon={<EmailIcon />}
-          label="Erinnerung senden"
-          onClick={() => handleSendReminder(row.id)}
-          showInMenu
-        />,
-        <GridActionsCellItem
-          icon={<CheckCircleOutlineIcon />}
-          label="Bewertung eingereicht"
-          onClick={() => handleMarkAsProcessing(row.id)}
-          showInMenu
-        />,
+        <Tooltip title="Erinnerung senden" key="email-tooltip">
+          <GridActionsCellItem
+            icon={<EmailIcon />}
+            label="Erinnerung senden"
+            onClick={() => handleSendReminder(row.id)}
+          />
+        </Tooltip>,
+        <Tooltip title="Bewerbung eingereicht" key="check-tooltip">
+          <GridActionsCellItem
+            icon={<CheckCircleOutlineIcon />}
+            label="Bewerbung eingereicht"
+            onClick={() => handleMarkAsProcessing(row.id)}
+          />
+        </Tooltip>,
       ],
     },
     { field: "tenant.surname", headerName: "Nachname", width: 150, valueGetter: (_, row) => row.tenant.surname },
@@ -87,6 +100,13 @@ const OpenClaimsTable: React.FC = () => {
       type: "date",
       valueGetter: (value) => dayjs(value).toDate(),
     },
+    {
+      field: "move_out",
+      headerName: "Auszugsdatum",
+      width: 160,
+      type: "date",
+      valueGetter: (value) => dayjs(value).toDate(),
+    },
   ];
 
   if (loading) return <CircularProgress />;
@@ -99,7 +119,12 @@ const OpenClaimsTable: React.FC = () => {
         columns={columns}
         loading={loading}
         getRowId={(row) => row.id}
-        sx={{ height: "100%" }}
+        sx={{ 
+          height: "100%",
+          "& .MuiDataGrid-row": {
+            cursor: "pointer",
+          },
+        }}
         slots={{ toolbar: GridToolbar }}
         showToolbar
         slotProps={{
@@ -107,6 +132,12 @@ const OpenClaimsTable: React.FC = () => {
             showQuickFilter: true,
           },
         }}
+        initialState={{
+          sorting: {
+            sortModel: [{ field: "move_out", sort: "asc" }],
+          },
+        }}
+        onRowClick={handleRowClick}
       />
     </Box>
   );

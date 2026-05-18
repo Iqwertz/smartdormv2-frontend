@@ -8,6 +8,8 @@ import {
   EngagementCreatePayload,
   TenantOverview,
   EngagementOverviewGroup,
+  ContractCalculation,
+  TenantStatistics
 } from "../types/tenant";
 
 export const fetchGlobalSettings = async (): Promise<GlobalAppSettings> => {
@@ -83,6 +85,13 @@ export const fetchEngagementOverviewData = async (): Promise<EngagementOverviewG
   return response.data;
 };
 
+export const fetchTenantStatistics = async (scope: "current" | "all" = "current"): Promise<TenantStatistics> => {
+  const response = await apiClient.get<TenantStatistics>("/api/engagements/misc/tenant-statistics/", {
+    params: { scope },
+  });
+  return response.data;
+};
+
 export const compensateAllEngagements = async (): Promise<{ message: string }> => {
   const response = await apiClient.post("/api/engagements/heimrat/engagements/compensate-all/");
   return response.data;
@@ -116,5 +125,10 @@ export const heimratCreateApplication = async (formData: FormData): Promise<{ me
       "Content-Type": "multipart/form-data",
     },
   });
+  return response.data;
+};
+
+export const fetchContractCalculation = async (): Promise<ContractCalculation> => {
+  const response = await apiClient.get<ContractCalculation>("/api/tenants/my-contract-calculation");
   return response.data;
 };

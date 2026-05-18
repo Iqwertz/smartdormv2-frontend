@@ -4,8 +4,13 @@ import "../../styles/Sidebar.scss";
 import MenuIcon from "@mui/icons-material/Menu";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import LogoutIcon from "@mui/icons-material/Logout";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import EditIcon from "@mui/icons-material/Edit";
 import { useAuth } from "../../context/AuthContext";
-import { getSidebarItems, AppRoute } from "../../routesConfig";
+import { getSidebarItems, appRoutes } from "../../routesConfig";
+import attendanceService from "../../services/attendanceService";
+import Tooltip from "./Tooltip";
 
 export interface AppSidebarItem {
   id: string;
@@ -13,27 +18,59 @@ export interface AppSidebarItem {
   title: string;
   path: string;
   requiredGroups?: string[];
+  isReferat?: boolean;
 }
 
 const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [referatDropdownOpen, setReferatDropdownOpen] = useState(false);
+  const [hasEvents, setHasEvents] = useState(false);
   const { authState, logout } = useAuth();
   const location = useLocation();
   const previousPathnameRef = useRef(location.pathname);
 
-  const sidebarItems: AppSidebarItem[] = useMemo(() => {
+  const { sidebarItems, referatItems } = useMemo(() => {
     if (authState.user?.groups) {
-      return getSidebarItems(authState.user.groups).map((route: AppRoute) => ({
-        id: route.id,
-        icon: route.icon,
-        title: route.title!,
-        path: route.path,
-        requiredGroups: route.requiredGroups,
-      }));
+      const items = getSidebarItems(authState.user.groups);
+
+      const normalItems = items
+        .filter((item) => !("routes" in item))
+        .filter((item) => {
+          if (!("routes" in item) && item.id === "attendance-manage" && !hasEvents) return false;
+          return true;
+        })
+        .map((route) => {
+          if ("routes" in route) return null;
+          return {
+            id: route.id,
+            icon: route.icon,
+            title: route.title!,
+            path: route.path,
+            requiredGroups: route.requiredGroups,
+          };
+        })
+        .filter(Boolean) as AppSidebarItem[];
+
+      const referatGroups = items.filter((item) => "routes" in item);
+      const referatItems =
+        referatGroups.length > 0
+          ? referatGroups[0].routes.map((route) => ({
+              id: route.id,
+              icon: route.icon,
+              title: route.title!,
+              path: route.path,
+              requiredGroups: route.requiredGroups,
+            }))
+          : [];
+
+      return {
+        sidebarItems: normalItems,
+        referatItems: referatItems,
+      };
     }
-    return [];
-  }, [authState.user?.groups]);
+    return { sidebarItems: [], referatItems: [] };
+  }, [authState.user?.groups, hasEvents]);
 
   const handleLogout = async () => {
     await logout();
@@ -42,6 +79,21 @@ const Sidebar: React.FC = () => {
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
+
+  const toggleReferatDropdown = () => {
+    setReferatDropdownOpen(!referatDropdownOpen);
+  };
+
+  useEffect(() => {
+    if (authState.user) {
+      attendanceService
+        .getManageableEvents()
+        .then((res) => {
+          setHasEvents(res.data.length > 0);
+        })
+        .catch(console.error);
+    }
+  }, [authState.user]);
 
   useEffect(() => {
     const checkIfMobile = () => {
@@ -73,6 +125,12 @@ const Sidebar: React.FC = () => {
     }
     previousPathnameRef.current = location.pathname;
   }, [location.pathname, isMobile, isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setReferatDropdownOpen(false);
+    }
+  }, [isOpen]);
 
   const hasAccess = (item: AppSidebarItem): boolean => {
     if (!item.requiredGroups || item.requiredGroups.length === 0) return true;
@@ -106,6 +164,47 @@ const Sidebar: React.FC = () => {
     setIsOpen(true);
   };
 
+  const renderReferatDropdown = () => {
+    if (referatItems.length === 0) return null;
+
+    const hasReferatAccess = referatItems.some((item) => hasAccess(item));
+    if (!hasReferatAccess) return null;
+
+    const handleReferatClick = () => {
+      if (!isOpen) {
+        setIsOpen(true);
+      } else {
+        toggleReferatDropdown();
+      }
+    };
+
+    return (
+      <li className="referat-dropdown">
+        <div className="referat-header" onClick={handleReferatClick}>
+          <EditIcon />
+          <span className="links_name">Unterschriften</span>
+          {isOpen && (referatDropdownOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />)}
+        </div>
+
+        {isOpen && referatDropdownOpen && (
+          <ul className="referat-submenu">
+            {referatItems.map(
+              (item) =>
+                hasAccess(item) && (
+                  <li key={item.id} className={location.pathname === item.path ? "active" : ""}>
+                    <Link to={item.path}>
+                      {item.icon}
+                      <span className="links_name">{item.title}</span>
+                    </Link>
+                  </li>
+                ),
+            )}
+          </ul>
+        )}
+      </li>
+    );
+  };
+
   return (
     <>
       <div
@@ -126,14 +225,18 @@ const Sidebar: React.FC = () => {
             (item) =>
               hasAccess(item) && (
                 <li key={item.id} className={location.pathname === item.path ? "active" : ""}>
-                  <Link to={item.path}>
-                    {item.icon}
-                    <span className="links_name">{item.title}</span>
-                  </Link>
-                  <span className="tooltip">{item.title}</span>
+                  <Tooltip text={item.title} disabled={isOpen || isMobile}>
+                    <Link to={item.path}>
+                      {item.icon}
+                      <span className="links_name">{item.title}</span>
+                    </Link>
+                  </Tooltip>
                 </li>
-              )
+              ),
           )}
+
+          {renderReferatDropdown()}
+
           <li className="profile">
             <div className="profile-details">
               <div className="name_job">

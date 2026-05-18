@@ -43,17 +43,15 @@
   .left > *:nth-child(2) {
     order: 7;
   }
-  .left > *:nth-child(1) {
+
+  .right > *:nth-child(6) {
     order: 8;
   }
-  .left > *:nth-child(4) {
+  .right > *:nth-child(7) {
     order: 9;
   }
-  .left > *:nth-child(5) {
+  .left > *:nth-child(1) {
     order: 10;
-  }
-  .left > *:nth-child(6) {
-    order: 11;
   }
   .right > *:last-child {
     order: 100;

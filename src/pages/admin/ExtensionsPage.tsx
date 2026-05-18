@@ -22,7 +22,7 @@ const ExtensionsPage: React.FC = () => {
   ];
 
   return (
-    <Box sx={{ maxWidth: "1300px", margin: "0 auto" }}>
+    <Box sx={{ maxWidth: "1300px", margin: "0 auto" }} className="page-root">
       <TabbedDashboardCard
         title="Verlängerungen verwalten"
         tabs={tabs}
