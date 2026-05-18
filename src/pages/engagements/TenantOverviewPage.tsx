@@ -33,7 +33,7 @@ const TenantOverviewPage: React.FC = () => {
     {
       label: "Statistiken",
       content: <TenantStatisticsTab />,
-      authGroups: ["ADMIN", "Heimrat","Zimmerreferat", "Inforeferat", "HSV-Vertreter"],
+      authGroups: ["ADMIN", "Heimrat", "Zimmerreferat", "Inforeferat", "HSV-Vertreter", "Finanzenreferat"],
     },
   ];
 
