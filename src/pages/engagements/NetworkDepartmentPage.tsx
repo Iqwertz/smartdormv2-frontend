@@ -20,6 +20,8 @@ import TabbedDashboardCard from "../../components/shared/TabbedDashboardCard";
 import apiClient from "../../services/api";
 import { useNotification } from "../../context/NotificationContext"; // Assuming this exists
 import EventManagementTab from "../../components/networkdepartment/EventManagementTab";
+import LdapRolesTab from "../../components/networkdepartment/LdapRolesTab";
+import LogsTab from "../../components/networkdepartment/LogsTab";
 
 // --- Types ---
 interface Department {
@@ -291,6 +293,14 @@ const NetworkDepartmentPage: React.FC = () => {
     {
       label: "Anwesenheits Events",
       content: <EventManagementTab />,
+    },
+    {
+      label: "LDAP Rollen",
+      content: <LdapRolesTab />,
+    },
+    {
+      label: "Logs",
+      content: <LogsTab />,
     },
   ];
 

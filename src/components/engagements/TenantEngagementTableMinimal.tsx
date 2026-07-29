@@ -64,7 +64,7 @@ const TenantEngagementTableMinimal: React.FC = () => {
     },
     { field: "surname", headerName: "Nachname", width: 140 },
     { field: "name", headerName: "Vorname", width: 140 },
-    { field: "email", headerName: "E-Mail", width: 200 },
+    //{ field: "email", headerName: "E-Mail", width: 200 },
     { field: "tel_number", headerName: "Telefon", width: 150, sortable: false },
     {
       field: "move_out",

@@ -14,6 +14,7 @@ import { fetchGlobalSettings } from "../services/engagementService";
 import ExternalServicesStatus from "../components/tenants/dashboard/content/ExternalServicesStatus";
 import CalendarWidget from "../components/tenants/dashboard/content/CalendarWidget";
 import PointsStatus from "../components/tenants/dashboard/content/PointsStatus";
+import DonationNote from "../components/tenants/dashboard/content/DonationNote";
 import AttendanceHistoryCard from "../components/tenants/AttendanceHistoryCard";
 import { lazy, Suspense } from "react";
 import { Dialog, DialogContent, DialogTitle, CircularProgress, DialogActions } from "@mui/material";
@@ -65,6 +66,9 @@ const TenantPage: React.FC = () => {
         <div className="left">
           <DashboardCard title="Deine Daten">
             <UserProfile />
+          </DashboardCard>
+          <DashboardCard title="Spendenaufruf">
+            <DonationNote />
           </DashboardCard>
           <DashboardCard
             title="Deine Referate"
