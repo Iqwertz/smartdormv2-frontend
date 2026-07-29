@@ -28,30 +28,36 @@
   .right > *:nth-child(1) {
     order: 2;
   }
-  .right > *:nth-child(2) {
+  .left > *:nth-child(2) {
     order: 3;
   }
-  .right > *:nth-child(3) {
+  .right > *:nth-child(2) {
     order: 4;
   }
-  .right > *:nth-child(4) {
+  .right > *:nth-child(3) {
     order: 5;
   }
-  .right > *:nth-child(5) {
+  .right > *:nth-child(4) {
     order: 6;
   }
-  .left > *:nth-child(2) {
+  .right > *:nth-child(5) {
     order: 7;
+  }
+  .left > *:nth-child(2) {
+    order: 8;
+  }
+  .left > *:nth-child(6) {
+    order: 9;
   }
 
   .right > *:nth-child(6) {
-    order: 8;
+    order: 10;
   }
   .right > *:nth-child(7) {
-    order: 9;
+    order: 11;
   }
   .left > *:nth-child(1) {
-    order: 10;
+    order: 12;
   }
   .right > *:last-child {
     order: 100;
