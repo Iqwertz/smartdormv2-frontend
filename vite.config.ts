@@ -6,10 +6,13 @@ import { visualizer } from "rollup-plugin-visualizer";
 export default defineConfig({
   plugins: [
     react(),
-    visualizer({
-      filename: "dist/stats.html", // Output file path
-      open: true, // Automatically open it in the browser after build
-    }),
+    // Only run the bundle analyzer when explicitly requested (e.g. `ANALYZE=true npm run build`),
+    // so a flaky/corrupted install of this dev-only plugin can't break every CI build.
+    !!process.env.ANALYZE &&
+      visualizer({
+        filename: "dist/stats.html", // Output file path
+        open: true, // Automatically open it in the browser after build
+      }),
   ],
   server: {
     allowedHosts: true,
