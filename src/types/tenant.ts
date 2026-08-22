@@ -113,6 +113,20 @@ export interface SubtenantProfile {
   external_id: string;
 }
 
+// What a subtenant sees about their own sublet (GET /api/subtenant/profile-data/).
+// Narrower than SubtenantProfile above, which is the Verwaltung's view of the record.
+export interface SubtenantOwnProfile {
+  name: string;
+  surname: string;
+  email: string;
+  move_in: string;
+  move_out: string;
+  duration_months: number | null;
+  university_confirmation: boolean;
+  tenant_name: string | null;
+  room_name: string | null;
+}
+
 export interface NewSubtenantPayload {
   name: string;
   surname: string;

@@ -32,7 +32,7 @@ const LoginForm: React.FC = () => {
     if (authState.isAuthenticated && authState.user) {
       // If redirected from a protected route, 'from' will have the path.
       // Otherwise, or if 'from' is no longer relevant, use getInitialRedirectPath.
-      const redirectTo = from || getInitialRedirectPath(authState.user.groups);
+      const redirectTo = from || getInitialRedirectPath(authState.user);
       navigate(redirectTo, { replace: true });
     }
   }, [authState, navigate, from]);

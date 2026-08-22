@@ -8,6 +8,7 @@ export interface User {
   is_superuser: boolean;
   primary_role: string | null;
   user_type: string; // e.g., "TENANT"
+  is_subtenant: boolean; // Subtenants only get their own dashboard, see routesConfig
 }
 
 export interface AuthState {

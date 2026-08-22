@@ -32,7 +32,7 @@ const Sidebar: React.FC = () => {
 
   const { sidebarItems, referatItems } = useMemo(() => {
     if (authState.user?.groups) {
-      const items = getSidebarItems(authState.user.groups);
+      const items = getSidebarItems(authState.user);
 
       const normalItems = items
         .filter((item) => !("routes" in item))
@@ -70,7 +70,7 @@ const Sidebar: React.FC = () => {
       };
     }
     return { sidebarItems: [], referatItems: [] };
-  }, [authState.user?.groups, hasEvents]);
+  }, [authState.user, hasEvents]); // whole user: the sidebar now depends on is_subtenant too
 
   const handleLogout = async () => {
     await logout();
@@ -85,7 +85,8 @@ const Sidebar: React.FC = () => {
   };
 
   useEffect(() => {
-    if (authState.user) {
+    // Subtenants have no access to the attendance API, so do not even ask.
+    if (authState.user && !authState.user.is_subtenant) {
       attendanceService
         .getManageableEvents()
         .then((res) => {
