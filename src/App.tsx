@@ -83,7 +83,12 @@ function App() {
               if ("routes" in item) {
                 // It's an AppRouteGroup
                 return (item as AppRouteGroup).routes.map((route) => (
-                  <Route key={route.id} element={<ProtectedRoute requiredGroups={route.requiredGroups} />}>
+                  <Route
+                    key={route.id}
+                    element={
+                      <ProtectedRoute requiredGroups={route.requiredGroups} allowSubtenants={route.allowSubtenants} />
+                    }
+                  >
                     <Route path={route.path} element={route.element} />
                   </Route>
                 ));
@@ -91,7 +96,12 @@ function App() {
                 // It's a single AppRoute
                 const route = item as AppRoute;
                 return (
-                  <Route key={route.id} element={<ProtectedRoute requiredGroups={route.requiredGroups} />}>
+                  <Route
+                    key={route.id}
+                    element={
+                      <ProtectedRoute requiredGroups={route.requiredGroups} allowSubtenants={route.allowSubtenants} />
+                    }
+                  >
                     <Route path={route.path} element={route.element} />
                   </Route>
                 );
@@ -104,7 +114,7 @@ function App() {
             path="/"
             element={
               authState.isAuthenticated && authState.user ? (
-                <Navigate to={getInitialRedirectPath(authState.user.groups)} replace />
+                <Navigate to={getInitialRedirectPath(authState.user)} replace />
               ) : (
                 <Navigate to={loginRoute} replace />
               )

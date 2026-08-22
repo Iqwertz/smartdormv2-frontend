@@ -10,7 +10,7 @@ import DashboardCard from "../components/shared/DashboardCard";
 const Error403Page: React.FC = () => {
   const { authState } = useAuth();
 
-  const goHomePath = authState.user ? getInitialRedirectPath(authState.user.groups) : "/dashboard";
+  const goHomePath = authState.user ? getInitialRedirectPath(authState.user) : "/dashboard";
 
   return (
     <DashboardCard

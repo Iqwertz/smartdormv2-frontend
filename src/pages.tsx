@@ -14,6 +14,7 @@ export const EditTenantPage = React.lazy(() => import("./pages/admin/EditTenantP
 export const EditSubtenantPage = React.lazy(() => import("./pages/admin/EditSubtenantPage"));
 export const NewSubtenantPage = React.lazy(() => import("./pages/admin/NewSubtenantPage"));
 export const SubtenantPage = React.lazy(() => import("./pages/admin/SubtenantPage"));
+export const SubtenantDashboardPage = React.lazy(() => import("./pages/subtenants/SubtenantDashboardPage"));
 export const DepartmentSignaturePage = React.lazy(() => import("./pages/engagements/DepartmentSignaturePage"));
 export const DeparturesPage = React.lazy(() => import("./pages/admin/DeparturesPage"));
 export const ExtensionsPage = React.lazy(() => import("./pages/admin/ExtensionsPage"));

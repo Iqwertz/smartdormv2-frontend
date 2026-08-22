@@ -22,6 +22,7 @@ import {
   Print,
 } from "@mui/icons-material";
 import { ALL_FLOORS, ATTENDANCE_LINK_ROUTE } from "./config";
+import { User } from "./types/auth";
 
 // Import all lazy page components from the dedicated pages file.
 import * as Pages from "./pages";
@@ -33,6 +34,12 @@ export interface AppRoute {
   title?: string;
   icon?: React.ReactNode;
   requiredGroups?: string[];
+  /**
+   * Subtenants are denied everywhere by default: their accounts carry the same wlan/wiki
+   * groups as tenants, so requiredGroups alone cannot keep them out. Only routes that
+   * opt in here are reachable for them.
+   */
+  allowSubtenants?: boolean;
   sidebar: boolean;
   defaultRedirectOrder?: number;
 }
@@ -58,6 +65,19 @@ const floorSignatureRoutes = ALL_FLOORS.map((floor) => ({
 console.log("Generated floor signature routes:", floorSignatureRoutes);
 
 export const appRoutes: AppRouteItem[] = [
+  ////////////////////////////////////////////////////////////
+  // Subtenant Specific Routes:
+  ////////////////////////////////////////////////////////////
+  {
+    id: "subtenant-dashboard",
+    path: "/subtenant",
+    element: <Pages.SubtenantDashboardPage />,
+    title: "Dashboard",
+    icon: <HomeIcon />,
+    requiredGroups: [],
+    allowSubtenants: true,
+    sidebar: true,
+  },
   ////////////////////////////////////////////////////////////
   // Tenant Specific Routes:
   ////////////////////////////////////////////////////////////
@@ -339,29 +359,35 @@ export const appRoutes: AppRouteItem[] = [
 export const loginRoute = "/login";
 export const attendanceCheckInRoute = ATTENDANCE_LINK_ROUTE;
 export const defaultAuthenticatedRoute = "/dashboard"; // Fallback if no specific route is found
+export const subtenantDashboardRoute = "/subtenant"; // The only route a subtenant may open
 
-export const getSidebarItems = (userGroups: string[]): AppRouteItem[] => {
-  console.log("Determining sidebar items for user groups:", userGroups);
+// A subtenant may only open routes that opted in via allowSubtenants; for everyone else
+// the route's group list decides.
+export const isRouteAccessible = (route: AppRoute, user: User): boolean => {
+  if (user.is_subtenant) {
+    return route.allowSubtenants === true;
+  }
+
+  if (route.allowSubtenants && (!route.requiredGroups || route.requiredGroups.length === 0)) {
+    return false; // Subtenant-only route, not meant for tenants or Verwaltung
+  }
+
+  return (
+    !route.requiredGroups ||
+    route.requiredGroups.length === 0 ||
+    route.requiredGroups.some((group) => user.groups.includes(group))
+  );
+};
+
+export const getSidebarItems = (user: User): AppRouteItem[] => {
+  console.log("Determining sidebar items for user groups:", user.groups);
   return appRoutes.filter((item) => {
     if (!("routes" in item)) {
-      return (
-        item.sidebar &&
-        item.title &&
-        item.icon &&
-        (!item.requiredGroups ||
-          item.requiredGroups.length === 0 ||
-          item.requiredGroups.some((group) => userGroups.includes(group)))
-      );
+      return item.sidebar && !!item.title && !!item.icon && isRouteAccessible(item, user);
     }
 
     const visibleRoutes = item.routes.filter(
-      (route) =>
-        route.sidebar &&
-        route.title &&
-        route.icon &&
-        (!route.requiredGroups ||
-          route.requiredGroups.length === 0 ||
-          route.requiredGroups.some((group) => userGroups.includes(group))),
+      (route) => route.sidebar && route.title && route.icon && isRouteAccessible(route, user),
     );
 
     if (visibleRoutes.length === 0) return false;
@@ -372,14 +398,14 @@ export const getSidebarItems = (userGroups: string[]): AppRouteItem[] => {
 };
 
 // Helper function to determine initial redirect path after login (Needed to redirect tenants and departments to their respective dashboards)
-export const getInitialRedirectPath = (userGroups: string[]): string => {
+export const getInitialRedirectPath = (user: User): string => {
+  if (user.is_subtenant) {
+    return subtenantDashboardRoute;
+  }
+
   const accessibleRoutes = appRoutes
     .filter((item): item is AppRoute => !("routes" in item))
-    .filter(
-      (route) =>
-        (route.requiredGroups && route.requiredGroups.length === 0) ||
-        route.requiredGroups?.some((group) => userGroups.includes(group)),
-    )
+    .filter((route) => isRouteAccessible(route, user))
     .sort((a, b) => {
       const orderA = a.defaultRedirectOrder ?? Infinity;
       const orderB = b.defaultRedirectOrder ?? Infinity;

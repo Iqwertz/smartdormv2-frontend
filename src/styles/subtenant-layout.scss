@@ -1,0 +1,53 @@
+/*
+Layout for the subtenant dashboard. Separate from bento-layout.scss on purpose: that
+file's mobile ordering is tuned to the tenant dashboard's card count and would scatter
+this much shorter page.
+
+Two columns on desktop, one column on mobile. The mobile order is not the DOM order, so
+the columns become `display: contents` there and every card gets an explicit order -
+same technique as bento-layout.scss. The nth-child indexes below follow the markup in
+SubtenantDashboardPage.tsx: adding or moving a card there means renumbering here.
+*/
+
+.subtenant-grid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 1rem;
+  max-width: 1000px;
+  margin: 0 auto;
+
+  .left,
+  .right {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+
+    .left,
+    .right {
+      display: contents; // Manual mobile ordering, see below.
+    }
+
+    .left > *:nth-child(3) {
+      order: 1; // Services
+    }
+    .right > *:nth-child(1) {
+      order: 2; // Quick Links
+    }
+    .right > *:nth-child(2) {
+      order: 3; // Kalender
+    }
+    .left > *:nth-child(2) {
+      order: 4; // Spendenaufruf
+    }
+    .left > *:nth-child(1) {
+      order: 5; // Deine Daten
+    }
+    .right > *:nth-child(3) {
+      order: 6; // Settings
+    }
+  }
+}

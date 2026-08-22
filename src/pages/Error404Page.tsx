@@ -10,7 +10,7 @@ const Error404Page: React.FC = () => {
   const { authState } = useAuth();
 
   const goHomePath =
-    authState.isAuthenticated && authState.user ? getInitialRedirectPath(authState.user.groups) : loginRoute;
+    authState.isAuthenticated && authState.user ? getInitialRedirectPath(authState.user) : loginRoute;
 
   return (
     <DashboardCard
