@@ -65,7 +65,7 @@ const TenantEngagementTable: React.FC = () => {
     { field: "surname", headerName: "Nachname", width: 140 },
     { field: "name", headerName: "Vorname", width: 140 },
     { field: "username", headerName: "Benutzername", width: 130 },
-    //{ field: "email", headerName: "E-Mail", width: 200 },
+    { field: "email", headerName: "E-Mail", width: 200 },
     {
       field: "birthday",
       headerName: "Geburtstag",
