@@ -125,6 +125,7 @@ export interface SubtenantOwnProfile {
   university_confirmation: boolean;
   tenant_name: string | null;
   room_name: string | null;
+  room_floor: string | null;
 }
 
 export interface NewSubtenantPayload {

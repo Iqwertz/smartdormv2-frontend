@@ -3,6 +3,7 @@ import { Box, Button } from "@mui/material";
 import { Lock } from "@mui/icons-material";
 import LogoutButton from "./LogoutButton";
 import PasswordChangeModal from "./PasswordChangeModal";
+import SchollwireIpButton from "./SchollwireIpButton";
 
 const Settings: React.FC = () => {
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
@@ -29,6 +30,8 @@ const Settings: React.FC = () => {
           Passwort ändern
         </Button>
         
+        <SchollwireIpButton />
+
         <LogoutButton />
         <PasswordChangeModal 
           open={passwordModalOpen} 
