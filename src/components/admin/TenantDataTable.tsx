@@ -138,6 +138,16 @@ const TenantDataTable: React.FC<TenantDataTableProps> = ({ status = "current", t
       type: "number",
       width: 90,
     },
+    {
+      // HSV membership. Only the join date is shown here: the Verwaltung is the Schollheim
+      // e.V., a separate legal entity from the HSV, so Mandatsnummer and IBAN live on the
+      // Mitglieder page instead, which is gated to the HSV organs.
+      field: "membership_joined_on",
+      headerName: "HSV-Beitritt",
+      width: 130,
+      type: "date",
+      valueGetter: (value) => (value ? new Date(value as string) : null),
+    },
     { field: "note", headerName: "Notiz", width: 200, sortable: false, hideable: true },
     { field: "new_address", headerName: "Neue Adresse", width: 220, sortable: false, hideable: true },
     { field: "id", headerName: "ID", width: 80, type: "number", hideable: true },

@@ -22,6 +22,8 @@ export interface TenantProfile {
   university: string;
   username: string | null;
   new_address: string | null;
+  /** Beitrittsdatum der HSV-Mitgliedschaft, null wenn kein Mitglied. */
+  membership_joined_on: string | null;
 }
 
 export interface GlobalAppSettings {

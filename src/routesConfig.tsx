@@ -14,6 +14,8 @@ import DrawOutlinedIcon from "@mui/icons-material/DrawOutlined";
 import QrCode2Icon from "@mui/icons-material/QrCode2";
 import {
   AssignmentOutlined,
+  CardMembershipOutlined,
+  FactCheckOutlined,
   FilterVintageOutlined,
   Groups,
   GroupWorkOutlined,
@@ -105,6 +107,15 @@ export const appRoutes: AppRouteItem[] = [
     path: "/view-applications",
     element: <Pages.ViewApplicationsPage />,
     requiredGroups: [], // All authenticated users can view if enabled
+    sidebar: false,
+  },
+  {
+    // Reached from the dashboard popup or the "Mitglied werden" card; not a sidebar entry,
+    // since it is a one-off action rather than a place tenants return to.
+    id: "membership-join",
+    path: "/mitgliedschaft/beitritt",
+    element: <Pages.MembershipJoinPage />,
+    requiredGroups: ["tenant", "ADMIN"],
     sidebar: false,
   },
   {
@@ -281,6 +292,26 @@ export const appRoutes: AppRouteItem[] = [
     title: "Netzwerkreferat",
     icon: <LanOutlined />,
     requiredGroups: ["Netzwerkreferat", "ADMIN"],
+    sidebar: true,
+  },
+  // HSV e.V. membership. Gated to the organs that decide on admission - deliberately not
+  // VERWALTUNG, which is the Schollheim e.V. and a separate legal entity.
+  {
+    id: "membership-applications",
+    path: "/mitgliedschaft/antraege",
+    element: <Pages.MembershipApplicationsPage />,
+    title: "Mitgliedsanträge",
+    icon: <FactCheckOutlined />,
+    requiredGroups: ["Zimmerreferat", "Finanzenreferat", "Heimrat", "ADMIN"],
+    sidebar: true,
+  },
+  {
+    id: "membership-members",
+    path: "/mitgliedschaft/mitglieder",
+    element: <Pages.MembershipMembersPage />,
+    title: "Mitglieder",
+    icon: <CardMembershipOutlined />,
+    requiredGroups: ["Zimmerreferat", "Finanzenreferat", "Heimrat", "ADMIN"],
     sidebar: true,
   },
   //////////////////////////////////////////////////////////////

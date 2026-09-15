@@ -39,3 +39,8 @@ export const ActiveSessionDisplay = React.lazy(() => import("./pages/engagements
 export const AttendanceCheckInPage = React.lazy(() => import("./pages/engagements/AttendanceCheckInPage"));
 export const AttendanceReport = React.lazy(() => import("./pages/engagements/AttendanceReportPage"));
 export const BaseAttendanceOverview = React.lazy(() => import("./pages/engagements/BaseAttendanceOverviewPage"));
+
+// HSV membership (Beitritt, Antragsprüfung, Mitgliederregister)
+export const MembershipJoinPage = React.lazy(() => import("./pages/tenants/MembershipJoinPage"));
+export const MembershipApplicationsPage = React.lazy(() => import("./pages/membership/MembershipApplicationsPage"));
+export const MembershipMembersPage = React.lazy(() => import("./pages/membership/MembershipMembersPage"));

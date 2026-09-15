@@ -8,9 +8,12 @@ import Settings from "../components/tenants/dashboard/content/Settings";
 import MyEngagements from "../components/tenants/dashboard/content/MyEngagements";
 import QuickLinks from "../components/tenants/dashboard/content/QuickLinks";
 import DepartureDecisionPopup from "../components/tenants/dashboard/content/DepartureDecisionPopup";
+import MembershipJoinPopup from "../components/tenants/dashboard/content/MembershipJoinPopup";
 import { fetchMyDeparture } from "../services/departureService";
 import { Departure, GlobalAppSettings } from "../types/tenant";
 import { fetchGlobalSettings } from "../services/engagementService";
+import { fetchMyMembershipStatus } from "../services/membershipService";
+import { MembershipState } from "../types/membership";
 import ExternalServicesStatus from "../components/tenants/dashboard/content/ExternalServicesStatus";
 import CalendarWidget from "../components/tenants/dashboard/content/CalendarWidget";
 import PointsStatus from "../components/tenants/dashboard/content/PointsStatus";
@@ -30,6 +33,8 @@ const TenantPage: React.FC = () => {
   const [showScanner, setShowScanner] = useState(false);
   const [attendanceHistoryRefresh, setAttendanceHistoryRefresh] = useState(0);
   const [settings, setSettings] = useState<GlobalAppSettings | null>(null);
+  const [membershipState, setMembershipState] = useState<MembershipState | null>(null);
+  const [showMembershipPopup, setShowMembershipPopup] = useState(false);
 
   const handleAttendanceScanSuccess = () => {
     setShowScanner(false);
@@ -55,8 +60,20 @@ const TenantPage: React.FC = () => {
         console.error("Could not fetch global settings.", error);
       }
     };
+    // The HSV is a separate association, so joining is offered rather than assumed: the
+    // dialog only appears while the tenant has neither joined, applied, nor opted out.
+    const checkMembership = async () => {
+      try {
+        const data = await fetchMyMembershipStatus();
+        setMembershipState(data.state);
+        setShowMembershipPopup(data.state === "NONE");
+      } catch (error) {
+        console.error("Could not fetch membership status.", error);
+      }
+    };
     checkDeparture();
     loadSettings();
+    checkMembership();
   }, []);
 
   return (
@@ -106,6 +123,16 @@ const TenantPage: React.FC = () => {
               QR Code Scannen
             </Button>
           </DashboardCard>
+          {(membershipState === "NONE" || membershipState === "OPTED_OUT") && (
+            <DashboardCard title="HSV-Mitgliedschaft">
+              <Typography sx={{ mb: 2 }}>
+                Werde Mitglied in der studentischen Selbstverwaltung des Schollheims.
+              </Typography>
+              <Button component={Link} to="/mitgliedschaft/beitritt" variant="contained" fullWidth>
+                Mitglied werden
+              </Button>
+            </DashboardCard>
+          )}
           {settings?.applications_open && (
             <DashboardCard title="Referatsbewerbung">
               <Typography sx={{ mb: 2 }}>Die Bewerbungsphase für das nächste Semester ist jetzt geöffnet.</Typography>
@@ -132,6 +159,14 @@ const TenantPage: React.FC = () => {
       <AttendanceResultPopup
         storageKey={ATTENDANCE_RESULT_STORAGE_KEY}
         onClosed={() => setAttendanceHistoryRefresh((prev) => prev + 1)}
+      />
+      <MembershipJoinPopup
+        open={showMembershipPopup}
+        onClose={() => setShowMembershipPopup(false)}
+        onOptedOut={() => {
+          setShowMembershipPopup(false);
+          setMembershipState("OPTED_OUT");
+        }}
       />
       {departure && (
         <DepartureDecisionPopup open={showPopup} onClose={() => setShowPopup(false)} departure={departure} />
