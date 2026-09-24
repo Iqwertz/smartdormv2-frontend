@@ -143,7 +143,14 @@ const SchollwireIpButton: React.FC = () => {
 
   return (
     <>
-      <Button variant="outlined" color="primary" startIcon={<LanOutlined />} fullWidth onClick={() => setOpen(true)}>
+      <Button
+        data-tour="lan-ip"
+        variant="outlined"
+        color="primary"
+        startIcon={<LanOutlined />}
+        fullWidth
+        onClick={() => setOpen(true)}
+      >
         LAN IP-Daten
       </Button>
 

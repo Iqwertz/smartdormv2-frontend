@@ -225,7 +225,11 @@ const Sidebar: React.FC = () => {
           {sidebarItems.map(
             (item) =>
               hasAccess(item) && (
-                <li key={item.id} className={location.pathname === item.path ? "active" : ""}>
+                <li
+                  key={item.id}
+                  data-tour={`nav-${item.id}`}
+                  className={location.pathname === item.path ? "active" : ""}
+                >
                   <Tooltip text={item.title} disabled={isOpen || isMobile}>
                     <Link to={item.path}>
                       {item.icon}

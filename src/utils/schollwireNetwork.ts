@@ -1,7 +1,7 @@
 // src/utils/schollwireNetwork.ts
 // Ableitung der statischen IP-Daten (schollwire) aus Flur- und Zimmerangabe eines Mieters.
 //
-// Schema laut Wiki (https://wiki.schollheim.net/e/en/lan):
+// Schema laut Wiki (https://wiki.schollheim.net/en/lan):
 //   IP:      10.<H>.<R>.<1-5>
 //   Gateway: 10.<H>.<R>.254
 //   Maske:   255.255.255.0, DNS: 10.0.0.1
@@ -17,7 +17,7 @@
 
 export const SCHOLLWIRE_SUBNET_MASK = "255.255.255.0";
 export const SCHOLLWIRE_DNS_SERVER = "10.0.0.1";
-export const SCHOLLWIRE_WIKI_URL = "https://wiki.schollheim.net/e/en/lan";
+export const SCHOLLWIRE_WIKI_URL = "https://wiki.schollheim.net/en/lan";
 
 /** Flurname: H<Haus>EG oder H<Haus><Buchstabe><Stockwerk>, z. B. H1EG, H1L3, H1R5, H2F4 */
 const FLOOR_PATTERN = /^H([123])(?:EG|[A-Z]([0-9]))$/;

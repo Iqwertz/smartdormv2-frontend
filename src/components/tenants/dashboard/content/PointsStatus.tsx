@@ -53,7 +53,7 @@ const PointsStatus: React.FC = () => {
   const isDeadlineClose = dayjs(nextDeadline).diff(dayjs(), "month") < 3;
 
   return (
-    <DashboardCard title="Wohnzeit & Punkte">
+    <DashboardCard title="Wohnzeit & Punkte" tourId="points">
       <Box sx={{ p: 1 }}>
         {/* Header Stats */}
         <Box

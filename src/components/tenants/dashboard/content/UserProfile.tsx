@@ -277,6 +277,7 @@ const UserProfile: React.FC = () => {
           endAdornment: (
             <InputAdornment position="end">
               <IconButton 
+                data-tour="move-out-info"
                 size="small" 
                 onClick={() => setCalcModalOpen(true)}
                 title="Berechnung anzeigen"

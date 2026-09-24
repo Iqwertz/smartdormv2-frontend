@@ -150,7 +150,7 @@ const AttendanceHistoryCard: React.FC<AttendanceHistoryCardProps> = ({ refreshTr
   }, [history]);
 
   return (
-    <DashboardCard title="Anwesenheitshistorie" contentSx={{ p: "8px 16px" }}>
+    <DashboardCard title="Anwesenheitshistorie" contentSx={{ p: "8px 16px" }} tourId="attendance-history">
       {loading ? (
         <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
           <CircularProgress size={24} />

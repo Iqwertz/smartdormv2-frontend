@@ -1,11 +1,16 @@
 import React, { useState } from "react";
 import { Box, Button } from "@mui/material";
-import { Lock } from "@mui/icons-material";
+import { Lock, SchoolOutlined } from "@mui/icons-material";
 import LogoutButton from "./LogoutButton";
 import PasswordChangeModal from "./PasswordChangeModal";
 import SchollwireIpButton from "./SchollwireIpButton";
 
-const Settings: React.FC = () => {
+interface SettingsProps {
+  /** Replays the introduction tour. Only passed on the tenant dashboard. */
+  onRestartTutorial?: () => void;
+}
+
+const Settings: React.FC<SettingsProps> = ({ onRestartTutorial }) => {
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
 
   const handlePasswordEdit = () => {
@@ -31,6 +36,18 @@ const Settings: React.FC = () => {
         </Button>
         
         <SchollwireIpButton />
+
+        {onRestartTutorial && (
+          <Button
+            variant="outlined"
+            color="primary"
+            startIcon={<SchoolOutlined />}
+            fullWidth
+            onClick={onRestartTutorial}
+          >
+            Tutorial erneut starten
+          </Button>
+        )}
 
         <LogoutButton />
         <PasswordChangeModal 

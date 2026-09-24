@@ -22,6 +22,8 @@ export interface TenantProfile {
   university: string;
   username: string | null;
   new_address: string | null;
+  // Comes from the t_tenant_onboarding side-table, not from t_tenant itself.
+  tutorial_completed: boolean;
 }
 
 export interface GlobalAppSettings {

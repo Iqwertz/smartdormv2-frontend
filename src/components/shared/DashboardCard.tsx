@@ -7,10 +7,19 @@ interface DashboardCardProps {
   action?: React.ReactNode;
   cardSx?: object;
   contentSx?: object;
+  /** Marks this card as an anchor for the onboarding tour (see config/tenantTourSteps). */
+  tourId?: string;
 }
 
-const DashboardCard: React.FC<DashboardCardProps> = ({ title, children, action, cardSx = {}, contentSx = {} }) => (
-  <Box sx={{ position: "relative", mt: 2 }}>
+const DashboardCard: React.FC<DashboardCardProps> = ({
+  title,
+  children,
+  action,
+  cardSx = {},
+  contentSx = {},
+  tourId,
+}) => (
+  <Box data-tour={tourId} sx={{ position: "relative", mt: 2 }}>
     {/* Title Box */}
     {title && (
       <Paper
