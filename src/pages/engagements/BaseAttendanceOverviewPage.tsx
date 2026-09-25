@@ -208,7 +208,7 @@ const BaseAttendanceOverviewPage: React.FC = () => {
   }, [baseAttendanceInputs, processingTenantId]);
 
   if (!eventId) {
-    return <div>Event ID not found</div>;
+    return <div>Event nicht gefunden.</div>;
   }
 
   return (

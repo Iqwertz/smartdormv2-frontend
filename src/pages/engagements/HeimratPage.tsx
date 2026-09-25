@@ -310,7 +310,7 @@ const HeimratApplicationList: React.FC = () => {
       <Dialog open={deleteConfirm.open} onClose={() => setDeleteConfirm({ open: false, appId: null })}>
         <DialogTitle>Löschen bestätigen</DialogTitle>
         <DialogContent>
-          <DialogContentText>Möchten Sie diese Bewerbung wirklich löschen?</DialogContentText>
+          <DialogContentText>Diese Bewerbung wirklich löschen?</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteConfirm({ open: false, appId: null })}>Abbrechen</Button>
@@ -367,8 +367,8 @@ const UpdateSemesterComponent: React.FC = () => {
         Aktuelles Semester: <strong>{settings?.current_semester || "Laden..."}</strong>
       </Typography>
       <Alert severity="warning">
-        <b>Achtung:</b> Führt diese Aktion nur aus wenn alle neuen Referate eingetragen sind. Sie entfernt die
-        Berechtigungn für alle Ämter des aktuellen Semesters und fügt sie für alle Ämter des neuen Semesters hinzu.
+        <b>Achtung:</b> Erst ausführen, wenn alle Referate fürs neue Semester eingetragen sind. Die Ämter des
+        alten Semesters verlieren dann ihre Rechte, die neuen bekommen sie.
       </Alert>
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
         <Autocomplete

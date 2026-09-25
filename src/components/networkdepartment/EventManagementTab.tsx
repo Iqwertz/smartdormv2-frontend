@@ -133,11 +133,11 @@ const EventManagementTab: React.FC = () => {
 
   const columns: GridColDef<AttendanceEvent>[] = [
     { field: "name", headerName: "Name", flex: 1, minWidth: 200 },
-    { field: "parts_count", headerName: "Anzahl an tracking checkpoints", type: "number", width: 130 },
-    { field: "required_parts", headerName: "Benötigte tracking checkpoints", type: "number", width: 150 },
+    { field: "parts_count", headerName: "Anzahl Teile", type: "number", width: 130 },
+    { field: "required_parts", headerName: "Benötigte Teile", type: "number", width: 150 },
     {
       field: "admin_groups",
-      headerName: "Admin Gruppen",
+      headerName: "Zuständige Gruppen",
       flex: 1,
       minWidth: 200,
       valueGetter: (value, row) => (row.admin_groups ? row.admin_groups.join(", ") : ""),

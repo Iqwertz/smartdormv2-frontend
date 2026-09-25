@@ -14,7 +14,7 @@ Tick items off instead of deleting them, and add the date and commit.
   from the same array, so after someone logs out and another account logs in *in the same
   tab* (no reload), grouped routes the first user couldn't see are missing: from the sidebar
   and from the router (404). Fix: filter into a new object instead of assigning.
-- [ ] `index.html` has `lang="en"`. It should be `de`, or browsers offer to translate the page.
+- [x] `index.html` had `lang="en"`, so browsers offered to translate the page. Now `de` (2026-09-25, language pass).
 
 ## Projects
 

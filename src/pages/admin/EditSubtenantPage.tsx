@@ -223,7 +223,7 @@ const EditSubtenantPage: React.FC = () => {
       <Dialog open={deleteOpen} onClose={() => setDeleteOpen(false)}>
         <DialogTitle>Löschen bestätigen</DialogTitle>
         <DialogContent>
-          <DialogContentText>Möchten Sie den Untermieter wirklich löschen?</DialogContentText>
+          <DialogContentText>Untermieter wirklich löschen?</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteOpen(false)}>Abbrechen</Button>

@@ -71,7 +71,7 @@ const ConfirmedDeparturesList: React.FC = () => {
   const handleRevertDeparture = async (id: number) => {
     if (
       !window.confirm(
-        "Sind Sie sicher, dass Sie den Auszug abbrechen möchten? Alle Unterschriften und Auszugsdaten werden gelöscht. Dies lässt sich nicht rückgängig machen.",
+        "Auszug wirklich abbrechen? Alle Unterschriften und Auszugsdaten werden gelöscht. Das lässt sich nicht rückgängig machen.",
       )
     ) {
       return;

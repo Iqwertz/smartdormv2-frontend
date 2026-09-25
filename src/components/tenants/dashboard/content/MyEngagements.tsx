@@ -43,7 +43,7 @@ const MyEngagements: React.FC = () => {
         setError(null);
       })
       .catch((err) => {
-        setError("Failed to load engagements.");
+        setError("Deine Referate konnten nicht geladen werden.");
         console.error("Error fetching engagements:", err);
       })
       .finally(() => {

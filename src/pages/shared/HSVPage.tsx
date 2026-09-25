@@ -47,7 +47,7 @@ const HSVPage: React.FC = () => {
         setError(null);
       })
       .catch((err) => {
-        setError("Failed to load HSV data.");
+        setError("Die HSV-Übersicht konnte nicht geladen werden.");
         console.error("Error fetching HSV data:", err);
         setEngagementGroups([]);
         setFilteredGroups([]);

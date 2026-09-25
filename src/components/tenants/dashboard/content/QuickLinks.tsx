@@ -14,7 +14,7 @@ import {
 const quickLinksConfig = [
   {
     id: "notion",
-    label: "Notion Page",
+    label: "Notion-Seite",
     icon: <DescriptionOutlined fontSize="small" />,
     url: "https://rounded-drizzle-262.notion.site/d54f89e5c0284894987ad876773fc03e?v=25b2286eb82c47c8b578121e6fce1972",
   },

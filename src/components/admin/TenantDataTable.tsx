@@ -33,7 +33,7 @@ const TenantDataTable: React.FC<TenantDataTableProps> = ({ status = "current", t
       })
       .catch((err) => {
         console.error("Failed to fetch tenant data:", err);
-        setError("Mieterdaten konnten nicht geladen werden. Bitte versuchen Sie es später erneut.");
+        setError("Die Mieterdaten konnten nicht geladen werden. Versuch's später nochmal.");
       })
       .finally(() => {
         setLoading(false);

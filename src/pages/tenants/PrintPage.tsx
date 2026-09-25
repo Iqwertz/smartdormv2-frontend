@@ -268,7 +268,7 @@ const PrintPage: React.FC = () => {
         mode: "Color",
         source: "Flatbed",
       });
-      showNotification("Scan gestartet! Bitte warten Sie, bis der Scan fertig ist.", "success");
+      showNotification("Scan gestartet. Warte kurz, bis er fertig ist.", "success");
       // Starte Polling für neuen Scan
       setTimeout(() => {
         refreshActiveSession();
@@ -618,7 +618,7 @@ const PrintPage: React.FC = () => {
                     {scanning ? "Scan wird gestartet..." : "Scan starten"}
                   </Button>
                   <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
-                    Legen Sie das Dokument auf den Scanner und klicken Sie auf "Scan starten".
+                    Leg dein Dokument auf den Scanner und tipp auf „Scan starten“.
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
                     Der Scan erscheint automatisch in der Liste, sobald er fertig ist.

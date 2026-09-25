@@ -269,7 +269,7 @@ const ReferatsManagement: React.FC = () => {
         <DialogTitle>Löschen bestätigen</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Möchten Sie das Referat "{departmentToDelete?.full_name}" wirklich löschen?
+            Referat „{departmentToDelete?.full_name}“ wirklich löschen?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
