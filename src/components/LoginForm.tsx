@@ -9,15 +9,24 @@ import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Alert from "@mui/material/Alert";
+import MenuItem from "@mui/material/MenuItem";
 import { useAuth } from "../context/AuthContext";
+import apiClient from "../services/api";
 import { getInitialRedirectPath } from "../routesConfig";
 import { useTheme } from "@mui/material";
+
+// Test accounts per role - only offered where the backend sets SHOW_DEV_ACCOUNTS (the test system).
+interface DevAccount {
+  username: string;
+  description: string;
+}
 
 const LoginForm: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [devAccounts, setDevAccounts] = useState<DevAccount[]>([]);
   const navigate = useNavigate();
   const location = useLocation();
   const { login, authState } = useAuth();
@@ -36,6 +45,14 @@ const LoginForm: React.FC = () => {
       navigate(redirectTo, { replace: true });
     }
   }, [authState, navigate, from]);
+
+  useEffect(() => {
+    // 404 everywhere but the test system; nothing to show then.
+    apiClient
+      .get<DevAccount[]>("/api/auth/dev-accounts/")
+      .then((res) => setDevAccounts(res.data))
+      .catch(() => setDevAccounts([]));
+  }, []);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -95,6 +112,23 @@ const LoginForm: React.FC = () => {
           </Alert>
         )}
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          {devAccounts.length > 0 && (
+            <TextField
+              select
+              margin="normal"
+              fullWidth
+              label="Testkonto (Testsystem)"
+              value={devAccounts.some((a) => a.username === username) ? username : ""}
+              onChange={(e) => setUsername(e.target.value)}
+              helperText="Füllt den Benutzernamen aus. Passwort: das gemeinsame Testkonten-Passwort."
+            >
+              {devAccounts.map((account) => (
+                <MenuItem key={account.username} value={account.username}>
+                  {account.username} – {account.description}
+                </MenuItem>
+              ))}
+            </TextField>
+          )}
           <TextField
             margin="normal"
             required
