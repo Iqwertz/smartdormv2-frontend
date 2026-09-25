@@ -15,9 +15,10 @@ how the system works unless you need that to act.
 
 1. **German, always.** Every label, message, dialog, email and error the user can see.
    Code, comments, logs and `console` output stay English.
-2. **"du", always**: residents, the Verwaltung, externals. In the app, lowercase ("Möchtest
-   du …"). In emails, capitalized, as in the templates ("Falls Du Fragen hast …", "Deine
-   Wohnzeit …").
+2. **"du", always**: residents, the Verwaltung, externals. Write it as German grammar
+   has it: **lowercase** (du, dich, dir, dein), in the app and in emails alike ("Falls du
+   Fragen hast …"). Capitalized only at the start of a sentence or line ("Deine Wohnzeit
+   läuft bald aus", "Dein Netzwerkreferat").
 3. **Short.** One sentence beats two. Cut filler like "Hinweis:", "Bitte beachten Sie",
    "Hier können Sie …", "Diese Funktion ermöglicht …". If the screen is self-explanatory,
    add no text at all.
@@ -25,7 +26,7 @@ how the system works unless you need that to act.
    nochmal." is better than "Ein Fehler ist aufgetreten." on its own.
 5. **No tech talk to users.** No "CSRF", "Session-ID", "Server-Error 500", "LDAP".
    (Admin pages for the Netzwerkreferat may use them. They know what LDAP is.)
-6. **Use the words residents use**: Bewohner, Untermieter, Referat, Amt, Auszug, Wohnzeit,
+6. **Use the words residents use**, in their short form (no ":innen"): Bewohner, Mieter, Untermieter, Referat, Amt, Auszug, Wohnzeit,
    Verlängerung, Punkte, Entlastung, Flursprecher. See the glossary in
    `../smartdormv2-backend/docs/domain/glossary.md`. English words are fine only where
    residents use them too (Dashboard, Login, Quick Links, Scan).
@@ -64,7 +65,7 @@ how the system works unless you need that to act.
 The templates share one layout (`template.html`) and one shape:
 
 ```text
-Betreff: short and concrete ("Dein Auszug aus dem Schollheim", "Benachrichtigung: Post für Dich")
+Betreff: short and concrete ("Dein Auszug aus dem Schollheim", "Benachrichtigung: Post für dich")
 
 Hallo {Vorname},
 

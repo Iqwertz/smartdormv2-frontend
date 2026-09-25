@@ -21,10 +21,16 @@ Subtenant accounts share groups with tenants (wlan, wiki), so group checks can't
 `ProtectedRoute` only lets them through on routes with `allowSubtenants: true`, which mirrors the
 backend's default-deny middleware.
 
+## 2026-09-25: Short forms, grammatical "du"
+
+Terms stay in their short form (Bewohner, Mieter, Untermieter), without ":innen". "du" is
+written as German grammar has it: lowercase mid-sentence, in the app and in emails.
+
 ## Point thresholds are shown, not enforced
 
 `utils/extensionLogic.ts` shows residents how far they are from the next extension. The
-decision stays with the Zimmerreferat and the Verwaltung.
+decision stays with the Zimmerreferat and the Verwaltung. The thresholds come from the
+private Vereinsstatuten.
 
 ## Routes and access in one config file
 

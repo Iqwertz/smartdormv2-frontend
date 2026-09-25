@@ -84,7 +84,8 @@ quick links, service status, attendance history, donation note, and the move-out
 - **Points → extensions display.** `utils/extensionLogic.ts` holds the dorm's point thresholds
   for lease extensions (75, 150, 250, 300, 350, then +50 each) and the deadline for each
   (move-in + sublet months + (n+1) years + 9 months). It is **only shown for orientation**. The
-  Zimmerreferat and the Verwaltung decide by hand. If the dorm changes the rule, change it here.
+  Zimmerreferat and the Verwaltung decide by hand. The rule comes from the association's
+  statutes (Vereinsstatuten, private, don't copy them into the repo). If they change, change it here.
 - **External services** on the dashboard are called directly with plain axios, without the
   session cookie: the room booking API (`api-rooms.schollheim.net`, room status in
   `services/externalStatusService.ts`, calendar in `CalendarWidget.tsx`, linking to
