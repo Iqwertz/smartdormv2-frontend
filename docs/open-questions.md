@@ -10,4 +10,4 @@ and tick the item here (with the date). Domain questions are in
 - [x] **Point thresholds:** they come from the association's statutes (Vereinsstatuten), which
       are private. Don't copy them into the repo. When the statutes change, the maintainers
       update `utils/extensionLogic.ts`. *(2026-09-25)*
-- [ ] Is Umami analytics (`umami.juliushussl.at`) meant to stay, and do residents know about it?
+- [x] Umami analytics (`umami.juliushussl.at`) stays. *(2026-09-25)*

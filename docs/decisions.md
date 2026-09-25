@@ -21,6 +21,11 @@ Subtenant accounts share groups with tenants (wlan, wiki), so group checks can't
 `ProtectedRoute` only lets them through on routes with `allowSubtenants: true`, which mirrors the
 backend's default-deny middleware.
 
+## 2026-09-25: Umami analytics stays
+
+`index.html` loads the self-hosted Umami (`umami.juliushussl.at`). It is switched off on dev
+and local hosts by `hooks/useTracking.ts`.
+
 ## 2026-09-25: Short forms, grammatical "du"
 
 Terms stay in their short form (Bewohner, Mieter, Untermieter), without ":innen". "du" is

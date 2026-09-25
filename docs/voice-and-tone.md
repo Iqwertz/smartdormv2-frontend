@@ -83,5 +83,8 @@ Dein Netzwerkreferat
 
 ## API messages
 
-Messages from the backend that the frontend shows (`{"error": …}`, `{"message": …}`) follow
-the same rules. Many are still English. See `docs/todo.md`.
+Messages from the backend that the frontend shows (`{"error": …}`, `{"message": …}`,
+`{"detail": …}`) follow the same rules. They are written in the backend views, so a new
+endpoint needs German texts there. Two exceptions: DRF's serializer field errors are still
+English (show your own text for 400 validation errors), and the Pi agent endpoints stay
+English because a machine reads them.

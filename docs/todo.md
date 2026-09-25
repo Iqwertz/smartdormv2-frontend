@@ -18,10 +18,9 @@ Tick items off instead of deleting them, and add the date and commit.
 
 ## Projects
 
-- [ ] **German API messages.** Only about 17 of about 213 `{"error"/"message": …}` texts in the
-  backend views are German, and the frontend shows many of them as they are (in 26 files). Either
-  translate them in the backend, following `voice-and-tone.md`, or map them to German texts in
-  the frontend.
+- [x] **German API messages.** The backend's messages are now German with "du", including
+  DRF's own 403/404/CSRF texts (2026-09-25). Serializer field errors are still English, so
+  show a German text of your own for 400 validation errors.
 
 ## Cleanup
 
