@@ -86,7 +86,15 @@ const NewTenantPage: React.FC = () => {
     setIsSubmitting(true);
     try {
       const response = await createNewTenant(formData);
-      showNotification(`Bewohner ${response.username} erfolgreich erstellt.`, "success");
+      if (response.email_sent === false) {
+        showNotification(
+          `Bewohner ${response.username} erstellt, aber die E-Mail mit den Zugangsdaten konnte nicht gesendet werden. Bitte das Passwort manuell zurücksetzen.`,
+          "warning",
+          null
+        );
+      } else {
+        showNotification(`Bewohner ${response.username} erfolgreich erstellt.`, "success");
+      }
       setFormData(initialState);
     } catch (err: any) {
       const serverErrors = err.response?.data;

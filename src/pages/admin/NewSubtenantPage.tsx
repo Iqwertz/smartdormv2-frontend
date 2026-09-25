@@ -64,8 +64,24 @@ const NewSubtenantPage: React.FC = () => {
     setIsSubmitting(true);
     setError(null);
     try {
-      await apiClient.post("/api/department/subtenants/create/", formData);
-      showNotification("Untermieter erfolgreich erstellt.", "success");
+      const response = await apiClient.post("/api/department/subtenants/create/", formData);
+      const { username, account_reused, email_sent } = response.data;
+      if (email_sent === false) {
+        // The account exists, but its password only lives in the failed email - stay on the
+        // page so the warning cannot be missed.
+        showNotification(
+          `Untermieter angelegt (Account ${username}), aber die E-Mail mit den Zugangsdaten konnte nicht gesendet werden. Bitte Untermieter löschen und erneut anlegen, um die Zugangsdaten neu zu senden.`,
+          "warning",
+          null
+        );
+      } else {
+        showNotification(
+          account_reused
+            ? `Untermieter erstellt. Bestehender Account ${username} wurde reaktiviert, neue Zugangsdaten wurden per E-Mail gesendet.`
+            : `Untermieter erstellt. Zugangsdaten für ${username} wurden per E-Mail gesendet.`,
+          "success"
+        );
+      }
       navigate("/department/subtenancies");
     } catch (err: any) {
       const errorMessage = err.response?.data?.detail || err.response?.data?.error || "Erstellen fehlgeschlagen.";

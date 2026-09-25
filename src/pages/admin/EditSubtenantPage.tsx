@@ -89,11 +89,15 @@ const EditSubtenantPage: React.FC = () => {
     setIsSubmitting(true);
     setError(null);
     try {
-      await apiClient.put(`/api/department/subtenants/${id}/update/`, formData);
-      showNotification("Daten erfolgreich aktualisiert.", "success");
+      const response = await apiClient.put(`/api/department/subtenants/${id}/update/`, formData);
+      if (response.data.ldap_warning) {
+        showNotification(`Gespeichert, aber: ${response.data.ldap_warning}`, "warning", null);
+      } else {
+        showNotification("Daten erfolgreich aktualisiert.", "success");
+      }
       navigate("/department/subtenancies");
     } catch (err: any) {
-      setError(err.response?.data?.detail || "Update fehlgeschlagen.");
+      setError(err.response?.data?.error || err.response?.data?.detail || "Update fehlgeschlagen.");
     } finally {
       setIsSubmitting(false);
     }
