@@ -65,9 +65,9 @@ const LoginForm: React.FC = () => {
       if (err.response?.status === 401) {
         setError("Ungültiger Benutzername oder Passwort.");
       } else if (err.response?.status === 403) {
-        setError("Permission denied. CSRF check might have failed.");
+        setError("Anmeldung fehlgeschlagen. Lad die Seite neu und versuch's nochmal.");
       } else {
-        setError("Login failed. Could not connect to the server.");
+        setError("Der Server ist gerade nicht erreichbar. Versuch's gleich nochmal.");
       }
     }
   };
@@ -102,8 +102,8 @@ const LoginForm: React.FC = () => {
         </Typography>
         {isDemoMode && (
           <Alert severity="info" sx={{ width: "100%", mt: 2 }}>
-            Demo Version:
-            <br /> Login with user "<strong>demo</strong>" &amp; password "<strong>demo</strong>".
+            Demo-Version:
+            <br /> Benutzername „<strong>demo</strong>“, Passwort „<strong>demo</strong>“.
           </Alert>
         )}
         {error && (

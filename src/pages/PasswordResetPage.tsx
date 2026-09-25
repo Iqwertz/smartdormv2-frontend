@@ -66,7 +66,7 @@ const PasswordResetPage: React.FC = () => {
       console.error("Password reset request failed", err);
       setMessage({
         type: "error",
-        text: err.response?.data?.message || "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
+        text: err.response?.data?.message || "Das hat nicht geklappt. Versuch's später nochmal.",
       });
     } finally {
       setLoading(false);
@@ -136,7 +136,7 @@ const PasswordResetPage: React.FC = () => {
                 Passwort zurücksetzen
               </Typography>
               <Typography variant="body2" sx={{ mt: 2, textAlign: "center", color: "text.secondary" }}>
-                Geben Sie Ihre E-Mail-Adresse ein. Wir senden Ihnen ein neues Passwort zu.
+                Gib deine E-Mail-Adresse ein, dann schicken wir dir ein neues Passwort.
               </Typography>
 
               {message && (

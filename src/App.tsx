@@ -35,7 +35,7 @@ const InitialLoadingScreen: React.FC = () => (
     >
       <CircularProgress />
       <Typography variant="body1" sx={{ mt: 2, color: "text.primary" }}>
-        Loading application...
+        Lädt …
       </Typography>
     </Box>
   </div>

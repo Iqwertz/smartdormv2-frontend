@@ -80,7 +80,7 @@ const NewTenantPage: React.FC = () => {
     e.preventDefault();
     setError(null);
     if (!formData.name || !formData.surname || !formData.email || !formData.move_in) {
-      setError("Bitte füllen Sie alle erforderlichen Felder aus.");
+      setError("Füll alle Pflichtfelder aus.");
       return;
     }
     setIsSubmitting(true);

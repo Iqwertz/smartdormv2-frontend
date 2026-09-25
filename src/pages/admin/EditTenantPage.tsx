@@ -464,7 +464,7 @@ const EditTenantPage: React.FC = () => {
                   slotProps={{ 
                     textField: { 
                       fullWidth: true, 
-                      helperText: "Wird automatisch berechnet. Für Änderungen nutzen Sie Verlängerungen oder Kündigung." 
+                      helperText: "Wird automatisch berechnet. Ändern über Verlängerung oder Kündigung." 
                     } 
                   }}
                   disabled
@@ -887,8 +887,8 @@ const EditTenantPage: React.FC = () => {
         <DialogTitle>Löschen bestätigen</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Möchten Sie den Bewohner {tenant.name} {tenant.surname} wirklich endgültig löschen? Diese Aktion kann nicht
-            rückgängig gemacht werden und entfernt auch den zugehörigen Account.
+            {tenant.name} {tenant.surname} wirklich endgültig löschen? Das entfernt auch den Account und lässt sich
+            nicht rückgängig machen.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
