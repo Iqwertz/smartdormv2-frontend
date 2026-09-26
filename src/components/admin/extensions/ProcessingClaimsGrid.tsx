@@ -6,6 +6,7 @@ import { Claim } from "../../../types/tenant";
 import { fetchClaimsByStatus, processClaimDecision } from "../../../services/claimService";
 import { useNotification } from "../../../context/NotificationContext";
 import { Dayjs } from "dayjs";
+import RevertDepartureDialog from "../departures/RevertDepartureDialog";
 
 const ProcessingClaimsGrid: React.FC = () => {
   const [claims, setClaims] = useState<Claim[]>([]);
@@ -14,6 +15,7 @@ const ProcessingClaimsGrid: React.FC = () => {
   const [decisionStates, setDecisionStates] = useState<Record<number, { newDate: Dayjs | null; isDeciding: boolean }>>(
     {}
   );
+  const [revertTarget, setRevertTarget] = useState<Claim | null>(null);
   const { showNotification } = useNotification();
   const navigate = useNavigate();
   const mouseDownPos = useRef<{ x: number; y: number } | null>(null);
@@ -132,12 +134,20 @@ const ProcessingClaimsGrid: React.FC = () => {
                     Genehmigen
                   </Button>
                 </Box>
+                <Button size="small" color="error" onClick={() => setRevertTarget(claim)} disabled={isDeciding}>
+                  Auszug zurückziehen
+                </Button>
                 {isDeciding && <CircularProgress size={24} sx={{ alignSelf: "center" }} />}
               </CardContent>
             </Card>
           </Grid>
         );
       })}
+      <RevertDepartureDialog
+        tenant={revertTarget?.tenant ?? null}
+        onClose={() => setRevertTarget(null)}
+        onDone={loadClaims}
+      />
     </Grid>
   );
 };

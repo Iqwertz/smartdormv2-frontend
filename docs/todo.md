@@ -34,7 +34,7 @@ Tick items off instead of deleting them, and add the date and commit.
   (`TenantStatisticsTab`, `DashboardCard`, `TabbedDashboardCard`, `AttendanceResultPopup`,
   `DonationNote`, `ActiveSessionDisplayPage`). Also drop the stray `;` inside the colour strings
   in `theme.ts` (`"rgb(128, 22, 44);"`). MUI only parses them by luck.
-- [ ] Replace the four `window.confirm()` calls with MUI dialogs (see `design-language.md`).
+- [ ] Replace the three `window.confirm()` calls with MUI dialogs (see `design-language.md`).
 - [ ] Remove the `console.log`s in `routesConfig.tsx` (they run on every load and every sidebar render).
 - [ ] `index.html` loads Roboto and Material Icons from Google Fonts. The app uses Geist and SVG
   icons, so both are probably unused requests. Check, then remove.

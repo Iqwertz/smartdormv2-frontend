@@ -48,6 +48,10 @@ src/theme.ts, src/styles/   MUI theme and SCSS (see docs/design-language.md)
 
 ## Rules
 
+- **Look for an existing feature before building a new one.** If something similar already
+  exists (an endpoint, a button, a flow), check whether it can be extended or combined
+  instead of adding a parallel solution. If it's unclear, ask first how it should be done.
+  Two features that do nearly the same thing confuse the Verwaltung and the residents.
 - **All user-facing text is German and uses "du".** Short and friendly, like a fellow resident
   writing, not an office. Don't add explanatory text nobody asked for. Follow
   [`docs/voice-and-tone.md`](docs/voice-and-tone.md). Code, comments and console output stay English.
