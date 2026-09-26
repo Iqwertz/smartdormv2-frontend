@@ -8,12 +8,15 @@ import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import EmailIcon from "@mui/icons-material/Email";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import UndoIcon from "@mui/icons-material/Undo";
+import RevertDepartureDialog from "../departures/RevertDepartureDialog";
 import { GridToolbar } from "@mui/x-data-grid/internals";
 
 const OpenClaimsTable: React.FC = () => {
   const [claims, setClaims] = useState<Claim[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [revertTarget, setRevertTarget] = useState<Claim | null>(null);
   const { showNotification } = useNotification();
   const navigate = useNavigate();
 
@@ -67,7 +70,7 @@ const OpenClaimsTable: React.FC = () => {
       field: "actions",
       type: "actions",
       headerName: "Aktionen",
-      width: 100,
+      width: 140,
       getActions: ({ row }) => [
         <Tooltip title="Erinnerung senden" key="email-tooltip">
           <GridActionsCellItem
@@ -81,6 +84,13 @@ const OpenClaimsTable: React.FC = () => {
             icon={<CheckCircleOutlineIcon />}
             label="Bewerbung eingereicht"
             onClick={() => handleMarkAsProcessing(row.id)}
+          />
+        </Tooltip>,
+        <Tooltip title="Auszug zurückziehen" key="revert-tooltip">
+          <GridActionsCellItem
+            icon={<UndoIcon />}
+            label="Auszug zurückziehen"
+            onClick={() => setRevertTarget(row)}
           />
         </Tooltip>,
       ],
@@ -138,6 +148,11 @@ const OpenClaimsTable: React.FC = () => {
           },
         }}
         onRowClick={handleRowClick}
+      />
+      <RevertDepartureDialog
+        tenant={revertTarget?.tenant ?? null}
+        onClose={() => setRevertTarget(null)}
+        onDone={loadClaims}
       />
     </Box>
   );
