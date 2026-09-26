@@ -35,7 +35,7 @@ const DepartureDecisionPopup: React.FC<DepartureDecisionPopupProps> = ({ open, o
     setError(null);
     try {
       if (decision === "CONFIRM" && (!bankName || !iban)) {
-        setError("Bitte geben Sie Kontoinhaber und IBAN an.");
+        setError("Gib Kontoinhaber und IBAN an.");
         setIsSubmitting(false);
         return;
       }

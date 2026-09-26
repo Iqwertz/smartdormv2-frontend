@@ -1,63 +1,18 @@
-# React + TypeScript + Vite
+# SmartDorm frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The React app of SmartDorm, the tenant management software of the Schollheim. The API is
+[`smartdormv2-backend`](../smartdormv2-backend).
 
-Currently, two official plugins are available:
+- **New here?** Start with [`docs/README.md`](docs/README.md), and for the dorm itself with the
+  backend's [`docs/README.md`](../smartdormv2-backend/docs/README.md).
+- **Working with an AI agent?** Agents read [`AGENTS.md`](AGENTS.md) (Claude via `CLAUDE.md`).
+- **How it should look and sound:** [`docs/design-language.md`](docs/design-language.md),
+  [`docs/voice-and-tone.md`](docs/voice-and-tone.md).
+- **Open bugs and ideas:** [`docs/todo.md`](docs/todo.md).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```sh
+npm install
+npm run dev      # http://localhost:5173, API from VITE_API_BASE_URL (.env.development)
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
-
-## Demo Mode
-
-To enable the demo mode which displays a hint on the login screen (login with username `demo` and password `demo`), add the following environment variable to your `.env` or `.env.development` file:
-
-```env
-VITE_DEMO_MODE=true
-```
-
+Needs Node 20+. Details and the WSL Node trap: [`docs/development.md`](docs/development.md).

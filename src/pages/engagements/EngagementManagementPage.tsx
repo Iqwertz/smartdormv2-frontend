@@ -300,7 +300,7 @@ const EngagementList: React.FC<{ compensated: boolean; refreshKey: number; onDat
       <Dialog open={deleteState.open} onClose={() => setDeleteState({ ...deleteState, open: false })}>
         <DialogTitle>Löschen bestätigen</DialogTitle>
         <DialogContent>
-          <DialogContentText>Möchten Sie dieses Amt wirklich löschen?</DialogContentText>
+          <DialogContentText>Dieses Amt wirklich löschen?</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteState({ ...deleteState, open: false })}>Abbrechen</Button>

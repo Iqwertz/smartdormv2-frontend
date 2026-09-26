@@ -168,7 +168,7 @@ const EventManagementPage: React.FC = () => {
           <TextField
             fullWidth
             margin="normal"
-            label="Parts Count"
+            label="Anzahl Teile"
             type="number"
             value={newEventData.parts_count}
             onChange={(e) => setNewEventData({ ...newEventData, parts_count: parseInt(e.target.value) || 1 })}
@@ -176,7 +176,7 @@ const EventManagementPage: React.FC = () => {
           <TextField
             fullWidth
             margin="normal"
-            label="Required Parts"
+            label="Benötigte Teile"
             type="number"
             value={newEventData.required_parts}
             onChange={(e) => setNewEventData({ ...newEventData, required_parts: parseInt(e.target.value) || 1 })}
@@ -184,7 +184,7 @@ const EventManagementPage: React.FC = () => {
           <TextField
             fullWidth
             margin="normal"
-            label="Admin Groups (kommagetrennt)"
+            label="Zuständige Gruppen (kommagetrennt)"
             value={newEventData.admin_groups}
             onChange={(e) => setNewEventData({ ...newEventData, admin_groups: e.target.value })}
           />

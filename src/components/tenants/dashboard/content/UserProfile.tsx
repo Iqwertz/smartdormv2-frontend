@@ -45,7 +45,7 @@ const UserProfile: React.FC = () => {
           setError(null);
         })
         .catch((err) => {
-          setError("Failed to load tenant profile.");
+          setError("Dein Profil konnte nicht geladen werden.");
           console.error(err);
         })
         .finally(() => {
@@ -73,7 +73,7 @@ const UserProfile: React.FC = () => {
   if (!tenantData) {
     return (
       <Box p={2}>
-        <Typography>No profile data available.</Typography>
+        <Typography>Keine Profildaten vorhanden.</Typography>
       </Box>
     );
   }

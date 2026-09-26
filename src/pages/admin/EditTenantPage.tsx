@@ -53,6 +53,13 @@ interface SelectOption {
   label: string;
 }
 
+type CredentialKind = "WELCOME" | "PASSWORD_RESET";
+
+const CREDENTIAL_KIND_LABELS: Record<CredentialKind, string> = {
+  WELCOME: "Willkommensmail",
+  PASSWORD_RESET: "Passwort-Reset-Mail",
+};
+
 const EditTenantPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -95,6 +102,10 @@ const EditTenantPage: React.FC = () => {
   const [isExtending, setIsExtending] = useState(false);
 
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+
+  // Credentials mail: which kind is waiting for confirmation
+  const [resendKind, setResendKind] = useState<CredentialKind | null>(null);
+  const [isResending, setIsResending] = useState(false);
 
   const fetchTenantData = useCallback(async () => {
     if (!id) return;
@@ -165,8 +176,16 @@ const EditTenantPage: React.FC = () => {
     setIsSubmitting(true);
     setError(null);
     try {
-      await apiClient.put(`/api/department/tenant-data/${id}/update/`, tenant);
-      showNotification("Daten erfolgreich aktualisiert.", "success");
+      const response = await apiClient.put(`/api/department/tenant-data/${id}/update/`, tenant);
+      if (response.data.ldap_error) {
+        showNotification(
+          `Daten gespeichert, aber der Account konnte nicht angepasst werden: ${response.data.ldap_error}`,
+          "warning",
+          null
+        );
+      } else {
+        showNotification("Daten erfolgreich aktualisiert.", "success");
+      }
       fetchTenantData();
     } catch (err: any) {
       const errorMessage = err.response?.data?.error || "Update fehlgeschlagen.";
@@ -174,6 +193,29 @@ const EditTenantPage: React.FC = () => {
       showNotification(errorMessage, "error");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleResendCredentials = async () => {
+    if (!resendKind) return;
+    const kind = resendKind;
+    setResendKind(null);
+    setIsResending(true);
+    try {
+      const response = await apiClient.post(`/api/department/tenant-data/${id}/resend-credentials/`, { kind });
+      if (response.data.email_sent) {
+        showNotification(`${CREDENTIAL_KIND_LABELS[kind]} mit neuem Passwort gesendet.`, "success");
+      } else {
+        showNotification(
+          `${CREDENTIAL_KIND_LABELS[kind]} konnte nicht gesendet werden. Das bisherige Passwort bleibt gültig.`,
+          "error",
+          null
+        );
+      }
+    } catch (err: any) {
+      showNotification(err.response?.data?.error || "Senden fehlgeschlagen.", "error", 10000);
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -422,7 +464,7 @@ const EditTenantPage: React.FC = () => {
                   slotProps={{ 
                     textField: { 
                       fullWidth: true, 
-                      helperText: "Wird automatisch berechnet. Für Änderungen nutzen Sie Verlängerungen oder Kündigung." 
+                      helperText: "Wird automatisch berechnet. Ändern über Verlängerung oder Kündigung." 
                     } 
                   }}
                   disabled
@@ -525,6 +567,29 @@ const EditTenantPage: React.FC = () => {
                 {isSubmitting ? <CircularProgress size={24} /> : "Änderungen speichern"}
               </Button>
             </Box>
+          </Box>
+        </DashboardCard>
+
+        {/* --- Credentials Mail Section --- */}
+        <DashboardCard title="Zugangsdaten">
+          <Box sx={{ p: 2 }}>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
+              <Button
+                variant="outlined"
+                onClick={() => setResendKind("WELCOME")}
+                disabled={isResending || !tenant.username}
+              >
+                Willkommensmail erneut senden
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={() => setResendKind("PASSWORD_RESET")}
+                disabled={isResending || !tenant.username}
+              >
+                Passwort-Reset senden
+              </Button>
+              {isResending && <CircularProgress size={24} />}
+            </Stack>
           </Box>
         </DashboardCard>
 
@@ -799,13 +864,31 @@ const EditTenantPage: React.FC = () => {
 
       </Box>
 
+      {/* Credentials Mail Confirmation Dialog */}
+      <Dialog open={resendKind !== null} onClose={() => setResendKind(null)}>
+        <DialogTitle>{resendKind && CREDENTIAL_KIND_LABELS[resendKind]} senden?</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {tenant.name} {tenant.surname} bekommt ein neues Passwort, das an {tenant.email} gesendet wird. Das bisherige
+            Passwort funktioniert danach nicht mehr - nur falls die E-Mail nicht gesendet werden kann, bleibt es gültig.
+            Ungespeicherte Änderungen oben bitte vorher speichern.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setResendKind(null)}>Abbrechen</Button>
+          <Button onClick={handleResendCredentials} variant="contained">
+            Senden
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)}>
         <DialogTitle>Löschen bestätigen</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Möchten Sie den Bewohner {tenant.name} {tenant.surname} wirklich endgültig löschen? Diese Aktion kann nicht
-            rückgängig gemacht werden und entfernt auch den zugehörigen Account.
+            {tenant.name} {tenant.surname} wirklich endgültig löschen? Das entfernt auch den Account und lässt sich
+            nicht rückgängig machen.
           </DialogContentText>
         </DialogContent>
         <DialogActions>

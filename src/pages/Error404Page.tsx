@@ -38,7 +38,7 @@ const Error404Page: React.FC = () => {
         Seite nicht gefunden
       </Typography>
       <Typography variant="body1" color="text.secondary" sx={{ mb: 3, maxWidth: "500px" }}>
-        Entschuldigung, die Seite, die Sie suchen, existiert nicht oder wurde verschoben.
+        Diese Seite gibt es nicht (mehr). Vielleicht ist sie umgezogen.
       </Typography>
       <Button variant="contained" color="primary" component={RouterLink} to={goHomePath} startIcon={<HomeIcon />}>
         Zur Startseite

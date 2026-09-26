@@ -74,7 +74,7 @@ const ParcelPage: React.FC = () => {
     event.preventDefault();
     setFormError(null);
     if (!selectedTenant) {
-      setFormError("Bitte wählen Sie einen Mieter aus.");
+      setFormError("Wähl einen Mieter aus.");
       return;
     }
     if (quantity < 1) {

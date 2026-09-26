@@ -56,7 +56,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           loading: false,
         });
       } else {
-        throw new Error(response.data.message || "Login failed");
+        throw new Error(response.data.message || "Anmeldung fehlgeschlagen");
       }
     } catch (error) {
       console.error("Login failed:", error);

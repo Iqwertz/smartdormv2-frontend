@@ -16,7 +16,7 @@ const TenantExport: React.FC = () => {
 
   const handleDownload = async () => {
     if (!selectedFloor) {
-      showNotification("Bitte wählen Sie eine Option aus.", "warning");
+      showNotification("Wähl eine Option aus.", "warning");
       return;
     }
     setIsDownloading(true);
@@ -50,7 +50,7 @@ const TenantExport: React.FC = () => {
       showNotification("Download erfolgreich gestartet.", "success");
     } catch (error) {
       console.error("Failed to download tenant list:", error);
-      showNotification("Download fehlgeschlagen. Bitte versuchen Sie es erneut.", "error");
+      showNotification("Download fehlgeschlagen. Versuch's nochmal.", "error");
     } finally {
       setIsDownloading(false);
     }
